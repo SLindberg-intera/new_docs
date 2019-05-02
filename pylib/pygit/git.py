@@ -31,8 +31,10 @@ def is_clean_master_branch():
     if "On branch master" not in res:
         return False
 
+    if "nothing to commit, working tree clean" in res:
+        return True
 
-    return res
+    return False 
 
 def run_command(command_str):
     """ runs a git command in the shell and returns the results as a text string"""
