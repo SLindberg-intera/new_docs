@@ -43,7 +43,8 @@ def make_tool_use_message(args):
     tool_name = get_invoked_tool_name(args)
     tool_args = get_invoked_tool_arguments(args)
     return config[c.TOOL_NOTIFICATION_TEMPLATE_KEY].format(
-            Name=tool_name, Arguments=tool_args)
+            Name=tool_name, Arguments=tool_args
+    )
 
 def make_user_summary():
     """
@@ -55,7 +56,8 @@ def make_user_summary():
             computer=info.computer,
             uname=info.uname,
             platform=info.platform,
-            username=info.username)
+            username=info.username
+    )
 
 if __name__ == "__main__":
     args = parse_args()
@@ -63,3 +65,4 @@ if __name__ == "__main__":
     notify_user(make_user_message(), shell=True)
     notify_user(make_tool_use_message(args))
     notify_user(make_user_summary())
+
