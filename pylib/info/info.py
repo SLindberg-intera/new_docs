@@ -16,7 +16,7 @@
 import datetime
 import platform
 import socket
-
+import getpass
 
 def get_machine():
     return platform.machine()
@@ -34,6 +34,9 @@ def get_computer():
 def get_now():
     return str(datetime.datetime.now())
 
+def get_username():
+    return getpass.getuser()
+
 class Info:
     """ container for the above information """
     def __init__(self):
@@ -42,6 +45,7 @@ class Info:
         self.platform = get_platform()
         self.computer = get_computer()
         self.start = get_now()
+        self.username = get_username()
 
     @property
     def now(self):

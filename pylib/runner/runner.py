@@ -1,6 +1,8 @@
 import constants as c
 from config import config, parse_args
 import logging
+from pylib.info.info import Info
+from pylib.pygit.git import get_version
 
 def configure_logger(args):
     """ set up the logger using the config parameters and
@@ -9,7 +11,7 @@ def configure_logger(args):
             level=c.LOG_LEVEL_MAP[args.loglevel],
             filename=args.logfile,
             **config[c.LOGGER_KEY]
-            )
+    )
     
 def notify_user(message, shell=False):
     """ log the message if shell=True; print otherwise"""
@@ -43,8 +45,19 @@ def make_tool_use_message(args):
     return config[c.TOOL_NOTIFICATION_TEMPLATE_KEY].format(
             Name=tool_name, Arguments=tool_args)
 
+def make_user_summary():
+    info = Info()
+    return config[c.USER_INFO_TEMPLATE_KEY].format(
+            machine=info.machine,
+            computer=info.computer,
+            uname=info.uname,
+            platform=info.platform,
+            username=info.username)
+
+
 if __name__ == "__main__":
     args = parse_args()
     configure_logger(args)
     notify_user(make_user_message(), shell=True)
     notify_user(make_tool_use_message(args))
+    notify_user(make_user_summary())

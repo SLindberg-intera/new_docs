@@ -33,3 +33,6 @@ LOG_LEVEL_MAP = {
     "D":logging.DEBUG,
 }
 """ maps parsed logger arguments into logging ENUMs """
+
+USER_INFO_TEMPLATE_KEY = "User Info Template"
+""" template for the look of the header reported by the runner """
