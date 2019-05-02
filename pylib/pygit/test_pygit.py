@@ -18,7 +18,7 @@ class TestFn_get_version(unittest.TestCase):
 class TestFn_is_clean_master_branch(unittest.TestCase):
     def test_execute(self):
         res = git.is_clean_master_branch()
-        self.assertTrue(res)
+        self.assertTrue(type(res)==bool)
 
 if __name__ == "__main__":
     unittest.test()
