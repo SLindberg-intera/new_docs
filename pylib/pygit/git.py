@@ -36,6 +36,11 @@ def is_clean_master_branch():
 
     return False 
 
+def get_branch():
+    cmd = "branch"
+    res = run_command(cmd).split()[2]
+    return res
+
 def run_command(command_str):
     """ runs a git command in the shell and returns the results as a text string"""
     shell_command = [GIT_COMMAND]
