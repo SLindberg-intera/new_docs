@@ -11,6 +11,7 @@ GIT_COMMAND = 'git'
 IS_NOT_A_GIT_COMMAND = 'is not a git command.'
 
 def check_output(out_bstr):
+    """ validates the output of a git command; raises ValueError if fail"""
     res = out_bstr.decode('utf-8')
     if IS_NOT_A_GIT_COMMAND in res:
         raise ValueError(res)
@@ -37,6 +38,7 @@ def is_clean_master_branch():
     return False 
 
 def get_branch():
+    """ returns the current branch name"""
     cmd = "branch"
     res = run_command(cmd).split()[2]
     return res

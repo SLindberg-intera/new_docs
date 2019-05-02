@@ -23,7 +23,6 @@ class TestFn_get_branch(unittest.TestCase):
         git.run_command("checkout {}".format(currbranch))
         git.run_command("branch -d temptest")
 
-
 class TestFn_is_clean_master_branch(unittest.TestCase):
     def test_execute(self):
         currbranch = git.get_branch()
@@ -32,7 +31,6 @@ class TestFn_is_clean_master_branch(unittest.TestCase):
         self.assertTrue(res==False)
         git.run_command("checkout {}".format(currbranch))
         git.run_command("branch -d temptest")
-
 
 
 if __name__ == "__main__":
