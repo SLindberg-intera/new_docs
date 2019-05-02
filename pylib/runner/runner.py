@@ -69,11 +69,25 @@ def make_qa_status():
         status = c.QA_TEST
     return config[c.QA_STATUS_TEMPLATE_KEY].format(status=status)
 
+
+def make_version():
+    version = get_version()
+    return config[c.VERSION_TEMPLATE_KEY].format(version=version)
+
+
+def log_header(args):
+    notify_user(make_user_message(args), shell=True)
+    notify_user(make_tool_use_message(args))
+    notify_user(make_version())
+    notify_user(make_qa_status())
+    notify_user(make_user_summary())
+
+def execute_program(args):
+    pass
+
 if __name__ == "__main__":
     args = parse_args()
     configure_logger(args)
-    notify_user(make_user_message(args), shell=True)
-    notify_user(make_tool_use_message(args))
-    notify_user(make_user_summary())
-    notify_user(make_qa_status())
+    log_header(args)
+    execute_program(args)
 

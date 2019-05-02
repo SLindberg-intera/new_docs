@@ -37,6 +37,9 @@ LOG_LEVEL_MAP = {
 USER_INFO_TEMPLATE_KEY = "User Info Template"
 """ template for the look of the header reported by the runner """
 
+VERSION_TEMPLATE_KEY = "Version Template"
+""" template for showing the code version number""" 
+
 QA_QUALIFIED = "QUALIFIED"
 QA_TEST = "TEST"
 QA_STATUS_TEMPLATE_KEY = "QA Status Template"

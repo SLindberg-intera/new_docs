@@ -1,6 +1,6 @@
 {
 	"Name":"CA-CIE Tool Runner.",
-	"Program Display Template": "{} (version {})",
+	"Version Template":"Code Version : {version}",
 	"QA Status Template":"QA Status: {status}",
 	"User Notification Template":"Starting {Name}\tLogging to \"{logfile}\"",
 	"Tool Notification Template":"Invoking: \tCommand:\"{Name}\"\tArguments:\"{Arguments}\"",
