@@ -46,6 +46,9 @@ def make_tool_use_message(args):
             Name=tool_name, Arguments=tool_args)
 
 def make_user_summary():
+    """
+      construct a string that contains information about user and computer
+    """
     info = Info()
     return config[c.USER_INFO_TEMPLATE_KEY].format(
             machine=info.machine,
@@ -53,7 +56,6 @@ def make_user_summary():
             uname=info.uname,
             platform=info.platform,
             username=info.username)
-
 
 if __name__ == "__main__":
     args = parse_args()
