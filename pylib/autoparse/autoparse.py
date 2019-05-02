@@ -40,5 +40,6 @@ def config_parser(config_dict):
     try:
         args = parser.parse_args()
     except SystemExit as e:
+        raise e
         raise ValueError("error with arg {}".format(args))
     return args
