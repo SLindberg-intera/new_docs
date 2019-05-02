@@ -1,11 +1,12 @@
 {
-	"Name":"CACIE Tool Runner",
+	"Name":"CA-CIE Tool Runner.",
 	"Program Display Template": "{} (version {})",
-	"User Notification Template":"Starting {Name}",
+	"QA Status Template":"QA Status: {status}",
+	"User Notification Template":"Starting {Name}\tLogging to \"{logfile}\"",
 	"Tool Notification Template":"Invoking: \tCommand:\"{Name}\"\tArguments:\"{Arguments}\"",
 	"Output Log Template":"Output is being logged to {Logfile} ",
 	"LOGGER":{
-		"format":"%(levelname)s-%(asctime)s-%(message)s",
+		"format":"%(levelname)s--%(asctime)s--%(message)s",
 		"datefmt":"%m/%d/%Y %I:%M:%S %p"
 	},
 	"User Info Template":"Username:{username}\tComputer:{computer}\tPlatform:{platform}",
@@ -23,7 +24,8 @@
 			{
 			  "ARG":"--loglevel",
 			  "help":"verbosity of log: (I)nfo, (D)ebug; default=I",
-			  "default":"I"
+			  "default":"I",
+			  "choices":["I","D"]
 			},
 			{
 			  "ARG":"--logfile",
@@ -31,8 +33,9 @@
 			},
 			{
 			  "ARG":"--logfilemode",
-			  "help":"Log file mode: (A)ppend or (W)rite; default=W",
-			  "default":"W"
+			  "help":"Log file mode: (a)ppend or (w)rite; default=w",
+			  "default":"w",
+			  "choices":["a","w"]
 			}
 		]
 	}	
