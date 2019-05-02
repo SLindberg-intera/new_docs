@@ -1,0 +1,13 @@
+{
+	"stuff to ignore":"ignore",
+	"ARGPARSE_SECTION":{
+		"description":"Test command line utility",
+		"ARGUMENTS":[
+			{
+			"ARG":"--testarg",
+			"help":"A test command",
+			"default":"default value"
+			}
+		]
+	}
+}
