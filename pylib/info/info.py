@@ -5,14 +5,21 @@
     - what CPU?
     - what OS?  etc.
 
+
+    can use like:
+
+    info = Info()
+    info.machine
+        (is AMD for an AMD processor)
+
 """
 import datetime
-import getpass
 import platform
+import socket
 
 
 def get_machine():
-    return " ".join(platform.machine())
+    return platform.machine()
 
 def get_uname():
     return " ".join(platform.uname())
@@ -28,6 +35,7 @@ def get_now():
     return str(datetime.datetime.now())
 
 class Info:
+    """ container for the above information """
     def __init__(self):
         self.machine = get_machine()
         self.uname = get_uname()
