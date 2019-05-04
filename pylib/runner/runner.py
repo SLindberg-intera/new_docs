@@ -4,6 +4,8 @@ import logging
 from pylib.info.info import Info
 from pylib.pygit.git import get_version, is_clean_master_branch
 
+import subprocess
+
 def configure_logger(args):
     """ set up the logger using the config parameters and
     the arguments passed from the command line"""
@@ -83,7 +85,9 @@ def log_header(args):
     notify_user(make_user_summary())
 
 def execute_program(args):
-    pass
+    runargs = args.Arguments.split(" ")
+    proc = subprocess.run(
+        [args.Name]+runargs, shell=True)
 
 if __name__ == "__main__":
     args = parse_args()
