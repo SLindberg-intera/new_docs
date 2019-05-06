@@ -39,7 +39,6 @@ class SolidWasteReleaseData:
             self.zero_below = None
         self.zero_below = zero_below
 
-
         logging.info("COPCS in {}: {}".format(filename, str(self.copcs)))
         logging.info("Sites in {}: {}".format(filename, str(self.sites)))
 
