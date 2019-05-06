@@ -10,6 +10,8 @@
 import pandas as pd
 import logging
 
+from timeseries import TimeSeries
+
 SITE_COL = 'Site_Name'
 YEAR_COL = 'Year'
 
@@ -20,13 +22,6 @@ def read_solid_waste_file(filename):
         logging.info("reading input file: '{}'".format(filename))
         return pd.read_csv(filename, header=0, skiprows=[SKIP_ROW,])
 
-class TimeSeries:
-    """ represents a particular site/copc's timeseries """
-    def __init__(self, times, values, copc, site):
-        self.site = site
-        self.copc = copc
-        self.times = times
-        self.values = values
 
 class SolidWasteReleaseData:
     """
@@ -35,9 +30,9 @@ class SolidWasteReleaseData:
     """
     def __init__(self, filename, zero_below=''):
         self.df = read_solid_waste_file(filename)
+        self.zero_below = zero_below
         if zero_below == '':
             self.zero_below = None
-        self.zero_below = zero_below
 
         logging.info("COPCS in {}: {}".format(filename, str(self.copcs)))
         logging.info("Sites in {}: {}".format(filename, str(self.sites)))
@@ -62,8 +57,6 @@ class SolidWasteReleaseData:
 
     def extract(self, copc, site):
         """ extract [times], [values] for the copc/site """
-        copc = signal_definition.copc
-        site = signal_definition.site
         sub = self.df[self.df[SITE_COL]==site]
         x = sub[YEAR_COL].values
         y = sub[copc].values

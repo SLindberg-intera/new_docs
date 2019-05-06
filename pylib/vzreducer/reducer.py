@@ -38,7 +38,11 @@ if __name__ == "__main__":
     solid_waste_release = SolidWasteReleaseData(
             input_data[c.SOURCE_FILES_KEY][c._200E_KEY], input_data[c.ZERO_BELOW_KEY])
 
-    print(solid_waste_release)
+
+    copc = input_data[c.COPCS_KEY][0]
+    site = input_data[c.WASTE_SITES_KEY][0]
+    timeseries = solid_waste_release.extract(copc, site)
+
     output_folder = get_output_folder(args)
     logging.info("END execution")
 

@@ -20,3 +20,5 @@ SOURCE_FILES_KEY = "Source Files"
 _200E_KEY = "200 E"
 _200W_KEY = "200 W"
 ZERO_BELOW_KEY = "Zero Below"
+WASTE_SITES_KEY = 'Waste Sites'
+COPCS_KEY = "COPCs"
