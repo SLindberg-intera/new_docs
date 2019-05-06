@@ -32,5 +32,4 @@ if __name__ == "__main__":
     logging.info("START execution")
     input_file = get_inputfile(args)
     output_folder = get_output_folder(args)
-
     logging.info("END execution")
