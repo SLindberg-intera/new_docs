@@ -1,0 +1,16 @@
+{
+	"Name":"VZ Data Reducer",
+	"ARGPARSE_SECTION":{
+		"description":"Data reducer for vadose zone models",
+		"ARGUMENTS":[
+			{
+				"ARG":"inputFile",
+				"help":"Path to input file"
+			},
+			{
+				"ARG":"outputFolder",
+				"help":"Path to output folder"
+			}
+		]
+	}
+}
