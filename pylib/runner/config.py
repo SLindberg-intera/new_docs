@@ -1,6 +1,5 @@
 """
    configure the runner
-
    - reads the config file
    - defines the command line arguments that are possible
 
