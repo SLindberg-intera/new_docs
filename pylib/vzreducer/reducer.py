@@ -2,6 +2,8 @@ from config import config, parse_args
 import logging
 import constants as c
 import os
+from parse_input_file import parse_input_file
+from read_solid_waste_release import SolidWasteReleaseData
 
 def configure_logger(args):
     """
@@ -31,5 +33,12 @@ if __name__ == "__main__":
     configure_logger(args)
     logging.info("START execution")
     input_file = get_inputfile(args)
+    input_data = parse_input_file(input_file)
+
+    solid_waste_release = SolidWasteReleaseData(
+            input_data[c.SOURCE_FILES_KEY][c._200E_KEY], input_data[c.ZERO_BELOW_KEY])
+
+    print(solid_waste_release)
     output_folder = get_output_folder(args)
     logging.info("END execution")
+
