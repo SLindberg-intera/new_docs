@@ -3,6 +3,7 @@ import numpy as np
 from . import timeseries as ts
 from . import plots
 import matplotlib.pyplot as plt
+import os
 
 class TestTimeSeries(unittest.TestCase):
     def setUp(self):
@@ -20,6 +21,9 @@ class TestTimeSeries(unittest.TestCase):
     def test_residual_plot(self):
         residual = ts.Residual(self.t)
         plots.residual_plot(residual, 'temp.png')
+        self.assertTrue(os.path.exists("temp.png"))
+        os.path.remove("temp.png")
+
         
 
 
