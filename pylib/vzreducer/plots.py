@@ -6,15 +6,30 @@ def make_title(residual):
     return "{} {}".format(residual.raw.copc, residual.raw.site)
 
 
-PLOT = config[c.PLOTS_KEY]
+PLOT = config[c.PLOTS_KEY] # shortcut to the PLOT dict in the config file
 BLACK = 'k'
 
 def get_symbol(source_key):
+    """ construct a matplotlib plot symbol
+
+    source_key must be the key of the PLOT dict in the config file
+    """
     color = PLOT[source_key][c.COLOR]
     symbol = PLOT[source_key][c.SYMBOL]
     return color+symbol
 
 def residual_plot(residual, tofile, show=False):
+    """
+        Constructs a plot with two graphs:
+
+        Top plot: the signal and the smoothed values for that signal
+        Bottomplot : the estimated error for the signal
+
+
+        the result is saved to a file "tofile" or displayed
+        to the screen if show=True
+
+    """
     x = residual.raw.times
     raw = residual.raw.values
 
