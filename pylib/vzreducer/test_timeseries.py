@@ -1,9 +1,14 @@
+import sys
+import os
+sys.path.append(
+    os.path.join(os.path.dirname(__file__), '..','..')
+)
+import pylib.vzreducer.constants as c
 import unittest
 import numpy as np
-from . import timeseries as ts
-from . import plots
+from pylib.vzreducer import timeseries as ts
+from pylib.vzreducer import plots
 import matplotlib.pyplot as plt
-import os
 
 class TestTimeSeries(unittest.TestCase):
     def setUp(self):
@@ -20,12 +25,14 @@ class TestTimeSeries(unittest.TestCase):
 
     def test_residual_plot(self):
         residual = ts.Residual(self.t)
-        plots.residual_plot(residual, 'temp.png')
+        try:
+            os.remove("temp.png")
+        except FileNotFoundError:
+            pass
+        plots.residual_plot(residual, 'temp.png', show=True)
         self.assertTrue(os.path.exists("temp.png"))
-        os.path.remove("temp.png")
+        os.remove("temp.png")
 
         
-
-
 if __name__=="__main__":
     unittest.main()

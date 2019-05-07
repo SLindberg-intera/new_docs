@@ -1,14 +1,16 @@
 """ represents a timeseries """
 import scipy.signal as signal
 import numpy as np
+from pylib.vzreducer.config import config
+import pylib.vzreducer.constants as c
 
 def smooth(timeseries):
     """ smooth the data set """
     x = timeseries.times
     y = timeseries.values
     
-    N = 4
-    f_c = .1
+    N = config[c.SMOOTH_KEY][c.BUTTER_INDEX_KEY]
+    f_c = config[c.SMOOTH_KEY][c.CUTOFF_FREQUENCY]
     B, A = signal.butter(N, f_c, output='ba')
     smoothed = signal.filtfilt(B, A, y)
 
@@ -58,4 +60,19 @@ class Residual:
         site = self.raw.site
         return TimeSeries(self.raw.times,  v, copc, site)
 
+    def region_above_error(self):
+        """ return a TimeSeries that only has values that
+        are (strictly) greater than the estimated noise floor """
+        condition = np.abs(self.raw.values) > self.error_mean
+        xnew = self.raw.times[condition]
+        ynew = self.raw.values[condition]
+        return TimeSeries(xnew, ynew, self.raw.copc, self.raw.site)
+
+    def region_below_error(self):
+        """ return a TimeSeries that only has values that
+        are less than or equal to the estimated noise floor """
+        condition = np.abs(self.raw.values) <= self.error_mean
+        xnew = self.raw.times[condition]
+        ynew = self.raw.values[condition]
+        return TimeSeries(xnew, ynew, self.raw.copc, self.raw.site)
 

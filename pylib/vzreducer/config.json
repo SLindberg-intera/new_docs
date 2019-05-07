@@ -32,5 +32,26 @@
 			  "choices":["a","w"]
 			}
 		]
-	}	
+	},
+	"SMOOTHING":{
+		"BUTTERWORTH_FACTOR":2,
+		"CUTOFF_FREQUENCY":0.5
+	},
+	"PLOTS":{
+		"ERROR_TITLE":"Error",
+		"SIGNAL_TITLE":"Mass Flux",
+		"AVERAGE_ERROR_LABEL":"Avg. Error: {:.3g}",
+		"RAW":{
+			"COLOR":"b",
+			"SYMBOL":"."
+		},
+		"SMOOTHED":{
+			"COLOR":"k",
+			"SYMBOL":"-"
+		},
+		"ERROR":{
+			"COLOR":"r",
+			"SYMBOL":"."
+		}
+	}
 }
