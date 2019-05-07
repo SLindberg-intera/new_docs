@@ -38,6 +38,8 @@ class TimeSeries:
         return TimeSeries(self.times, smoothed_values, 
                 self.copc, self.site)
 
+    def get_residual(self):
+        return Residual(self)
 
 class Residual:
     """  Represents a signal with an estimate

@@ -24,7 +24,7 @@ class TestTimeSeries(unittest.TestCase):
         self.assertTrue(len(filtered.times)==len(self.x))
 
     def test_residual_plot(self):
-        residual = ts.Residual(self.t)
+        residual = self.t.get_residual()
         try:
             os.remove("temp.png")
         except FileNotFoundError:
