@@ -1,6 +1,7 @@
 import unittest
 import numpy as np
 from . import timeseries as ts
+from . import plots
 import matplotlib.pyplot as plt
 
 class TestTimeSeries(unittest.TestCase):
@@ -14,18 +15,11 @@ class TestTimeSeries(unittest.TestCase):
 
     def test_run(self):
         filtered = self.t.smooth()
-        #plt.plot(self.t.times, self.t.values)
-        #plt.plot(filtered.times, filtered.values, 'r')
-        #plt.show()
         self.assertTrue(len(filtered.times)==len(self.x))
 
-    def test_residual(self):
+    def test_residual_plot(self):
         residual = ts.Residual(self.t)
-        plt.plot(residual.errors.times, residual.errors.values)
-        plt.plot(
-                residual.errors.times, 
-                residual.errors.values*0+residual.error_mean)
-        plt.show()
+        plots.residual_plot(residual, 'temp.png')
         
 
 
