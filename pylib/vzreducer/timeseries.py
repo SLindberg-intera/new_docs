@@ -1,5 +1,6 @@
 """ represents a timeseries """
 import scipy.signal as signal
+from scipy.integrate import cumtrapz as cumtrapz
 import numpy as np
 from pylib.vzreducer.config import config
 import pylib.vzreducer.constants as c
@@ -39,7 +40,13 @@ class TimeSeries:
                 self.copc, self.site)
 
     def get_residual(self):
+        """ Return an instance of Residual from self """
         return Residual(self)
+
+    def integrate(self):
+        """ integrate as a cumulative trap"""
+        y_int = cumtrapz(self.values, self.times, initial=0)
+        return TimeSeries(self.times, y_int, self.copc, self.site)
 
 class Residual:
     """  Represents a signal with an estimate
@@ -49,9 +56,20 @@ class Residual:
         self.raw = timeseries
         self.smoothed = timeseries.smooth()
         self.errors = self.estimate_error_series()
-        self.error_mean = np.mean(np.abs(self.errors.values))
+        self.error_mean = np.mean(np.abs(self.errors.values))/(
+                np.sqrt(len(self.errors.times))
+                )
+        
         self.error_std = np.std(np.abs(self.errors.values))
-    
+        self.mass_error = self._mass_error()
+
+    def _mass_error(self):
+        """ effectively integrating the error in the flux
+        to get an estimate of the accumlative error in the mass
+        
+        """
+        return self.error_mean*(len(self.raw.times))
+
     def estimate_error_series(self):
         """
             estimate the error by subtracting the
@@ -61,6 +79,17 @@ class Residual:
         copc = self.raw.copc
         site = self.raw.site
         return TimeSeries(self.raw.times,  v, copc, site)
+
+    def region_large_error(self):
+        """ return a TimeSeries that only has the points
+        that have an ERROR > average error (not signal)
+
+        These are points where the smoothing was poor
+        """
+        condition = np.abs(self.errors.values) > self.error_mean
+        xnew = self.raw.times[condition]
+        ynew = self.raw.values[condition]
+        return TimeSeries(xnew, ynew, self.raw.copc, self.raw.site)
 
     def region_above_error(self):
         """ return a TimeSeries that only has values that

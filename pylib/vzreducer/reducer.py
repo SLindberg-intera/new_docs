@@ -4,6 +4,7 @@ import constants as c
 import os
 from parse_input_file import parse_input_file
 from read_solid_waste_release import SolidWasteReleaseData
+from plots import residual_plot, mass_plot 
 
 def configure_logger(args):
     """
@@ -44,8 +45,10 @@ if __name__ == "__main__":
     copc = input_data[c.COPCS_KEY][0]
     site = input_data[c.WASTE_SITES_KEY][0]
     timeseries = solid_waste_release.extract(copc, site)
-
-
+    residual = timeseries.get_residual()
+    #residual_plot(residual, "temp.png", show=True)
+    mass = timeseries.integrate()
+    mass_plot(timeseries, mass)
     output_folder = get_output_folder(args)
     logging.info("END execution")
 
