@@ -4,7 +4,9 @@ import constants as c
 import os
 from parse_input_file import parse_input_file
 from read_solid_waste_release import SolidWasteReleaseData
-from plots import residual_plot, mass_plot 
+from pylib.vzreducer.reduce_timeseries import ReducedTimeSeries
+from plots import residual_plot, mass_plot, recursive_plot, reduced_timeseries_plot 
+import matplotlib.pyplot as plt
 
 def configure_logger(args):
     """
@@ -35,20 +37,39 @@ if __name__ == "__main__":
     logging.info("START execution")
     input_file = get_inputfile(args)
     input_data = parse_input_file(input_file)
+    output_folder = get_output_folder(args)
 
     solid_waste_release = SolidWasteReleaseData(
             input_data[c.SOURCE_FILES_KEY][c._200E_KEY],
             input_data[c.ZERO_BELOW_KEY]
     )
-
-
-    copc = input_data[c.COPCS_KEY][0]
-    site = input_data[c.WASTE_SITES_KEY][0]
-    timeseries = solid_waste_release.extract(copc, site)
-    residual = timeseries.get_residual()
-    #residual_plot(residual, "temp.png", show=True)
-    mass = timeseries.integrate()
-    mass_plot(timeseries, mass)
-    output_folder = get_output_folder(args)
+    if len(input_data[c.COPCS_KEY])>0:
+        copc_list = input_data[c.COPCS_KEY]
+    else:    
+        copc_list = solid_waste_release.copcs
+    if len(input_data[c.WASTE_SITES_KEY])>0:
+        site_list = input_data[c.WASTE_SITES_KEY]
+    else:    
+        site_list = solid_waste_release.sites
+    for copc in copc_list:
+        for site in site_list:
+            try:
+                timeseries = solid_waste_release.extract(copc, site)
+                if timeseries.are_all_zero():
+                    logging.info("Skipped {} {} - all zero".format(
+                        copc, site))
+                    continue
+                reduced_timeseries = ReducedTimeSeries.from_timeseries(
+                        timeseries)
+                f, axes = reduced_timeseries_plot(reduced_timeseries)
+                f.savefig(
+                        os.path.join(output_folder,
+                        "{} {}.png".format(copc, site))
+                )
+                logging.info("reduced {} {} to {}".format(
+                    copc, site, len(reduced_timeseries)))
+                plt.close(f)
+            except TypeError:
+                logging.error("failed at {} {}".format(copc, site))
     logging.info("END execution")
 
