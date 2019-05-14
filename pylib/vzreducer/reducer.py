@@ -7,6 +7,7 @@ from read_solid_waste_release import SolidWasteReleaseData
 from pylib.vzreducer.reduce_timeseries import ReducedTimeSeries
 from plots import residual_plot, mass_plot, recursive_plot, reduced_timeseries_plot 
 import matplotlib.pyplot as plt
+from pylib.vzreducer.summary_report import SummaryReportRecord
 
 def configure_logger(args):
     """
@@ -51,6 +52,10 @@ if __name__ == "__main__":
         site_list = input_data[c.WASTE_SITES_KEY]
     else:    
         site_list = solid_waste_release.sites
+
+    summary_file = os.path.join(output_folder, "summary.csv")
+    with open(summary_file, "w") as f:
+        f.write("test line\n")
     for copc in copc_list:
         for site in site_list:
             try:
@@ -69,6 +74,16 @@ if __name__ == "__main__":
                 logging.info("reduced {} {} to {}".format(
                     copc, site, len(reduced_timeseries)))
                 plt.close(f)
+                try:
+                    srr = SummaryReportRecord.from_reduced_timeseries(
+                            reduced_timeseries)
+                    with open(summary_file, "a") as f:
+                        f.write("{}\n".format(copc))
+                        f.write(srr.to_line(input_data[c.SUMMARY_TEMPLATE_KEY]))
+                except Exception as e:
+                    print("error: {}".format(str(e)))
+
+
             except TypeError:
                 logging.error("failed at {} {}".format(copc, site))
     logging.info("END execution")
