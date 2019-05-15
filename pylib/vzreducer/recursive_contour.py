@@ -45,9 +45,10 @@ def reducer(signal, threshold_area, threshold_peak, branch0=0):
     x, y = signal
     if len(x)<=2:
         return [x[-1]]
+    dx = x[-1]-x[1]
     line = make_line(signal)
     flat_segment = subtract(signal, line)
-    area = integrate(flat_segment)
+    area = integrate(flat_segment)/dx
     y_seg = flat_segment[1]
     if np.all(
          (y_seg/np.max(y))<threshold_peak) and area < threshold_area:

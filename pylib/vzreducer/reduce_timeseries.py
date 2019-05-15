@@ -31,6 +31,8 @@ class ErrorReport:
         self.residual = residual
         self.mass_error = self.calc_mass_error(integrated_timeseries)
         self.last_raw_mass = integrated_timeseries.values[-1]
+        
+        self.model_mass_error = residual.mass_error
         self.number_reduced_points = len(
                 timeseries)-len(reduced_timeseries)
 
@@ -80,33 +82,71 @@ class ErrorReport:
                 copc=raw.copc,
                 site=raw.site)
 
-
-
 class ReducedTimeSeries(ts.TimeSeries):
-    def __init__(self, error_report, timeseries):
+    def __init__(self, error_report, timeseries, area=None, threshold_peak=None):
         self.error_report = error_report
         super().__init__(
                 times=timeseries.times,
                 values=timeseries.values,
                 copc=timeseries.copc,
                 site=timeseries.site)
+        self.area = area
+        self.threshold_peak = threshold_peak
 
     def get_residual(self):
         return self.error_report.residual
 
+    @property
     def number_reduced_points(self):
         return self.error_report.number_reduced_points
 
+    @property
+    def last_mass_error(self):
+        return self.error_report.last_mass_error
+
+    @property
+    def total_rms_mass_error(self):
+        return self.error_report.total_rms_mass_error
+    
+    @property
+    def total_mass(self):
+        return self.error_report.integrated_timeseries.values[-1]
+
+    @property
+    def model_mass_error(self):
+        """ an estimate of the mass error expected from the model itself
+            due to model noise"""
+        return self.error_report.model_mass_error
+    
+    @property
+    def mass_error_factor(self):
+        """
+            the mass error expressed as a fraction of the model error
+        """
+        return self.last_mass_error/self.model_mass_error
+
+    @property
+    def relative_mass_error(self):
+        """
+            mass_error/last_mass
+        """
+        return self.last_mass_error/self.total_mass
+
+
     @classmethod
-    def from_timeseries(cls, timeseries):
+    def from_timeseries(cls, timeseries, area=None, threshold_peak=None):
         """
             timeseries is a instance of TimeSeries
         """
         integrated = timeseries.integrate()
         residual = timeseries.get_residual()
         mass_error = residual.mass_error
-        area = 10*mass_error 
-        threshold_peak = .1
+        if area is None:
+            #area = 1e5*mass_error 
+            area = abs(np.max(integrated.values))
+
+        if threshold_peak is None:
+            threshold_peak = .2501
         #100000*residual.error_mean
         r = recursive_contour.reducer(
                 (timeseries.times, timeseries.values), area, 
@@ -133,4 +173,4 @@ class ReducedTimeSeries(ts.TimeSeries):
                 reduced_timeseries.integrate(),
                 residual=residual
                 )
-        return cls(error_report, reduced_timeseries) 
+        return cls(error_report, reduced_timeseries, area, threshold_peak) 

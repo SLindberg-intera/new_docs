@@ -3,11 +3,11 @@ import logging
 import constants as c
 import os
 from parse_input_file import parse_input_file
-from read_solid_waste_release import SolidWasteReleaseData
 from pylib.vzreducer.reduce_timeseries import ReducedTimeSeries
+from pylib.vzreducer.read_solid_waste_release import SolidWasteReleaseData
 from plots import residual_plot, mass_plot, recursive_plot, reduced_timeseries_plot 
 import matplotlib.pyplot as plt
-from pylib.vzreducer.summary_report import SummaryReportRecord
+from pylib.vzreducer.reduce_dataset import reduce_dataset
 
 def configure_logger(args):
     """
@@ -47,11 +47,11 @@ if __name__ == "__main__":
     if len(input_data[c.COPCS_KEY])>0:
         copc_list = input_data[c.COPCS_KEY]
     else:    
-        copc_list = solid_waste_release.copcs
+        copc_list = sorted(solid_waste_release.copcs)
     if len(input_data[c.WASTE_SITES_KEY])>0:
         site_list = input_data[c.WASTE_SITES_KEY]
     else:    
-        site_list = solid_waste_release.sites
+        site_list = sorted(solid_waste_release.sites)
 
     summary_file = os.path.join(output_folder, "summary.csv")
     with open(summary_file, "w") as f:
@@ -60,31 +60,15 @@ if __name__ == "__main__":
         for site in site_list:
             try:
                 timeseries = solid_waste_release.extract(copc, site)
-                if timeseries.are_all_zero():
-                    logging.info("Skipped {} {} - all zero".format(
-                        copc, site))
+                worked = reduce_dataset(
+                        timeseries, summary_file, output_folder,
+                        input_data
+                        )
+                if not worked:
                     continue
-                reduced_timeseries = ReducedTimeSeries.from_timeseries(
-                        timeseries)
-                f, axes = reduced_timeseries_plot(reduced_timeseries)
-                f.savefig(
-                        os.path.join(output_folder,
-                        "{} {}.png".format(copc, site))
-                )
-                logging.info("reduced {} {} to {}".format(
-                    copc, site, len(reduced_timeseries)))
-                plt.close(f)
-                try:
-                    srr = SummaryReportRecord.from_reduced_timeseries(
-                            reduced_timeseries)
-                    with open(summary_file, "a") as f:
-                        f.write("{}\n".format(copc))
-                        f.write(srr.to_line(input_data[c.SUMMARY_TEMPLATE_KEY]))
-                except Exception as e:
-                    print("error: {}".format(str(e)))
-
-
-            except TypeError:
+                
+            except TypeError as e:
+                raise Exception(e)
                 logging.error("failed at {} {}".format(copc, site))
     logging.info("END execution")
 

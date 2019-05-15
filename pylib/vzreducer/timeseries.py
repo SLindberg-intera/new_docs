@@ -139,6 +139,7 @@ class Residual:
     def _mass_error(self):
         """ effectively integrating the error in the flux
         to get an estimate of the accumlative error in the mass
+        at the last timestep
         
         """
         return self.error_mean*(self.raw.times[-1]-self.raw.times[0])
