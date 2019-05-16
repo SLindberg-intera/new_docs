@@ -6,8 +6,8 @@ import scipy.signal as signal
 from scipy.integrate import cumtrapz as cumtrapz, trapz
 from pylib.vzreducer.config import config
 import pylib.vzreducer.constants as c
-from pylib.vzreducer.timeseries import TimeSeries
 from scipy.interpolate import interp1d
+import numpy as np
 
 def smooth(timeseries):
     """ smooth the data set """
@@ -19,7 +19,7 @@ def smooth(timeseries):
     B, A = signal.butter(N, f_c, output='ba')
     smoothed = signal.filtfilt(B, A, y)
 
-    return TimeSeries.from_values(timeseries, smoothed)
+    return timeseries.from_values(smoothed)
 
 
 def equal_times(timeseries1, timeseries2):
@@ -43,13 +43,13 @@ def interpolate(timeseries):
 def integrate(timeseries):
     """ integrate as a cumulative trap"""
     y_int = cumtrapz(timeseries.values, timeseries.times, initial=0)
-    return TimeSeries.from_values(timeseries.times, y_int)
+    return timeseries.from_values(y_int)
 
 
 def diff(timeseries):
     """ simple first order derviative"""
     y_diff = np.gradient(timeseries.values, timeseries.times)
-    return TimeSeries.from_values(timeseries, y_diff)
+    return timeseries.from_values(y_diff)
 
 
 def delta(timeseries1, timeseries2):
@@ -61,13 +61,13 @@ def delta(timeseries1, timeseries2):
 
     """
     if equal_times(timeseries1, timeseries2):
-        return TimeSeries.from_values(
-                timeseries1, values=(timeseries1-timeseries2))
+        return timeseries1.from_values(
+                values=(timeseries1.values-timeseries2.values))
 
     interp_fn = interpolate(timeseries2)
     interp_values = interp_fn(timeseries1.times)
-    aligned_timeseries = TimeSeries.from_values(
-            timeseries, values=interp_values)
+    aligned_timeseries = timeseries1.from_values(
+            values=interp_values)
     return delta(timeseries1, aligned_timeseries)
 
 

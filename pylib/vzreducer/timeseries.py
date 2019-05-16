@@ -21,16 +21,18 @@ class TimeSeries:
         self.times = times
         self.values = values
 
-    @classmethod
-    def from_values(cls, timeseries, values):
+    def from_values(self, values):
         """
             Create a new TimeSeries by replacing the values;
             everything else is the same
 
         """
-        return cls(times=timeseries.times, values=values,
-                copc=timeseries.copc,
-                site=timeseries.site)
+        if len(values)!=len(self):
+            raise ValueError("Values did not have same length as TimeSeries")
+
+        return TimeSeries(times=self.times, values=values,
+                copc=self.copc,
+                site=self.site)
 
     def __eq__(self, timeseries):
         """ timeseries are equivalent if times and values are equal"""
@@ -51,7 +53,12 @@ class TimeSeries:
         peaks_neg, _ = signal.find_peaks(-self.values)
         peaks = np.concatenate((self.times[peaks], self.times[peaks_neg]))
         return np.concatenate((peaks, peaks_neg))
-            
+
+    def slice(self, from_ix, upto_ix):
+        """ equivalent to the numpy A[from:to] operation for an array A"""
+        x = self.times[from_ix:upto_ix]
+        y = self.values[from_ix:upto_ix]
+        return TimeSeries(times=x, values=y, copc=self.copc, site=self.site)
 
     def subset(self, timesteps):
         """ return a TimeSeries with the specific timesteps """

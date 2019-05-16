@@ -4,7 +4,6 @@ from scipy.signal import find_peaks
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 def make_line(signal):
     x, y = signal
     line_x = [x[0], x[-1]]
@@ -15,22 +14,18 @@ def make_line(signal):
 def subtract(signal, line):
     x, y = signal
     return x, np.abs(y-line[1])
-    return x, y-line[1]
 
 def normalize(signal):
     x, y = signal
     return x, y
-    ay = np.abs(y)
-    ay = y
-    my = np.max(y)
-    if my < 1e-16:
-        return x, ay
-    n = ay/np.max(y)
-    return x, n
 
 def integrate(signal):
     x, y = signal
     return trapz(y, x)
+
+def diff(signal):
+    x, y = signal
+    return x, np.gradient(y,x)
 
 def partition(signal, xpeak):
     x, y = signal
@@ -48,10 +43,11 @@ def reducer(signal, threshold_area, threshold_peak, branch0=0):
     dx = x[-1]-x[1]
     line = make_line(signal)
     flat_segment = subtract(signal, line)
-    area = integrate(flat_segment)/dx
+    area = np.max(y)/integrate(flat_segment) #/(dx*np.max(y))
     y_seg = flat_segment[1]
+
     if np.all(
-         (y_seg/np.max(y))<threshold_peak) and area < threshold_area:
+         (y_seg)/np.max(y)<threshold_peak) and area < threshold_area:
         return [x[-1]]
     peak, xpeak, ypeak = get_first_peak(flat_segment)
     segments = partition(signal, xpeak)

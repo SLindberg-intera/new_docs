@@ -26,47 +26,29 @@ def get_symbol(source_key):
 
 FORMATTER = EngFormatter(places=0, sep="\N{THIN SPACE}")
 
+def reduced_timeseries_plot(reduction_result):
+    f, (ax1, ax2) = plt.subplots(2,1, sharex=True)
+    flux = reduction_result.flux
+    mass = reduction_result.mass
+    r_flux = reduction_result.reduced_flux
+    r_mass = reduction_result.reduced_mass
 
-def reduced_timeseries_plot(timeseries):
-    error_report = timeseries.error_report
-    
-    f, (ax1, ax2, ax3) = plt.subplots(3, 1, sharex=True, squeeze=True)
-    raw_x = error_report.timeseries.times
-    raw_y = error_report.timeseries.values
-    red_x = timeseries.times
-    red_y = timeseries.values
-    
-    # the flux data
-    ax1.plot(raw_x, raw_y, 'b.')
-    ax1.plot(red_x, red_y, 'r.')
-
-    mass_x = error_report.integrated_timeseries.times
-    mass_y = error_report.integrated_timeseries.values
-    red_mass_x = error_report.integrated_reduced_timeseries.times
-    red_mass_y = error_report.integrated_reduced_timeseries.values
-
-    # the mass data
-    ax2.plot(mass_x, mass_y, 'b.-')
-    ax2.plot(red_mass_x, red_mass_y, '.')
-
-    # the residual
-    resid_x = error_report.mass_error.times
-    resid_y = error_report.mass_error.values
-    ax3.plot(resid_x, resid_y, 'b.')
+    ax1.plot(flux.times, flux.values, 'b.-')
+    ax1.plot(r_flux.times, r_flux.values, 'r.')
+    ax2.plot(mass.times, mass.values, 'b.-')
+    ax2.plot(r_mass.times, r_mass.values, 'r.')
 
     ax1.yaxis.set_major_formatter(FORMATTER)
     ax2.yaxis.set_major_formatter(FORMATTER)
-    ax3.yaxis.set_major_formatter(FORMATTER)
 
     ax1.set_title(
             "{}  {}".format(
-            timeseries.site, timeseries.copc)
+            flux.site, flux.copc)
             )
     ax1.set_ylabel("Flux (Ci/yr)")
     ax2.set_ylabel("Mass (Ci)")
-    ax3.set_ylabel("Error Mass (Ci)")
 
-    return f, (ax1, ax2, ax3)
+    return  f, ax1, ax2
 
 def recursive_plot(timeseries, masseries):
     """
