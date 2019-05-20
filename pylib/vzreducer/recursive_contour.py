@@ -43,12 +43,14 @@ def reducer(signal, threshold_area, threshold_peak, branch0=0):
     dx = x[-1]-x[1]
     line = make_line(signal)
     flat_segment = subtract(signal, line)
-    area = np.max(y)/integrate(flat_segment) #/(dx*np.max(y))
+    
+    area = integrate(flat_segment)
+      #/(dx*np.mean(y))
     y_seg = flat_segment[1]
 
     if np.all(
-         (y_seg)/np.max(y)<threshold_peak) and area < threshold_area:
-        return [x[-1]]
+         np.abs(y_seg)<threshold_peak) and area < threshold_area:
+        return [x[0], x[-1]]
     peak, xpeak, ypeak = get_first_peak(flat_segment)
     segments = partition(signal, xpeak)
     if segments is None:
@@ -71,7 +73,6 @@ def get_first_peak(signal):
         raise ValueError("Not enough Points")
     ix = np.argmax(y)
     return ix, x[ix], y[ix]
-    peak_indicies, _ = find_peaks(y)
     # also need to find valleys
     #valleys = (y-np.max(y))
     #valley_indicies, _ = find_peaks(valleys)
@@ -93,9 +94,14 @@ def make_signal():
     end = 2*np.pi
     x = np.arange(start, end, 0.0001)
     y = np.zeros(len(x))
-    y[234:237] = 200
+    y[232] = 234
+    y[233] = 800
+    y[234:237] = 20000
     y[237:10600] = 53
+
+    y[800:900] = 1000
     #y = 5*np.sin(8*x)*np.sin(x)/x-x+5
+    y=10*np.random.rand(len(y))+y
     return x, y
 
 
@@ -104,8 +110,10 @@ if __name__ == "__main__":
     signal = make_signal()
     line = make_line(signal)
     x, y = signal
-    area = 1e-8
-    ytol = .1
+    area = integrate(signal)
+    #np.max(y)
+    ytol = 0.0005*np.max(y)
+    #np.max(y)
     
     
     rawf = cumtrapz(y, x, initial=0)

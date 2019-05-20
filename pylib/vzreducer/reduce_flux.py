@@ -12,22 +12,28 @@ def reduce_timeseries(timeseries, threshold_area, threshold_peak):
     )
 
     flat_reduced_x = set(redcon.flatten_reduced(r))
+    #peaks = timeseries.get_peaks()
+    peaks = [timeseries.times[np.argmax(timeseries.values)]]
     required = {x[0], x[-1]}
-    xout = sorted(list(flat_reduced_x.union(required)))
+    xout = sorted(list(flat_reduced_x.union(required).union(set(peaks))))
 
     return timeseries.subset(xout)
 
 def reduce_flux(flux, threshold_area, threshold_peak):
     mass = tsmath.integrate(flux)
-    reduced_mass = reduce_timeseries(mass, threshold_area, threshold_peak)
-    reduced_flux_direct = reduce_timeseries(
-            flux, threshold_area, threshold_peak)
+    reduced_flux = reduce_timeseries(flux, threshold_area, threshold_peak)
 
-    x = sorted(list(set(np.concatenate((reduced_mass.times, reduced_flux_direct.times)
-        ))))
-
+    #reduced_mass = reduce_timeseries(mass, threshold_area, threshold_peak)
     
-    reduced_flux = flux.subset(x)
+    
+    
+    #reduced_flux_direct = reduce_timeseries(
+    #        flux, threshold_area, threshold_peak)
+
+    #x = sorted(list(set(np.concatenate((reduced_mass.times, reduced_flux_direct.times)
+    #    ))))
+
+    #reduced_flux = flux.subset(x)
     reduced_mass = tsmath.integrate(reduced_flux)
     
     #reduced_flux = tsmath.diff(reduced_mass)
