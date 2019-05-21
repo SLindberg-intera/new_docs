@@ -35,3 +35,10 @@ The 'main' program.  This will:
 ### reduce_flux
 ### reduction_result
 ### timeseries_math
+
+## ToDo
+- Code Documentation
+- User Documentation
+- Allocate mass balance of reduced data sets to points along the flux curve (rebalance)
+- Remove orphaned code fragments
+- Tests 
