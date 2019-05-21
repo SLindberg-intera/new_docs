@@ -5,8 +5,6 @@ from pylib.vzreducer.config import config
 import numpy as np
 from scipy import interpolate
 
-from pylib.vzreducer.reduce_timeseries import ReducedTimeSeries
-
 def make_title(residual):
     return "{} {}".format(residual.raw.copc, residual.raw.site)
 
