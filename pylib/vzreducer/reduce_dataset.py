@@ -1,11 +1,14 @@
 import logging
 import os
+import numpy as np
 import matplotlib.pyplot as plt
 import pylib.vzreducer.constants as c
 import pylib.vzreducer.reduce_flux as red_flux
 import pylib.vzreducer.plots as p
 from pylib.vzreducer.summary_file import summary_info
-import numpy as np
+
+SMOOTH = "SMOOTH"
+RAW = "RAW"
 
 def log_info(reduction_result):
     msg = "{} {} reduced: {} E_m:{:.2g}%"
@@ -18,27 +21,23 @@ def log_info(reduction_result):
     )
     logging.info(s)
 
-SMOOTH = "SMOOTH"
-RAW = "RAW"
+
+def summary_plot(reduction_result, output_folder):
+    """ make a plot of hte reduction result and place it in output_folder"""
+    copc = reduction_result.mass.copc
+    site = reduction_result.mass.site
+    f, ax1, ax2 = p.reduced_timeseries_plot(reduction_result)
+    plt.savefig(os.path.join(output_folder, 
+            "{}-{}.png".format(copc, site)))
+    plt.close(f)
 
 
-"""
-def summary_info(reduction_result, summary_file):
-    rr = reduction_result
+def reduce_dataset(timeseries, summary_file, output_folder):
+    """ take a TimeSeries object and reduce it.
 
-    outline = "{copc},{site},{N},{E_m:.2g},{E_t:.2g}\n".format(
-            copc=rr.mass.copc,
-            site=rr.mass.site,
-            N=rr.num_reduced_points,
-            E_m=rr.relative_total_mass_error*100,
-            E_t=rr.total_mass_error
-            )
+    write a summary into summary_folder
 
-    with open(summary_file, "a") as f:
-        f.write(outline)
-"""
-
-def reduce_dataset(timeseries, summary_file, output_folder, input_data):
+    """
     copc = timeseries.copc
     site = timeseries.site
     if timeseries.are_all_zero():
@@ -79,10 +78,6 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     if ix>=MAX_ITERATIONS - 1:
         logging.info("MAX ITERATIONS")
 
-    log_info(last_result)
+    plot_file = summary_plot(last_result, output_folder)
     summary_info(last_result, summary_file)
-    if out_error*100 > 1:
-        f, ax1, ax2 = p.reduced_timeseries_plot(last_result)
-        plt.savefig(os.path.join(output_folder, 
-            "{}-{}.png".format(copc, site)))
-        plt.close(f)
+    log_info(last_result)

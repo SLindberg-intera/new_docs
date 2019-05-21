@@ -35,29 +35,39 @@ def get_output_folder(args):
 
 
 def get_site_list(input_data, solid_waste_release):
+    """ get sites to reduce"""
     if len(input_data[c.WASTE_SITES_KEY])>0:
         return input_data[c.WASTE_SITES_KEY]
     return sorted(solid_waste_release.sites)
 
 def get_copc_list(input_data, solid_waste_release):
+    """ get copcs to reduce """
     if len(input_data[c.COPCS_KEY])>0:
         return input_data[c.COPCS_KEY]
     return sorted(solid_waste_release.copcs)
 
 
 def reduce_for_copc_site(solid_waste_release, copc, site,
-        summary_file, output_folder, input_data):
-    """ True if succeded in reducing; false otherwise """
+        summary_file, output_folder):
+    """
+        extract a TimeSeries instance from solid_waste_release
+        corresponding to the target copc/site and then reduce it
+        
+        returns True if succeded in reducing; false otherwise
+    
+    """
     timeseries = solid_waste_release.extract(copc, site)
     worked = reduce_dataset(
-            timeseries, summary_file, output_folder,
-            input_data
+            timeseries, summary_file, output_folder
             )
     return worked
 
-def reduce_input_data(filekey, input_data):
+
+def reduce_input_data(filekey, input_data, summary_file, output_folder):
     """
-        Reduce all the data in the input_data file
+        Reduce all the data in the input_data object  for the
+        given filekey
+
     """
 
     logging.info("START reducing {}".format(filekey))
@@ -73,15 +83,21 @@ def reduce_input_data(filekey, input_data):
             try:
                 worked = reduce_for_copc_site(
                         solid_waste_release, copc, site,
-                        summary_file, output_folder, input_data)
+                        summary_file, output_folder)
                 if not worked:
                     continue
             except TypeError as e:
                 raise Exception(e)
                 logging.error("failed at {} {}".format(copc, site))
+def main():
+    """ 
+        parse the input arguments, configure the logger
+        obtain the input data
+        reduce the input data
+        and write the results
 
+    """
 
-if __name__ == "__main__":
     args = parse_args()
     configure_logger(args)
     logging.info("START execution")
@@ -90,9 +106,13 @@ if __name__ == "__main__":
     output_folder = get_output_folder(args)
     summary_filename = "summary.csv"
     summary_file = reset_summary_file(output_folder, summary_filename)
-
     for filekey in [c._200E_KEY, c._200W_KEY]:
-        reduce_input_data(filekey, input_data)
+        reduce_input_data(filekey, input_data, summary_file,
+                output_folder)
 
     logging.info("END execution")
+
+
+if __name__ == "__main__":
+    main()
 
