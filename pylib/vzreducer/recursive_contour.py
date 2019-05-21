@@ -76,9 +76,6 @@ def get_first_peak(signal):
     # also need to find valleys
     #valleys = (y-np.max(y))
     #valley_indicies, _ = find_peaks(valleys)
-    #plt.plot(x, y)
-    #plt.plot(x, valleys)
-    #plt.show()
     p = peak_indicies
 
     #p = set(peak_indicies).union(set(valley_indicies))

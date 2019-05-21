@@ -1,4 +1,6 @@
 """
+    DEPRECIATED?
+
     helper for taking a TimeSeries object
     and then reducing the number of data points
 

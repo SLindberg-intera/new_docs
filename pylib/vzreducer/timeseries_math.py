@@ -3,11 +3,11 @@
 """
 
 import scipy.signal as signal
+import numpy as np
 from scipy.integrate import cumtrapz as cumtrapz, trapz
+from scipy.interpolate import interp1d
 from pylib.vzreducer.config import config
 import pylib.vzreducer.constants as c
-from scipy.interpolate import interp1d
-import numpy as np
 
 def smooth(timeseries):
     """ smooth the data set """

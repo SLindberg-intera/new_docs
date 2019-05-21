@@ -8,7 +8,6 @@ from scipy import interpolate
 def make_title(residual):
     return "{} {}".format(residual.raw.copc, residual.raw.site)
 
-
 PLOT = config[c.PLOTS_KEY] # shortcut to the PLOT dict in the config file
 BLACK = 'k'
 
