@@ -45,6 +45,16 @@ def get_copc_list(input_data, solid_waste_release):
     return sorted(solid_waste_release.copcs)
 
 
+def reduce_for_copc_site(solid_waste_release, copc, site,
+        summary_file, output_folder, input_data):
+    """ True if succeded in reducing; false otherwise """
+    timeseries = solid_waste_release.extract(copc, site)
+    worked = reduce_dataset(
+            timeseries, summary_file, output_folder,
+            input_data
+            )
+    return worked
+
 def reduce_input_data(filekey, input_data):
     """
         Reduce all the data in the input_data file
@@ -61,14 +71,11 @@ def reduce_input_data(filekey, input_data):
     for copc in copc_list:
         for site in site_list:
             try:
-                timeseries = solid_waste_release.extract(copc, site)
-                worked = reduce_dataset(
-                        timeseries, summary_file, output_folder,
-                        input_data
-                        )
+                worked = reduce_for_copc_site(
+                        solid_waste_release, copc, site,
+                        summary_file, output_folder, input_data)
                 if not worked:
                     continue
-                
             except TypeError as e:
                 raise Exception(e)
                 logging.error("failed at {} {}".format(copc, site))
