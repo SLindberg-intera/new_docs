@@ -79,5 +79,6 @@ def reduce_dataset(timeseries, summary_file, output_folder):
         logging.info("MAX ITERATIONS")
 
     plot_file = summary_plot(last_result, output_folder)
+    last_result.to_csv(output_folder)
     summary_info(last_result, summary_file)
     log_info(last_result)
