@@ -31,8 +31,8 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     points = [0, mx, len(timeseries)]
     x = timeseries.times
 
-    area = 10*np.std(timeseries.values)*(x[-1]-x[0])
-    ythresh = 10*np.std(timeseries.values)
+    area = 100*np.std(timeseries.values)*(x[-1]-x[0])
+    ythresh = 100*np.std(timeseries.values)
     out_error = 1
     out_error_last = out_error
     OUT_ERROR_THRESHOLD = 1e-2
@@ -54,7 +54,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         if out_error < OUT_ERROR_THRESHOLD and len(res.reduced_flux)>=LOWER_N:
             last_result = res
             break
-        if len(res.reduced_flux) > UPPER_N:
+        if len(res.reduced_flux) > 2*UPPER_N:
             solve_type = RAW
         ythresh = 0.5*ythresh
         area = 0.5*area
