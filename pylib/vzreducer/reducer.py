@@ -1,6 +1,9 @@
 import logging
 import os
-from pylib.config import config, parse_args 
+try:
+    from pylib.config import config, parse_args 
+except ModuleNotFoundError:
+    from config import config, parse_args
 import pylib.vzreducer.constants as c
 from pylib.vzreducer.parse_input_file import parse_input_file
 from pylib.vzreducer.read_solid_waste_release import SolidWasteReleaseData
