@@ -3,9 +3,16 @@ import pylib.vzreducer.recursive_contour as redcon
 from pylib.vzreducer.reduction_result import ReductionResult
 import numpy as np
 
-def reduce_timeseries(timeseries, threshold_area, threshold_peak):
+SMOOTH = "SMOOTH"
+RAW = "RAW"
+
+def reduce_timeseries(timeseries, threshold_area, threshold_peak,
+        solve_type=RAW):
     x = timeseries.times
     y = timeseries.values
+    if solve_type == SMOOTH:
+        ts_smooth = tsmath.smooth(timeseries)
+        y = ts_smooth.values
     r = redcon.reducer((x,y), 
             threshold_area=threshold_area,
             threshold_peak=threshold_peak,
@@ -19,9 +26,10 @@ def reduce_timeseries(timeseries, threshold_area, threshold_peak):
 
     return timeseries.subset(xout)
 
-def reduce_flux(flux, threshold_area, threshold_peak):
+def reduce_flux(flux, threshold_area, threshold_peak, solve_type):
     mass = tsmath.integrate(flux)
-    reduced_flux = reduce_timeseries(flux, threshold_area, threshold_peak)
+    reduced_flux = reduce_timeseries(flux, threshold_area, threshold_peak,
+            solve_type)
 
     #reduced_mass = reduce_timeseries(mass, threshold_area, threshold_peak)
     
