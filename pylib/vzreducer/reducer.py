@@ -34,6 +34,17 @@ def get_output_folder(args):
     raise IOError("Could not locate output folder '{}'.".format(args.outputFolder))
 
 
+def get_site_list(input_data, solid_waste_release):
+    if len(input_data[c.WASTE_SITES_KEY])>0:
+        return input_data[c.WASTE_SITES_KEY]
+    return sorted(solid_waste_release.sites)
+
+def get_copc_list(input_data, solid_waste_release):
+    if len(input_data[c.COPCS_KEY])>0:
+        return input_data[c.COPCS_KEY]
+    return sorted(solid_waste_release.copcs)
+
+
 def reduce_input_data(filekey, input_data):
     """
         Reduce all the data in the input_data file
@@ -44,14 +55,8 @@ def reduce_input_data(filekey, input_data):
             input_data[c.SOURCE_FILES_KEY][filekey],
             input_data[c.ZERO_BELOW_KEY]
     )
-    if len(input_data[c.COPCS_KEY])>0:
-        copc_list = input_data[c.COPCS_KEY]
-    else:    
-        copc_list = sorted(solid_waste_release.copcs)
-    if len(input_data[c.WASTE_SITES_KEY])>0:
-        site_list = input_data[c.WASTE_SITES_KEY]
-    else:    
-        site_list = sorted(solid_waste_release.sites)
+    copc_list = get_copc_list(input_data, solid_waste_release)
+    site_list = get_site_list(input_data, solid_waste_release)
 
     for copc in copc_list:
         for site in site_list:
@@ -80,7 +85,6 @@ if __name__ == "__main__":
     summary_file = reset_summary_file(output_folder, summary_filename)
 
     for filekey in [c._200E_KEY, c._200W_KEY]:
-
         reduce_input_data(filekey, input_data)
 
     logging.info("END execution")
