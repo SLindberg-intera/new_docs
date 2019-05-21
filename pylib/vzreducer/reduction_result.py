@@ -4,6 +4,10 @@ import pandas as pd
 import pylib.vzreducer.timeseries_math as tsmath
 
 def to_csv(reduction_result, filename):
+    """
+        write a ReductionResult object to a csv file
+
+    """
     rr = reduction_result    
     years = rr.flux.times
     flux = rr.flux.values

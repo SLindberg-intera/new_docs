@@ -1,12 +1,9 @@
-from config import config, parse_args 
 import logging
-import constants as c
 import os
-from parse_input_file import parse_input_file
-from pylib.vzreducer.reduce_timeseries import ReducedTimeSeries
+from pylib.config import config, parse_args 
+import pylib.vzreducer.constants as c
+from pylib.vzreducer.parse_input_file import parse_input_file
 from pylib.vzreducer.read_solid_waste_release import SolidWasteReleaseData
-from plots import residual_plot, mass_plot, recursive_plot, reduced_timeseries_plot 
-import matplotlib.pyplot as plt
 from pylib.vzreducer.reduce_dataset import reduce_dataset
 from pylib.vzreducer.summary_file import reset_summary_file 
 
