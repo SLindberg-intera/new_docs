@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import pylib.vzreducer.constants as c
 import pylib.vzreducer.reduce_flux as red_flux
 import pylib.vzreducer.plots as p
+from pylib.vzreducer.summary_file import summary_info
 import numpy as np
 
 def log_info(reduction_result):
@@ -19,6 +20,23 @@ def log_info(reduction_result):
 
 SMOOTH = "SMOOTH"
 RAW = "RAW"
+
+
+"""
+def summary_info(reduction_result, summary_file):
+    rr = reduction_result
+
+    outline = "{copc},{site},{N},{E_m:.2g},{E_t:.2g}\n".format(
+            copc=rr.mass.copc,
+            site=rr.mass.site,
+            N=rr.num_reduced_points,
+            E_m=rr.relative_total_mass_error*100,
+            E_t=rr.total_mass_error
+            )
+
+    with open(summary_file, "a") as f:
+        f.write(outline)
+"""
 
 def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     copc = timeseries.copc
@@ -47,10 +65,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
 
         res = red_flux.reduce_flux(timeseries, area, ythresh, 
                 solve_type=solve_type)
-        #result.append(res) 
         out_error = abs(res.relative_total_mass_error)
-        if abs(out_error_last - out_error) < 1e-3:
-            pass #break
         if out_error < OUT_ERROR_THRESHOLD and len(res.reduced_flux)>=LOWER_N:
             last_result = res
             break
@@ -65,6 +80,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         logging.info("MAX ITERATIONS")
 
     log_info(last_result)
+    summary_info(last_result, summary_file)
     if out_error*100 > 1:
         f, ax1, ax2 = p.reduced_timeseries_plot(last_result)
         plt.savefig(os.path.join(output_folder, 

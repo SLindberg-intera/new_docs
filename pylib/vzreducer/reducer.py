@@ -8,6 +8,7 @@ from pylib.vzreducer.read_solid_waste_release import SolidWasteReleaseData
 from plots import residual_plot, mass_plot, recursive_plot, reduced_timeseries_plot 
 import matplotlib.pyplot as plt
 from pylib.vzreducer.reduce_dataset import reduce_dataset
+from pylib.vzreducer.summary_file import reset_summary_file 
 
 def configure_logger(args):
     """
@@ -33,11 +34,6 @@ def get_output_folder(args):
     raise IOError("Could not locate output folder '{}'.".format(args.outputFolder))
 
 
-def reset_summary_file(output_folder, summary_filename):
-    summary_file = os.path.join(output_folder, summary_filename)
-    with open(summary_file, "w") as f:
-        f.write("test line\n")
-    return summary_file    
 
 if __name__ == "__main__":
     args = parse_args()
