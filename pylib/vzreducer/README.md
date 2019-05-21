@@ -5,7 +5,7 @@
 You must run this code with the CA-CIE tool runner
 
 ## code organization
-### reducer 
+### [reducer](reducer.py) 
 The 'main' program.  This will:
 - parse input arguments
 - read the config file
@@ -18,23 +18,23 @@ The 'main' program.  This will:
   - update a summary file
   - skip items where there is no release
 
-### constants
-### config
-### parse_input_file
-### read_solid_waste_release
-### timeseries 
-### reduce_dataset
-### reduce_flux
-### plots
-### summary_file
-### recursive_contour
-### timeseries
-### read_solid_waste_release
-### parse_input_file
-### reduce_dataset
-### reduce_flux
-### reduction_result
-### timeseries_math
+### [constants](constants.py)
+### [config](config.py)
+### [parse_input_file](parse_input_file.py)
+### [read_solid_waste_release](read_solid_waste_release.py)
+### [timeseries](timeseries.py)
+### [reduce_dataset](reduce_dataset.py)
+### [reduce_flux](reduce_flux.py)
+### [plots](plots.py)
+### [summary_file](summary_file.py)
+### [recursive_contour](recursive_contour.py)
+### [timeseries](timeseries.py)
+### [read_solid_waste_release](read_solid_waste_release.py)
+### [parse_input_file](parse_input_file.py)
+### [reduce_dataset](reduce_dataset.py)
+### [reduce_flux](reduce_flux.py)
+### [reduction_result](reduction_result.py)
+### [timeseries_math](timeseries_math.py)
 
 ## ToDo
 - Code Documentation
@@ -42,3 +42,5 @@ The 'main' program.  This will:
 - Allocate mass balance of reduced data sets to points along the flux curve (rebalance)
 - Remove orphaned code fragments
 - Tests 
+- move all constants to constants.py
+- move all hard-coded text or params to input config file
