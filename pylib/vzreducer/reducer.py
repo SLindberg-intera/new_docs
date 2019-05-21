@@ -32,6 +32,13 @@ def get_output_folder(args):
         return args.outputFolder
     raise IOError("Could not locate output folder '{}'.".format(args.outputFolder))
 
+
+def reset_summary_file(output_folder, summary_filename):
+    summary_file = os.path.join(output_folder, summary_filename)
+    with open(summary_file, "w") as f:
+        f.write("test line\n")
+    return summary_file    
+
 if __name__ == "__main__":
     args = parse_args()
     configure_logger(args)
@@ -39,36 +46,37 @@ if __name__ == "__main__":
     input_file = get_inputfile(args)
     input_data = parse_input_file(input_file)
     output_folder = get_output_folder(args)
+    summary_filename = "summary.csv"
+    summary_file = reset_summary_file(output_folder, summary_filename)
 
-    solid_waste_release = SolidWasteReleaseData(
-            input_data[c.SOURCE_FILES_KEY][c._200E_KEY],
-            input_data[c.ZERO_BELOW_KEY]
-    )
-    if len(input_data[c.COPCS_KEY])>0:
-        copc_list = input_data[c.COPCS_KEY]
-    else:    
-        copc_list = sorted(solid_waste_release.copcs)
-    if len(input_data[c.WASTE_SITES_KEY])>0:
-        site_list = input_data[c.WASTE_SITES_KEY]
-    else:    
-        site_list = sorted(solid_waste_release.sites)
+    for filekey in [c._200E_KEY, c._200W_KEY]:
+        logging.info("START reducing {}".format(filekey))
+        solid_waste_release = SolidWasteReleaseData(
+                input_data[c.SOURCE_FILES_KEY][filekey],
+                input_data[c.ZERO_BELOW_KEY]
+        )
+        if len(input_data[c.COPCS_KEY])>0:
+            copc_list = input_data[c.COPCS_KEY]
+        else:    
+            copc_list = sorted(solid_waste_release.copcs)
+        if len(input_data[c.WASTE_SITES_KEY])>0:
+            site_list = input_data[c.WASTE_SITES_KEY]
+        else:    
+            site_list = sorted(solid_waste_release.sites)
 
-    summary_file = os.path.join(output_folder, "summary.csv")
-    with open(summary_file, "w") as f:
-        f.write("test line\n")
-    for copc in copc_list:
-        for site in site_list:
-            try:
-                timeseries = solid_waste_release.extract(copc, site)
-                worked = reduce_dataset(
-                        timeseries, summary_file, output_folder,
-                        input_data
-                        )
-                if not worked:
-                    continue
-                
-            except TypeError as e:
-                raise Exception(e)
-                logging.error("failed at {} {}".format(copc, site))
+        for copc in copc_list:
+            for site in site_list:
+                try:
+                    timeseries = solid_waste_release.extract(copc, site)
+                    worked = reduce_dataset(
+                            timeseries, summary_file, output_folder,
+                            input_data
+                            )
+                    if not worked:
+                        continue
+                    
+                except TypeError as e:
+                    raise Exception(e)
+                    logging.error("failed at {} {}".format(copc, site))
     logging.info("END execution")
 
