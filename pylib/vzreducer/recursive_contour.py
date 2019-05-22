@@ -45,16 +45,23 @@ def reducer(signal, threshold_area, threshold_peak, branch0=0):
     flat_segment = subtract(signal, line)
     
     area = integrate(flat_segment)
-      #/(dx*np.mean(y))
     y_seg = flat_segment[1]
+
+    # if max gradient is > threshold, partition
+    #dff = diff(signal)
+    #dfy = dff[1]/np.max(y)
+    #absdiff = np.abs(dfy)
+
+    xout = [x[-1]]
+    #xout.append(x[np.where(absdiff>0.3)[0]])
 
     if np.all(
          np.abs(y_seg)<threshold_peak) and area < threshold_area:
-        return [x[0], x[-1]]
+        return xout
     peak, xpeak, ypeak = get_first_peak(flat_segment)
     segments = partition(signal, xpeak)
     if segments is None:
-        return [x[0], x[-1]]
+        return xout
     return [reducer(segment, threshold_area, threshold_peak,
         branch0*10+branch) 
             for branch, segment in enumerate(segments)

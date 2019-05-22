@@ -39,6 +39,14 @@ def interpolate(timeseries):
     y = timeseries.values
     return interp1d(x, y, assume_sorted=True)
 
+def interpolated(timeseries_a, timeseries_b):
+    """
+        same as interpolate, but returns a new timeseries
+
+        interpolates timeseries_b at timeseries_a's points
+    """
+    f = interpolate(timeseries_a)
+    return timeseries_b.from_values(f(timeseries_b.times))
 
 def integrate(timeseries):
     """ integrate as a cumulative trap"""

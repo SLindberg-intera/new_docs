@@ -29,6 +29,7 @@ def summary_plot(reduction_result, output_folder):
     f, ax1, ax2 = p.reduced_timeseries_plot(reduction_result)
     plt.savefig(os.path.join(output_folder, 
             "{}-{}.png".format(copc, site)))
+    plt.show()
     plt.close(f)
 
 
@@ -48,13 +49,15 @@ def reduce_dataset(timeseries, summary_file, output_folder):
     points = [0, mx, len(timeseries)]
     x = timeseries.times
 
-    area = 100*np.std(timeseries.values)*(x[-1]-x[0])
-    ythresh = 100*np.std(timeseries.values)
+
+    area = 1*np.std(timeseries.values)*(x[-1]-x[0])
+    #ythresh = 100*np.std(timeseries.values)
+    ythresh = 0.01*np.max(timeseries.values)
     out_error = 1
     out_error_last = out_error
-    OUT_ERROR_THRESHOLD = 1e-2
+    OUT_ERROR_THRESHOLD = 1e-3
     UPPER_N = 50
-    LOWER_N = 10
+    LOWER_N = 5
     last_result = None 
     MAX_ITERATIONS = 80
 
@@ -78,6 +81,7 @@ def reduce_dataset(timeseries, summary_file, output_folder):
     if ix>=MAX_ITERATIONS - 1:
         logging.info("MAX ITERATIONS")
 
+    last_result = red_flux.rebalance(last_result) 
     plot_file = summary_plot(last_result, output_folder)
     last_result.to_csv(output_folder)
     summary_info(last_result, summary_file)

@@ -1,15 +1,22 @@
+import numpy as np
+import scipy.signal as sig
 import pylib.vzreducer.timeseries_math as tsmath
 import pylib.vzreducer.recursive_contour as redcon  
 from pylib.vzreducer.reduction_result import ReductionResult
-import numpy as np
 
 SMOOTH = "SMOOTH"
 RAW = "RAW"
 
-def reduce_timeseries(timeseries, threshold_area, threshold_peak,
+def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass,
         solve_type=RAW):
     x = timeseries.times
     y = timeseries.values
+    peaks, _ = sig.find_peaks(y)
+    peaks = x[peaks]
+    pneg, _ = sig.find_peaks(-y)
+    required_slope = x[np.divide(np.abs(np.diff(y,prepend=0)),y,
+            where=(y!=0))>0.20]
+    required_slope = [i-1 for i in required_slope]
     if solve_type == SMOOTH:
         ts_smooth = tsmath.smooth(timeseries)
         y = ts_smooth.values
@@ -19,17 +26,42 @@ def reduce_timeseries(timeseries, threshold_area, threshold_peak,
     )
 
     flat_reduced_x = set(redcon.flatten_reduced(r))
-    peaks = [timeseries.times[np.argmax(timeseries.values)]]
-    required = {x[0], x[-1]}
-    xout = sorted(list(flat_reduced_x.union(required).union(set(peaks))))
+    required = {x[0],x[-1]}
 
-    return timeseries.subset(xout)
+    xout = sorted(list(flat_reduced_x.union(required)\
+            .union(peaks).union(pneg).union(required_slope)
+           ))
+    reduced_flux = timeseries.subset(xout)
+    reduced_mass = tsmath.integrate(reduced_flux)
+
+    return reduced_flux, reduced_mass
+
+def rebalance(reduction_result):
+    """
+        return a new ReductionResult 
+        flux, mass such that the total mass difference is 0
+    """
+    rr = reduction_result
+    deltaM = rr.total_mass_error
+    vals = rr.reduced_flux.values
+    times = rr.reduced_flux.times
+    ixwhere = np.where(vals<0.01*np.max(vals))[0]
+    vals += deltaM/(times[-1]-times[0])
+    adjusted = rr.reduced_flux.from_values(
+            values =vals)
+    reduced_mass = tsmath.integrate(adjusted)
+    return ReductionResult(
+            flux=rr.flux,
+            mass=rr.mass,
+            reduced_flux=adjusted,
+            reduced_mass=reduced_mass)
+
 
 def reduce_flux(flux, threshold_area, threshold_peak, solve_type):
     mass = tsmath.integrate(flux)
-    reduced_flux = reduce_timeseries(flux, threshold_area, threshold_peak,
-            solve_type)
-    reduced_mass = tsmath.integrate(reduced_flux)
+    reduced_flux, reduced_mass = reduce_timeseries(
+            flux, threshold_area, threshold_peak,
+            mass, solve_type)
     
     result = ReductionResult(
             flux=flux,

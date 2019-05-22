@@ -46,6 +46,10 @@ class TimeSeries:
                 copc=self.copc,
                 site=self.site)
 
+    def interpolate_at_timeseries(self, timeseries):
+        """ interpolates self at the values from timeseries """
+        return ts_math.interpolated(self, timeseries)
+
     def __eq__(self, timeseries):
         """ timeseries are equivalent if times and values are equal"""
         times = self.times==timeseries.times
@@ -54,6 +58,9 @@ class TimeSeries:
 
     def __len__(self):
         return len(self.times)
+
+    def integrate(self):
+        return ts_math.integrate(self)
 
     def are_all_zero(self):
         """ true if everything is zero """
