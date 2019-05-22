@@ -24,16 +24,24 @@ def get_symbol(source_key):
 FORMATTER = EngFormatter(places=0, sep="\N{THIN SPACE}")
 
 def reduced_timeseries_plot(reduction_result):
+    """  makes a pretty plot of the reduction result """
     f, (ax1, ax2) = plt.subplots(2,1, sharex=True)
     flux = reduction_result.flux
     mass = reduction_result.mass
+
     r_flux = reduction_result.reduced_flux
     r_mass = reduction_result.reduced_mass
+
+    dflux = flux - r_flux
+    dmass = mass - r_mass
 
     ax1.plot(flux.times, flux.values, 'b.-')
     ax1.plot(r_flux.times, r_flux.values, 'r.')
     ax2.plot(mass.times, mass.values, 'b.-')
     ax2.plot(r_mass.times, r_mass.values, 'r.')
+
+    ax1.plot(dflux.times, dflux.values, 'g')
+    ax2.plot(dmass.times, dmass.values, 'g')
 
     ax1.yaxis.set_major_formatter(FORMATTER)
     ax2.yaxis.set_major_formatter(FORMATTER)

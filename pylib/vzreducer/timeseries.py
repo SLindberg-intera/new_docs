@@ -4,6 +4,7 @@ from scipy.integrate import cumtrapz as cumtrapz, trapz
 import numpy as np
 from pylib.vzreducer.config import config
 import pylib.vzreducer.constants as c
+import pylib.vzreducer.timeseries_math as ts_math
 
 
 class TimeSeries:
@@ -20,6 +21,17 @@ class TimeSeries:
         self.copc = copc
         self.times = times
         self.values = values
+
+    def __sub__(self, b):
+        """
+            facilitates subtraction: a - b 
+
+
+            if the TimeSeries are not time-aligned, it will
+            first interpolate the "b" timeseries at "a"'s timesteps.
+
+        """
+        return ts_math.delta(self, b)
 
     def from_values(self, values):
         """
