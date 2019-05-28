@@ -47,13 +47,7 @@ def reducer(signal, threshold_area, threshold_peak, branch0=0):
     area = integrate(flat_segment)
     y_seg = flat_segment[1]
 
-    # if max gradient is > threshold, partition
-    #dff = diff(signal)
-    #dfy = dff[1]/np.max(y)
-    #absdiff = np.abs(dfy)
-
     xout = [x[-1]]
-    #xout.append(x[np.where(absdiff>0.3)[0]])
 
     if np.all(
          np.abs(y_seg)<threshold_peak) and area < threshold_area:

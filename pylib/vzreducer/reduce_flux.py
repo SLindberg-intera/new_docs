@@ -8,15 +8,25 @@ SMOOTH = "SMOOTH"
 RAW = "RAW"
 
 def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass,
-        solve_type=RAW):
+        solve_type=RAW, simple_peaks=False):
     x = timeseries.times
     y = timeseries.values
     peaks, _ = sig.find_peaks(y)
     peaks = x[peaks]
     pneg, _ = sig.find_peaks(-y)
+    pneg = x[pneg]
     required_slope = x[np.divide(np.abs(np.diff(y,prepend=0)),y,
-            where=(y!=0))>0.20]
+            where=(y>0.05*np.max(y)))>0.20]
     required_slope = [i-1 for i in required_slope]
+
+    #peaks = []
+    #pneg = []
+    #required_slope = []
+    if simple_peaks:
+        peaks = [x[np.argmax(timeseries.values)]]
+        pneg = []
+        required_slopes = []
+
     if solve_type == SMOOTH:
         ts_smooth = tsmath.smooth(timeseries)
         y = ts_smooth.values
@@ -57,11 +67,12 @@ def rebalance(reduction_result):
             reduced_mass=reduced_mass)
 
 
-def reduce_flux(flux, threshold_area, threshold_peak, solve_type):
+def reduce_flux(flux, threshold_area, threshold_peak, solve_type,
+        simple_peaks):
     mass = tsmath.integrate(flux)
     reduced_flux, reduced_mass = reduce_timeseries(
             flux, threshold_area, threshold_peak,
-            mass, solve_type)
+            mass, solve_type, simple_peaks)
     
     result = ReductionResult(
             flux=flux,

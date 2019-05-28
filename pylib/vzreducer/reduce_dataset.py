@@ -29,7 +29,6 @@ def summary_plot(reduction_result, output_folder):
     f, ax1, ax2 = p.reduced_timeseries_plot(reduction_result)
     plt.savefig(os.path.join(output_folder, 
             "{}-{}.png".format(copc, site)))
-    plt.show()
     plt.close(f)
 
 
@@ -49,29 +48,34 @@ def reduce_dataset(timeseries, summary_file, output_folder):
     points = [0, mx, len(timeseries)]
     x = timeseries.times
 
+    mass = timeseries.integrate()
 
-    area = 1*np.std(timeseries.values)*(x[-1]-x[0])
-    #ythresh = 100*np.std(timeseries.values)
-    ythresh = 0.01*np.max(timeseries.values)
+    area = 100*np.std(timeseries.values)*(x[-1]-x[0])
+    #mass.values[-1]
+    ythresh = 100*np.std(timeseries.values)
     out_error = 1
     out_error_last = out_error
-    OUT_ERROR_THRESHOLD = 1e-3
+    OUT_ERROR_THRESHOLD = 1e-2
     UPPER_N = 50
-    LOWER_N = 5
+    LOWER_N = 15
     last_result = None 
     MAX_ITERATIONS = 80
 
     solve_type = SMOOTH
+    simple_peaks = False
 
     for ix in range(MAX_ITERATIONS):
 
         res = red_flux.reduce_flux(timeseries, area, ythresh, 
-                solve_type=solve_type)
+                solve_type=solve_type,
+                simple_peaks=simple_peaks
+                )
         out_error = abs(res.relative_total_mass_error)
         if out_error < OUT_ERROR_THRESHOLD and len(res.reduced_flux)>=LOWER_N:
             last_result = res
             break
         if len(res.reduced_flux) > 2*UPPER_N:
+            simple_peaks = True
             solve_type = RAW
         ythresh = 0.5*ythresh
         area = 0.5*area
