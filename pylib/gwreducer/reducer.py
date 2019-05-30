@@ -9,6 +9,7 @@ from pylib.gwreducer.parse_input_file import parse_input_file
 from pylib.gwreducer.read_gw import GWData
 from pylib.gwreducer.reduce_dataset import reduce_dataset
 from pylib.gwreducer.summary_file import reset_summary_file 
+import pylib.gwreducer.reduce_groundwater_timeseries as rgt
 
 def configure_logger(args):
     """
@@ -64,11 +65,13 @@ def reduce_input_data(input_data, summary_file, output_folder):
     for rowcol in gw_data.get_rowcols:
         row, col = rowcol.split('-')
         try:
+            timeseries = gw_data.extract(row, col)
+            
+            #rt, rv = rgt.reduce_dataset(times, values)
+
             worked = reduce_for_row_col(
                     gw_data, row, col,
-                    summary_file, output_folder)
-            #if not worked:
-            #    continue
+                     summary_file, output_folder)
         except TypeError as e:
             raise Exception(e)
             logging.error("failed at {} {}".format(row, col))

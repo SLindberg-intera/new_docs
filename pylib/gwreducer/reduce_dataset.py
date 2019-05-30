@@ -40,19 +40,23 @@ def reduce_dataset(timeseries, summary_file, output_folder):
     """
     copc = timeseries.copc
     site = timeseries.site
+    A = np.max(timeseries.values)
+    timeseries.values = timeseries.values/A
     if timeseries.are_all_zero():
         logging.info("Skipped {} {} - all zero".format(
             copc, site))
         return False    
     mx = np.argmax(timeseries.values)
     points = [0, mx, len(timeseries)]
+
+
     x = timeseries.times
 
     mass = timeseries.integrate()
 
-    area = 100*np.std(timeseries.values)*(x[-1]-x[0])
+    area = 10*np.mean(timeseries.values)*(x[-1]-x[0])
     #mass.values[-1]
-    ythresh = 100*np.std(timeseries.values)
+    ythresh = .1*np.max(timeseries.values)
     out_error = 1
     out_error_last = out_error
     OUT_ERROR_THRESHOLD = 1e-2
