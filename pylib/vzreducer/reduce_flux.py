@@ -1,8 +1,8 @@
 import numpy as np
 import scipy.signal as sig
-import pylib.vzreducer.timeseries_math as tsmath
-import pylib.vzreducer.recursive_contour as redcon  
-from pylib.vzreducer.reduction_result import ReductionResult
+import pylib.timeseries.timeseries_math as tsmath
+import pylib.datareduction.recursive_contour as redcon  
+from pylib.datareduction.reduction_result import ReductionResult
 
 SMOOTH = "SMOOTH"
 RAW = "RAW"
