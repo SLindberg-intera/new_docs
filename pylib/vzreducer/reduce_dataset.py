@@ -85,8 +85,14 @@ def reduce_dataset(timeseries, summary_file, output_folder):
     if ix>=MAX_ITERATIONS - 1:
         logging.info("MAX ITERATIONS")
 
+    delta_mass = last_result.total_mass_error
+
     last_result = red_flux.rebalance(last_result) 
     plot_file = summary_plot(last_result, output_folder)
     last_result.to_csv(output_folder)
-    summary_info(last_result, summary_file)
+    used_ythresh = ythresh
+    used_area = area
+    n_iterations = ix
+    summary_info(last_result, summary_file, 
+            delta_mass, used_ythresh, used_area, n_iterations)
     log_info(last_result)
