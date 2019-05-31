@@ -3,6 +3,7 @@ from config import config, parse_args
 import logging
 from pylib.info.info import Info
 from pylib.pygit.git import get_version, is_clean_master_branch
+from pathlib import Path
 
 import subprocess
 
@@ -23,6 +24,8 @@ def notify_user(message, shell=False):
     logging.info(message)    
 
 def get_invoked_tool_name(args):
+# SLL COMMENT--this might be better referred to as command since it could be either .exe (compiled tool) or python/perl
+# if the tool is a script?
     """ return the tool name that was invoked at the command line"""
     return args.Name
 
@@ -44,6 +47,7 @@ def make_tool_use_message(args):
     is being invoked.  Message is defined in the config template
         
     """
+
     tool_name = get_invoked_tool_name(args)
     tool_args = get_invoked_tool_arguments(args)
     return config[c.TOOL_NOTIFICATION_TEMPLATE_KEY].format(
@@ -63,9 +67,29 @@ def make_user_summary():
             username=info.username
     )
 
-def make_qa_status():
+def get_approved_tools():
+    return config[c.APPROVED_TOOL_KEY]
+
+def get_filename(path_file):
+    return Path(path_file).name
+
+def is_on_qualified_list(args):
+    "determine the tool being invoked by the runner (if .exe then = tool_name; if script then = 1st argument)"
+    command = get_invoked_tool_name(args)
+    if command[-4:] == '.exe':
+        tool_name = get_filename(command)
+    else:
+        tool = get_invoked_tool_arguments(args).split(' ')[0]
+        tool_name = get_filename(tool)
+    approved_tools = get_approved_tools()
+    for tool in approved_tools:
+        if tool_name == tool['command']:
+            return True
+    return False
+
+def make_qa_status(args):
     """ construct a string showing the QA Status"""
-    if is_clean_master_branch():
+    if is_on_qualified_list(args) and is_clean_master_branch():
         status = c.QA_QUALIFIED
     else:
         status = c.QA_TEST
@@ -81,7 +105,7 @@ def log_header(args):
     notify_user(make_user_message(args), shell=True)
     notify_user(make_tool_use_message(args))
     notify_user(make_version())
-    notify_user(make_qa_status())
+    notify_user(make_qa_status(args))
     notify_user(make_user_summary())
 
 def execute_program(args):
