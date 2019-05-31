@@ -74,16 +74,20 @@ def get_filename(path_file):
     return Path(path_file).name
 
 def is_on_qualified_list(args):
-    "determine the tool being invoked by the runner (if .exe then = tool_name; if script then = 1st argument)"
+    "determine which tool being invoked by the runner (if .exe (or ?) then = tool_name; if script then = 1st argument)"
+# the following assumes that the command line statement is as follows:
+# .. python ..\runner.py 'perl\python\*.exe' "arguments [if script first argument is tool script filename..."
     command = get_invoked_tool_name(args)
+
+# this conditional statement may need to be updated depending upon how the CAST tool is called by the tool runner
     if command[-4:] == '.exe':
-        tool_name = get_filename(command)
+        tool_command = get_filename(command)
     else:
-        tool = get_invoked_tool_arguments(args).split(' ')[0]
-        tool_name = get_filename(tool)
+        path_tool = get_invoked_tool_arguments(args).split(' ')[0]
+        tool_command = get_filename(path_tool)
     approved_tools = get_approved_tools()
     for tool in approved_tools:
-        if tool_name == tool['command']:
+        if tool_command == tool['command']:
             return True
     return False
 
