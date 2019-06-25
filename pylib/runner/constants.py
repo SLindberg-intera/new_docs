@@ -21,6 +21,8 @@ TOOL_NAME_KEY = "Name"
 the runner
 """
 
+APPROVED_TOOL_KEY = "Approved Tools"
+
 TOOL_NOTIFICATION_TEMPLATE_KEY= "Tool Notification Template"
 """ key setting the template of what info is displayed to the user about the
      tool that they are invoking"""
