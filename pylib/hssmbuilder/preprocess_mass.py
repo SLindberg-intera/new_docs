@@ -74,11 +74,12 @@ class mass_obj:
     # build dataframe map of which cells belong to which file/model and the total_mass
     # for each cell.
     def build_cell_map(self,filename,col,total_mass):
+        file = "{0} ({1})".format(filename,total_mass)
         if col in self.cell_map.index.values:
-            self.cell_map.loc[col,"file"].append(filename)
+            self.cell_map.loc[col,"file"].append(file)
             self.cell_map.loc[col,"total_mass"] += total_mass
         else:
-            temp = pd.DataFrame([[col,total_mass,[filename]]],columns=self.cell_map_header)
+            temp = pd.DataFrame([[col,total_mass,[file]]],columns=self.cell_map_header)
             temp = temp.set_index(self.cell_map_index)
             self.cell_map = self.cell_map.append(temp,sort=False)
     #---------------------------------------------------------------------------
@@ -109,6 +110,7 @@ class mass_obj:
                             tmp = line.strip().split(",") ##line.strip().replace("  "," ")
                             if tmp[0].lower() == "time" or tmp[0].lower() == "year":
                                 break
+
                 df = pd.read_csv(dir_file,index_col=0,header=head_row, skiprows=[head_row+1])
                 df.rename(str.lower, axis='columns')
                 columns = df.columns

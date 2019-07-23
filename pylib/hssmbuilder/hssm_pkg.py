@@ -9,8 +9,9 @@ from decimal import *
 import datetime as dt
 import pylib.gwreducer.reduce_groundwater_timeseries as rgt
 from pylib.timeseries.timeseries import TimeSeries
-import pylib.timeseries.timeseries_math as ts_math
+import pylib.timeseries.timeseries_math as tsmath
 import pylib.hssmbuilder.plots as plt
+import scipy.signal as sig
 #---------------------------------------------------------------------------
 #
 def setup_logger(name, log_file, formatter, level=logging.INFO):
@@ -61,22 +62,29 @@ def build_pkg(file):
                 file.logger.info(msg_str)
                 print(msg_str)
             else:
-                non_zero_ind = np.where(file.vals > 0)[0]
-                if non_zero_ind.size < file.min_reduction_step:
+                non_zero_ind = np.where(file.vals > file.flux_floor)[0]
+                if non_zero_ind.size < file.min_reduction_steps:
+                    #add first zero after data decreases to zero
+                    if non_zero_ind[-1]+1 < file.vals.size-1 and non_zero_ind[-1]+1 not in non_zero_ind:
+                        non_zero_ind = np.append(non_zero_ind,non_zero_ind[-1]+1)
+                    #add last zero before flux increases above zero
+                    if non_zero_ind[0]-1 > 0 and non_zero_ind[0]-1 not in non_zero_ind:
+                        non_zero_ind = np.append(non_zero_ind,non_zero_ind[0]-1)
                     if 0 not in non_zero_ind:
                         non_zero_ind = np.append(non_zero_ind,[0])
-                    if (values.size -1) not in non_zero_ind:
-                        non_zero_ind = np.append(non_zero_ind,[(values.size -1)])
+                    if (file.vals.size -1) not in non_zero_ind:
+                        non_zero_ind = np.append(non_zero_ind,[(file.vals.size -1)])
                     non_zero_ind = np.sort(non_zero_ind)
-                    days = years[non_zero_ind]
-                    vals = values[non_zero_ind]
+                    days = file.days[non_zero_ind]
+                    vals = file.vals[non_zero_ind]
                     segs, error = file.build_hssm_data(days,vals)
-                    peaks, _ = sig.find_peaks(rr.reduced_flux.values,width=3,rel_height=1)
-                    if peaks.size == 0:
-                        peaks, _ = sig.find_peaks(rr.reduced_flux.values,width=2,rel_height=1)
-                        if peaks.size == 0:
-                            peaks, _ = sig.find_peaks(rr.reduced_flux.values,width=1,rel_height=1)
-                if len(file.data) > file.min_reduction_steps and file.reduce_data:
+                    num_peaks, _ = sig.find_peaks(vals,width=3,rel_height=1)
+                    if num_peaks.size == 0:
+                        num_peaks, _ = sig.find_peaks(vals,width=2,rel_height=1)
+                        if num_peaks.size == 0:
+                            num_peaks, _ = sig.find_peaks(vals,width=1,rel_height=1)
+                    num_peaks = num_peaks.size
+                elif len(file.data) > file.min_reduction_steps and file.reduce_data:
                     #segs = file.calc_segments()
 
                     #start = np.where(file.vals > 0)[0][0]-1
@@ -91,9 +99,9 @@ def build_pkg(file):
                     segs, error = file.build_hssm_data(file.days,file.vals)
 
                 file.logger.info("final data reduction produced {0} steps".format(len(segs)))
-                r_ts = ts_math.interpolated(r_ts,o_ts)
-                if len(segs) > max_steps:
-                    max_steps = len(segs) + 1
+                r_ts = tsmath.interpolated(r_ts,o_ts)
+                #if len(segs) > max_steps:
+                #    max_steps = len(segs) + 1
                 output_str = "{0} {1}\n".format(file.HSSFileName,file.inHSSFile)
                 output_str += "{0} {1} {2} {3} {4}\n".format(file.kSource,file.iSource, file.jSource,
                                             file.SourceName,file.iHSSComp)
@@ -117,11 +125,11 @@ def build_pkg(file):
                     dat_output += "{0} 0 {1}\n".format(hssm_obj.format_e(rec[0]),hssm_obj.format_e(rec[1]))
 
 
-                with open("{0}".format(file.HSSFileName),"w") as outfile:
+                with open("{0}".format(file.outputFileName),"w") as outfile:
                     outfile.write(dat_output)
-                cell_logger.info("finished dat file: {0}".format(file.HSSFileName))
-                if count > max_steps:
-                    max_steps = count +1
+                cell_logger.info("finished dat file: {0}".format(file.outputFileName))
+                #if count > max_steps:
+                #    max_steps = count +1
 
                 print('processed {0}-{1} in ({2}-{3}) {4}'.format(file.iSource,file.jSource, dt.datetime.utcnow(),time,dt.datetime.utcnow()- time))
         return new_data
@@ -133,7 +141,7 @@ def build_pkg(file):
 #-------------------------------------------------------------------------------
 #
 class hss_file():#data_reduction):
-    def __init__(self, fn, k, i, j, sn, c,tol,sy,log_p,min_steps,flux_floor,
+    def __init__(self, ofn,fn, k, i, j, sn, c,tol,sy,log_p,min_steps,flux_floor,
                 max_tm_error,units,dr=True):
 
         #data_reduction.__init__(self,i,j)
@@ -141,6 +149,7 @@ class hss_file():#data_reduction):
         self.start_year = sy
         #self.segments = []
         self.HSSFileName = fn
+        self.outputFileName = ofn
         self.inHSSFile = ""
         self.kSource = k
         self.iSource = i
@@ -231,7 +240,10 @@ class hssm_obj:
         self.saturation = sat
         self.cells = cel
         self.head = self.cells.loc[:, self.cells.columns != 'days'].columns.values
-        self.path = params["output"]
+        if "output" in params.keys():
+            self.path = params["output"]
+        else:
+            self.path = "output/"
         self.tolerance = params["tolerance"]
         self.start_year = params["start_year"]
         self.end_year = params["end_year"]
@@ -244,6 +256,10 @@ class hssm_obj:
         self.min_reduction_steps = min_steps
         self.units = params["units"]
         self.data_reduction = params["data_reduction"]
+        if "HSSpath" in params.keys():
+            self.HSSpath = params["HSSpath"]
+        else:
+            self.HSSpath = "./hss/"
     #---------------------------------------------------------------------------
     #
     def build_data(self):
@@ -257,13 +273,20 @@ class hssm_obj:
             try:
                 i_ind = int(self.head[i][0:str_ind])
                 j_ind = int(self.head[i][str_ind+1:])
-                k = int(self.saturation.loc[([i_ind-1,j_ind-1]),'k'].values[0])
+                try:
+                    k = int(self.saturation.loc[(i_ind,j_ind),'k'])
+                except:
+                    k = 0
+                    self.logger.info("{} Error: could not find saturation layer".format(self.head[i]))
+                    print("{} Error: could not find saturation layer".format(self.head[i]))
+                #print('{0}-{1}:{2} ({3})'.format(i_ind, j_ind,k,self.saturation.loc[(i_ind-1,j_ind-1),'k']))
                 list.append('{0}-{1}'.format(i_ind, j_ind))
             except:
                 #self.logger.critical("Invalid header format {0}".format(self.head[i]))
                 raise
-            file_name = "{0}i{1}j{2}_hss.dat".format(self.path,i_ind,j_ind)
-            rec = hss_file(file_name,k,i_ind,j_ind,1,self.head[i],
+            out_fileName = "{0}i{1}j{2}_hss.dat".format(self.path,i_ind,j_ind)
+            HSSFileName = "{0}i{1}j{2}_hss.dat".format(self.HSSpath,i_ind,j_ind)
+            rec = hss_file(out_fileName,HSSFileName,k,i_ind,j_ind,1,self.head[i],
                             self.tolerance,self.start_year,self.log_path,
                             self.min_reduction_steps,self.flux_floor,
                             self.max_tm_error,self.units,self.data_reduction)
@@ -310,8 +333,8 @@ class hssm_obj:
             if len(x) > 1:
                 file_str += x[2]
                 num_files += 1
-                if len(x[1])*2 >= max_steps:
-                    max_steps = len((x[1])*2)+1
+                if len(x[1]) >= max_steps:
+                    max_steps = len((x[1]))+5
         self.logger.info("Building dat file: mt3d.hss")
         output = "{0} {1} {2} NoRunHSSM\n".format(num_files, 1,max_steps)
         output += "{0} {1} {2}\n".format(1, 1, 1)
@@ -335,22 +358,59 @@ class hssm_obj:
                     break
         #check to make sure data was found
         if len(self.reduced_data[start]) >= 8:
-            o_ts = TimeSeries(self.reduced_data[start][7].times,np.zeros(self.reduced_data[start][7].times.size),None,None)
-            r_ts = TimeSeries(self.reduced_data[start][7].times,np.zeros(self.reduced_data[start][7].times.size),None,None)
+            #o_ts = TimeSeries(self.reduced_data[start][7].times,np.zeros(self.reduced_data[start][7].times.size),None,None)
+            cols = list(self.cells.columns)
+            cols.remove('days')
+            o_ts = TimeSeries(self.cells['days'].values,self.cells[cols].sum(axis=1).values,None,None)
+
+            r_ts = TimeSeries(o_ts.times,np.zeros(o_ts.times.size),None,None)
+            check_cells = pd.DataFrame()
             for data in self.reduced_data:
                 if len(data) >= 8:
-                    o_ts.values += data[7].values
-                    r_ts.values += data[6].values
+                    #o_ts.values += data[7].values
+                    #interp_fn = tsmath.interpolate(data[6])
+                    #interp_values = interp_fn(o_ts.times)
+                    #r_ts.values += interp_values
+                    r_ts.values += tsmath.interpolated(data[6],o_ts).values
+                    #check mass differences for cell
+                    r_t_mass = data[6].integrate()
+                    t_mass = data[7].integrate()
+                    d_mass_ts = tsmath.delta(t_mass,r_t_mass)
+                    p_mass_ts = TimeSeries(d_mass_ts.times,d_mass_ts.values /t_mass.values,None,None)
+
+                    d_flux_ts = tsmath.delta(data[7],data[6])
+                    p_flux_ts = TimeSeries(d_flux_ts.times,d_flux_ts.values /data[7].values,None,None)
+
+                    error_mass_ind = np.where(p_mass_ts.values > .1)[0]
+                    error_flux_ind = np.where(p_flux_ts.values > .1)[0]
+                    if len(error_mass_ind) > 0:
+                        t_data = pd.DataFrame(d_mass_ts.times[error_mass_ind],columns=["{} day".format(data[0])])
+                        check_cells = pd.concat([check_cells,t_data],axis=1,sort=False)
+                        t_data = pd.DataFrame(d_mass_ts.values[error_mass_ind],columns=["mass difference (pCi)"])
+                        check_cells = pd.concat([check_cells,t_data],axis=1,sort=False)
+                        t_data = pd.DataFrame(p_mass_ts.values[error_mass_ind],columns=["% mass difference".format(data[0])])
+                        check_cells = pd.concat([check_cells,t_data],axis=1,sort=False)
+                    if len(error_flux_ind) > 0:
+                        t_data = pd.DataFrame(d_flux_ts.times[error_flux_ind],columns=["{} day".format(data[0])])
+                        check_cells = pd.concat([check_cells,t_data],axis=1,sort=False)
+                        t_data = pd.DataFrame(d_flux_ts.values[error_flux_ind],columns=["flux difference (pCi/day)".format(data[0])])
+                        check_cells = pd.concat([check_cells,t_data],axis=1,sort=False)
+                        t_data = pd.DataFrame(p_flux_ts.values[error_flux_ind],columns=["% flux difference".format(data[0])])
+                        check_cells = pd.concat([check_cells,t_data],axis=1,sort=False)
+
+            #write file with mass error issues
+            fileName = os.path.join(self.misc_path,'cell_mass_error_year.csv')
+            check_cells.to_csv(fileName, header=True)
+            #finish processing total mass differences
             o_mass_ts = o_ts.integrate()
             r_mass_ts = r_ts.integrate()
-            d_ts = ts_math.delta(o_ts,r_ts)
-            d_mass_ts = ts_math.delta(o_mass_ts,r_mass_ts)
+            d_ts = tsmath.delta(o_ts,r_ts)
+            d_mass_ts = tsmath.delta(o_mass_ts,r_mass_ts)
 
             output = "year,day,original rate ({0}/day),reduced rate ({0}/day),original mass ({0}),reduced mass ({0}), rate error, mass error\n".format(self.units)
             for i in range(0,o_ts.times.size):
                 day = o_ts.times[i]
                 year = (day/365.25)+self.start_year
-
                 d_flux = o_ts.values[i]-r_ts.values[i]
                 p_flux = d_flux / o_ts.values[i]
                 d_mass = o_mass_ts.values[i]-r_mass_ts.values[i]

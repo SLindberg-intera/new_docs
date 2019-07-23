@@ -237,7 +237,7 @@ class sat_obj:
                             lvl = self.calc_sat(hds,t_depth,b_depth)
                             calc_txt = calc.format(hds,b_depth,t_depth,lvl)
                             if lvl > self.min_sat_lvl:
-                                #self.logger.info("K,i-j({0},{1}-{2}): {3} ".format(k+1,i+1,j+1,calc_txt))
+                                self.logger.info("K,i-j({0},{1}-{2}): {3} ".format(k+1,i+1,j+1,calc_txt))
                                 #logger.info(("K,i-j({0},{1}-{2}): {3} ".format(k+1,i+1,j+1,calc_txt)))
                                 if lvl > 1:
                                     lvl = 1

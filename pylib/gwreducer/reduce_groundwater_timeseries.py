@@ -24,6 +24,11 @@ def reduce_dataset(years, values,flux_floor=0,max_tm_error=0):
     #  we are removing anything under flux floor to help remove jidder
 
     non_zero_ind = np.where(values > flux_floor)[0]
+    if non_zero_ind[0]-1 > 0:
+        non_zero_ind = np.append(non_zero_ind,non_zero_ind[0]-1)
+    #add first zero after data decreases to zero
+    if non_zero_ind[-1]+1 < values.size-1:
+        non_zero_ind = np.append(non_zero_ind,non_zero_ind[-1]+1)
     if 0 not in non_zero_ind:
         non_zero_ind = np.append(non_zero_ind,[0])
     if (values.size -1) not in non_zero_ind:
