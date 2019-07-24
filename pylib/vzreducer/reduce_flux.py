@@ -17,11 +17,16 @@ def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass,
     pneg = x[pneg]
     required_slope = x[np.divide(np.abs(np.diff(y,prepend=0)),y,
             where=(y>0.05*np.max(y)))>0.20]
-    required_slope = [i-1 for i in required_slope]
+
+    required_slope_lower = [i-1 for i in required_slope if i != x[0]]
+    required_slope_upper = [i+1 for i in required_slope if i != x[-1]]
+    required_slope = sorted([*{*[*required_slope, *required_slope_upper, *required_slope_lower]}])
 
     if simple_peaks:
         peaks = [x[np.argmax(timeseries.values)]]
         pneg = []
+        # this is never used....above is required_slope (not plural...)
+        # threw off reduction for T31 if required slope is cleared though...
         required_slopes = []
 
     if solve_type == SMOOTH:
@@ -69,6 +74,7 @@ def rebalance(reduction_result):
 def reduce_flux(flux, threshold_area, threshold_peak, solve_type,
         simple_peaks):
     mass = tsmath.integrate(flux)
+    # note: don't think that mass is ever used in the called function reduce_timeseries ....
     reduced_flux, reduced_mass = reduce_timeseries(
             flux, threshold_area, threshold_peak,
             mass, solve_type, simple_peaks)

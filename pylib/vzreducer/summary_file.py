@@ -9,7 +9,7 @@ WRITE_MODE = 'w'
 NOTHING = ''
 
 def summary_header(summary_file):
-    hdr = "COPC,SITE,N reduced,N Iterations,y thresh,Area,Unreduced Total Mass Error (Ci),Reduced Total Mass (Ci)\n"
+    hdr = "COPC,SITE,N reduced,N Iterations,y thresh,Area,Unreduced Total Mass Error (Ci) (Reduced-Orig),Reduced Total Mass (Ci) (Reduced-Orig\n"
     with open(summary_file, APPEND_MODE) as f:
         f.write(hdr)
 

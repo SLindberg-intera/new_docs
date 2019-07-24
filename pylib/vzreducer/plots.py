@@ -38,13 +38,13 @@ def reduced_timeseries_plot(reduction_result):
     dflux = flux - r_flux
     dmass = mass - r_mass
 
-    ax1.plot(flux.times, flux.values, 'b', label="input")
-    ax1.plot(r_flux.times, r_flux.values, 'r.', label="reduced")
-    ax2.plot(mass.times, mass.values, 'b')
-    ax2.plot(r_mass.times, r_mass.values, 'r.')
+    ax1.plot(flux.times[:], flux.values[:], 'b', label="input")
+    ax1.plot(r_flux.times[:], r_flux.values[:], 'r.', label="reduced")
+    ax2.plot(mass.times[:], mass.values[:], 'b')
+    ax2.plot(r_mass.times[:], r_mass.values[:], 'r.')
 
-    ax1.plot(dflux.times, dflux.values, 'k', label="diff")
-    ax2.plot(dmass.times, dmass.values, 'k')
+    ax1.plot(dflux.times[:], dflux.values[:], 'k', label="diff")
+    ax2.plot(dmass.times[:], dmass.values[:], 'k')
 
     ax1.yaxis.set_major_formatter(FORMATTER)
     ax2.yaxis.set_major_formatter(FORMATTER)

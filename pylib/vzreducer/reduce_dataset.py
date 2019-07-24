@@ -45,20 +45,26 @@ def reduce_dataset(timeseries, summary_file, output_folder):
             copc, site))
         return False    
     mx = np.argmax(timeseries.values)
+    # unused variable...SLL
     points = [0, mx, len(timeseries)]
     x = timeseries.times
-
+    # unused variable...SLL
     mass = timeseries.integrate()
 
     area = 100*np.std(timeseries.values)*(x[-1]-x[0])
+    # unused variable (already commented out)...SLL
     #mass.values[-1]
     ythresh = 100*np.std(timeseries.values)
     out_error = 1
     out_error_last = out_error
+    # constants to move to config file--pending--SLL
     OUT_ERROR_THRESHOLD = 1e-2
     UPPER_N = 50
     LOWER_N = 15
-    last_result = None 
+
+    last_result = None
+
+    # constants to move to config file--pending--SLL (I had bumped it up to 100 in testing)
     MAX_ITERATIONS = 80
 
     solve_type = SMOOTH
