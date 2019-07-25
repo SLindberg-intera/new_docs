@@ -48,7 +48,7 @@ def get_copc_list(input_data, solid_waste_release):
 
 
 def reduce_for_copc_site(solid_waste_release, copc, site,
-        summary_file, output_folder):
+        summary_file, output_folder,input_data):
     """
         extract a TimeSeries instance from solid_waste_release
         corresponding to the target copc/site and then reduce it
@@ -58,7 +58,7 @@ def reduce_for_copc_site(solid_waste_release, copc, site,
     """
     timeseries = solid_waste_release.extract(copc, site)
     worked = reduce_dataset(
-            timeseries, summary_file, output_folder
+            timeseries, summary_file, output_folder, input_data
             )
     return worked
 
@@ -81,9 +81,10 @@ def reduce_input_data(filekey, input_data, summary_file, output_folder):
     for copc in copc_list:
         for site in site_list:
             try:
+                #SLL--inserted input_data as an argument for reduction constants moved to input file
                 worked = reduce_for_copc_site(
                         solid_waste_release, copc, site,
-                        summary_file, output_folder)
+                        summary_file, output_folder, input_data)
                 if not worked:
                     continue
             except TypeError as e:
@@ -106,7 +107,10 @@ def main():
     output_folder = get_output_folder(args)
     summary_filename = "summary.csv"
     summary_file = reset_summary_file(output_folder, summary_filename)
-    for filekey in [c._200E_KEY, c._200W_KEY]:
+
+    #replaced the area keys with source files key in case the areas change?
+    #for filekey in [c._200E_KEY, c._200W_KEY]:
+    for filekey in  input_data[c.SOURCE_FILES_KEY]:
         reduce_input_data(filekey, input_data, summary_file,
                 output_folder)
 

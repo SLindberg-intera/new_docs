@@ -32,7 +32,7 @@ def summary_plot(reduction_result, output_folder):
     plt.close(f)
 
 
-def reduce_dataset(timeseries, summary_file, output_folder):
+def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     """ take a TimeSeries object and reduce it.
 
     write a summary into summary_folder
@@ -56,16 +56,18 @@ def reduce_dataset(timeseries, summary_file, output_folder):
     #mass.values[-1]
     ythresh = 100*np.std(timeseries.values)
     out_error = 1
+    # unused variable...SLL
     out_error_last = out_error
-    # constants to move to config file--pending--SLL
-    OUT_ERROR_THRESHOLD = 1e-2
-    UPPER_N = 50
-    LOWER_N = 15
+
+    # SLL--constants to move to vz-reducer-input.json file
+    OUT_ERROR_THRESHOLD = float(input_data[c.OUT_ERROR_THRESHOLD_KEY]) #1e-2
+    UPPER_N =  int(input_data[c.UPPER_N_KEY]) #50
+    LOWER_N = int(input_data[c.LOWER_N_KEY]) #15
 
     last_result = None
 
-    # constants to move to config file--pending--SLL (I had bumped it up to 100 in testing)
-    MAX_ITERATIONS = 80
+    # SLL--constant to move to vz-reducer-input.json file(I had bumped it up to 100 in testing)
+    MAX_ITERATIONS = int(input_data[c.MAX_ITERATIONS_KEY])  #80
 
     solve_type = SMOOTH
     simple_peaks = False
