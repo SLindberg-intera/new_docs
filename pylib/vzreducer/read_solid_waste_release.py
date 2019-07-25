@@ -33,6 +33,9 @@ class SolidWasteReleaseData:
         self.zero_below = zero_below
         if zero_below == '':
             self.zero_below = None
+        #SLL--converted zero_below from string to a float to avoid type error
+        else:
+            self.zero_below = float(zero_below)
 
         logging.info("COPCS in {}: {}".format(filename, str(self.copcs)))
         logging.info("Sites in {}: {}".format(filename, str(self.sites)))
