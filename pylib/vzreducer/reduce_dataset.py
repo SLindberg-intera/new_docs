@@ -56,7 +56,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     #mass.values[-1]
     ythresh = 100*np.std(timeseries.values)
     out_error = 1
-    # unused variable...SLL
+    # tracked but unused variable?...SLL
     out_error_last = out_error
 
     # SLL--constants to move to vz-reducer-input.json file

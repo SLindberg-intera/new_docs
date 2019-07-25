@@ -25,9 +25,10 @@ def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass,
     if simple_peaks:
         peaks = [x[np.argmax(timeseries.values)]]
         pneg = []
-        # this is never used....above is required_slope (not plural...)
-        # threw off reduction for T31 if required slope is cleared though...
+        # this is never used....above is required_slope (singular and not plural...)
+        # threw off reduction for T31 and T34 (C-14 for sure) if required slope is cleared though...
         required_slopes = []
+
 
     if solve_type == SMOOTH:
         ts_smooth = tsmath.smooth(timeseries)
