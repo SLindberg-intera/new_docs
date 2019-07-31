@@ -18,14 +18,23 @@ def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass,
     peaks = x[peaks]
     pneg, _ = sig.find_peaks(-y)
     pneg = x[pneg]
+    peak_width = 1
+    while peaks.size >10:
+        peak_width += 1
+        peaks, _ = sig.find_peaks(y,width=peak_width,rel_height=1)
+        peaks = x[peaks]
+        pneg, _ = sig.find_peaks(-y,width=peak_width,rel_height=1)
+        pneg = x[pneg]
+
     required_slope = x[np.divide(np.abs(np.diff(y,prepend=0)),y,
             where=(y>0.05*np.max(y)))>0.20]
+
     required_slope = [i-1 for i in required_slope]
 
     if simple_peaks:
-        peaks = [x[np.argmax(timeseries.values)]]
+        peaks = np.array([x[np.argmax(timeseries.values)]])
         pneg = []
-        required_slopes = []
+        required_slope = np.array([])
 
     if solve_type == SMOOTH:
         ts_smooth = tsmath.smooth(timeseries)
@@ -36,6 +45,7 @@ def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass,
     )
 
     flat_reduced_x = set(redcon.flatten_reduced(r))
+
     required = {x[0],x[-1]}
 
     xout = sorted(list(flat_reduced_x.union(required)\
@@ -120,8 +130,6 @@ def get_inflection_points(flux,peaks,pneg,p_area):
     else:
         for index in range(1,peaks.size):
             e_ind = peaks[index]
-            #if e_ind > last_val:
-            #    e_ind = last_val
             if e_ind > s_ind and (e_ind - s_ind) > 0 and e_ind <= last_val: #skip time step 0 as that will always be a starting point
                 #find the deepest part of the valley
                 v_ind = np.where((pneg > s_ind) & (pneg < e_ind))
@@ -167,9 +175,11 @@ def adjust_flux(data,error):
             total_mass += temp_series.values[-1]
     adjusted = {}
 
-    total_error_perc = float(0.0)
-    mass_used = float(0.0)
+    #total_error_perc = float(0.0)
+    #mass_used = float(0.0)
 
+    #figure precentage to adjust each point by
+#    flux_diff = (total_mass+error)/total_mass
     for seg in data:
         #if segment has atleast 3 points (mid points are adjusted)
         if seg.times.size > 2:
@@ -188,6 +198,7 @@ def adjust_flux(data,error):
                     flux_diff = .1
                 else:
                     flux_diff = -.1
+
             adjusted[x[0]] = y[0]
             #for each value (except first and last values) adjust value by percent (flux_diff)
             for i in range(1,x.size-1):

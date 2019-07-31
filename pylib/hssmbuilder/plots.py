@@ -52,13 +52,17 @@ def reduced_timeseries_plot(o_flux,r_flux,i,j,unit,start_year,summary_plot):
     r_line = "r."
     g_title = "GW Model Surface {}-{}".format(i,j)
     title = 'Activity'
+    o_label = "unreduced ({} data points)".format(o_steps)
+    r_label = "reduced   ({} data points)".format(r_steps)
     if unit[1].lower == 'kg':
         title = "Mass"
     if summary_plot:
         r_line = "r--"
         g_title = "GW Model Total Surface {}".format(title)
-    ax1.plot(o_flux.times, o_flux.values, 'b',    label="unreduced ({} data points)".format(o_steps))
-    ax1.plot(r_flux.times, r_flux.values, r_line, label="reduced   ({} data points)".format(r_steps))
+        o_label = "unreduced"
+        r_label = "reduced"
+    ax1.plot(o_flux.times, o_flux.values, 'b',    label=o_label)
+    ax1.plot(r_flux.times, r_flux.values, r_line, label=r_label)
     ax2.plot(mass.times, mass.values, 'b')
     ax2.plot(r_mass.times, r_mass.values, r_line)
 

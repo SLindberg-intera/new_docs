@@ -173,6 +173,9 @@ class mass_obj:
     #
     def process_dry_cells(self,dry_cells,intrmdt_flag):
         more_dry_cells = True
+#        ml_cols = ["i-j","from"]
+#        move_log = pd.DataFrame(columns=ml_log)
+#        move_log = move_log.set_index("i-j")
 
         iteration = 0
         self.logger.info("Processing Flux from Cells that have have gone dry:")
@@ -207,23 +210,31 @@ class mass_obj:
                         self.logger.debug("Debug, sliced cell data: {0}".format(cell_loss))
                         #find and create proportional data
                         prcnt = self.find_proportion(faces,0)
+                        #log_row = []
+
                         if prcnt > 0:
-                            proportional_data = pd.concat([proportional_data,self.create_proportional_data(faces[0],cell_loss,prcnt)],axis=1)
-                            #self.create_proportional_data(faces[0],cell_loss,prcnt)
+                            temp = self.create_proportional_data(faces[0],cell_loss,prcnt)
+                            proportional_data = pd.concat([proportional_data,temp],axis=1)
+                            #if i_j in move_log.index:
+                            #    log_row = move_log.loc[i_j,"from"].values
+                            #else:
+                            #    log_row = temp[faces[1]].sum()
+                            #move_log.loc[faces[0],"from"][i_j] = log_row
                         prcnt = self.find_proportion(faces,1)
                         if prcnt > 0:
-                            proportional_data = pd.concat([proportional_data,self.create_proportional_data(faces[1],cell_loss,prcnt)],axis=1)
-                            #self.create_proportional_data(faces[1],cell_loss,prcnt)
+                            temp = self.create_proportional_data(faces[1],cell_loss,prcnt)
+                            proportional_data = pd.concat([proportional_data,temp],axis=1)
+
                         prcnt = self.find_proportion(faces,2)
                         if prcnt > 0:
-                            proportional_data = pd.concat([proportional_data,self.create_proportional_data(faces[2],cell_loss,prcnt)],axis=1)
-                            #self.create_proportional_data(faces[2],cell_loss,prcnt)
+                            temp = self.create_proportional_data(faces[2],cell_loss,prcnt)
+                            proportional_data = pd.concat([proportional_data,temp],axis=1)
+
                         prcnt = self.find_proportion(faces,3)
                         if prcnt > 0:
-                            proportional_data = pd.concat([proportional_data,self.create_proportional_data(faces[3],cell_loss,prcnt)],axis=1)
-                            #self.create_proportional_data(faces[3],cell_loss,prcnt)
-            #if proportional_data.columns.size > 1:
-                #concat proportional data to original data
+                            temp = self.create_proportional_data(faces[3],cell_loss,prcnt)
+                            proportional_data = pd.concat([proportional_data,temp],axis=1)
+
 
             self.cells = pd.concat([self.cells,proportional_data],axis=1)
             #change all NaN to 0

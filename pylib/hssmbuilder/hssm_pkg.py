@@ -56,27 +56,25 @@ def build_pkg(file):
             segs = []
             error = 0
             o_ts = TimeSeries(file.days,file.vals,None,None)
+            o_mass = o_ts.integrate().values[-1]
             r_ts = TimeSeries(file.days,file.vals,None,None)
-            if file.has_data == False:
+            #non_zero_ind = np.where(file.vals > (file.flux_floor * 365.25))[0]
+            if file.has_data == False:# or non_zero_ind.size < file.min_reduction_steps:
                 msg_str = ("Skipping Cell i{0}-j{1}: flux never exceeds {2}".format(file.iSource,file.jSource,file.flux_floor))
                 file.logger.info(msg_str)
                 print(msg_str)
             else:
-                non_zero_ind = np.where(file.vals > file.flux_floor)[0]
-                if non_zero_ind.size < file.min_reduction_steps:
-                    #add first zero after data decreases to zero
-                    if non_zero_ind[-1]+1 < file.vals.size-1 and non_zero_ind[-1]+1 not in non_zero_ind:
-                        non_zero_ind = np.append(non_zero_ind,non_zero_ind[-1]+1)
-                    #add last zero before flux increases above zero
-                    if non_zero_ind[0]-1 > 0 and non_zero_ind[0]-1 not in non_zero_ind:
-                        non_zero_ind = np.append(non_zero_ind,non_zero_ind[0]-1)
-                    if 0 not in non_zero_ind:
-                        non_zero_ind = np.append(non_zero_ind,[0])
-                    if (file.vals.size -1) not in non_zero_ind:
-                        non_zero_ind = np.append(non_zero_ind,[(file.vals.size -1)])
-                    non_zero_ind = np.sort(non_zero_ind)
+                #check if allowing any steps greater than flux_floor yearly is below min_reduction_steps
+                non_zero_ind = file.remove_zero_flux()
+
+                r_mass = TimeSeries(file.days[non_zero_ind],file.vals[non_zero_ind],None,None).integrate().values[-1]
+
+                #check if allowing only steps greater than flux floor reduces steps to below min_reduction_steps
+                if abs(o_mass - r_mass) < .001 and non_zero_ind.size < file.min_reduction_steps:
+
                     days = file.days[non_zero_ind]
                     vals = file.vals[non_zero_ind]
+
                     segs, error = file.build_hssm_data(days,vals)
                     num_peaks, _ = sig.find_peaks(vals,width=3,rel_height=1)
                     if num_peaks.size == 0:
@@ -220,6 +218,7 @@ class hss_file():#data_reduction):
             # year.
             elif self.data[i][1] != self.data[i+1][1]:
                 new_data.append(self.data[i])
+
         self.data = []
         self.data = new_data
     #---------------------------------------------------------------------------
@@ -230,7 +229,53 @@ class hss_file():#data_reduction):
         self.has_data = False
         if np.any(self.vals > self.flux_floor):
             self.has_data = True
-
+    #
+    #
+    def remove_zero_flux(self):
+        non_zero_ind = np.where(self.vals > (self.flux_floor))[0]
+        #check if allowing any steps greater than 0 is still below min_reduction_steps
+        temp_non_zero = np.where(self.vals > 0)[0]
+        if temp_non_zero.size < self.min_reduction_steps:
+            non_zero_ind = temp_non_zero
+        #add first zero after data decreases to zero
+        if non_zero_ind[-1]+1 < self.vals.size-1 and non_zero_ind[-1]+1 not in non_zero_ind:
+            ind = non_zero_ind[-1]+1
+            non_zero_ind = np.append(non_zero_ind,[ind])
+            low_val = self.vals[ind]
+            zero_ind = ind
+            #if low_val is not 0 then find then next zero
+            if self.vals[zero_ind] != 0:
+                for i in range(ind,self.vals.size):
+                    if self.vals[i] == 0:
+                        ind = i
+                        break
+                    elif self.vals[i] < low_val:
+                        low_val = self.vals[i]
+                        ind = i
+                if ind not in non_zero_ind:
+                    non_zero_ind = np.append(non_zero_ind,[ind])
+        #add last zero before flux increases above zero
+        if non_zero_ind[0]-1 > 0 and non_zero_ind[0]-1 not in non_zero_ind:
+            ind = non_zero_ind[0]-1
+            non_zero_ind = np.append(non_zero_ind,[ind])
+            low_val = self.vals[ind]
+            #if low_val is not 0 then find the previous zero
+            if low_val != 0:
+                for i in range(ind, 0,-1):
+                    if self.vals[i] == 0:
+                        ind = i
+                        break
+                    elif self.vals[i] < low_val:
+                        low_val = self.vals[i]
+                        ind = i
+            if ind not in non_zero_ind:
+                non_zero_ind = np.append(non_zero_ind,[ind])
+        if 0 not in non_zero_ind:
+            non_zero_ind = np.append(non_zero_ind,[0])
+        if (self.vals.size -1) not in non_zero_ind:
+            non_zero_ind = np.append(non_zero_ind,[(self.vals.size -1)])
+        non_zero_ind = np.sort(non_zero_ind)
+        return non_zero_ind
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 # build package object
@@ -251,7 +296,7 @@ class hssm_obj:
         self.misc_path = misc_p
         self.reduced_data = []
         self.logger = logging.getLogger(log)
-        self.flux_floor = params["flux_floor"]
+        self.flux_floor = params["flux_floor"]/365.25
         self.max_tm_error =params["max_tm_error"]
         self.min_reduction_steps = min_steps
         self.units = params["units"]

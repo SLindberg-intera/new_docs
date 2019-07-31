@@ -24,6 +24,38 @@ def reduce_dataset(years, values,flux_floor=0,max_tm_error=0):
     #  we are removing anything under flux floor to help remove jidder
 
     non_zero_ind = np.where(values > flux_floor)[0]
+    #add last zero before flux increases above zero
+    if non_zero_ind[-1]+1 < values.size-1 and non_zero_ind[-1]+1 not in non_zero_ind:
+        ind = non_zero_ind[-1]+1
+        non_zero_ind = np.append(non_zero_ind,[ind])
+        low_val = values[ind]
+        #if low_val is not 0 then find then next zero
+        if low_val != 0:
+            for i in range(ind,values.size):
+                if values[i] == 0:
+                    ind = i
+                    break
+                elif values[i] < low_val:
+                    low_val = values[i]
+                    ind = i
+            if ind not in non_zero_ind:
+                non_zero_ind = np.append(non_zero_ind,[ind])
+    #add last zero before flux increases above zero
+    if non_zero_ind[0]-1 > 0 and non_zero_ind[0]-1 not in non_zero_ind:
+        ind = non_zero_ind[0]-1
+        non_zero_ind = np.append(non_zero_ind,[ind])
+        low_val = values[ind]
+        #if low_val is not 0 then find the previous zero
+        if low_val != 0:
+            for i in range(ind, 0,-1):
+                if values[i] == 0:
+                    ind = i
+                    break
+                elif values[i] < low_val:
+                    low_val = values[i]
+                    ind = i
+            if ind not in non_zero_ind:
+                non_zero_ind = np.append(non_zero_ind,[ind])
     if non_zero_ind[0]-1 > 0:
         non_zero_ind = np.append(non_zero_ind,non_zero_ind[0]-1)
     #add first zero after data decreases to zero
@@ -69,6 +101,7 @@ def reduce_dataset(years, values,flux_floor=0,max_tm_error=0):
         years_mod = years
         values_mod = values
 
+
     #normalize Values
     maxval = np.max(values_mod)
     values_mod = values_mod/maxval
@@ -105,12 +138,18 @@ def reduce_dataset(years, values,flux_floor=0,max_tm_error=0):
                 )
 
         out_error = abs(res.relative_total_mass_error)
-        if out_error < OUT_ERROR_THRESHOLD and len(res.reduced_flux)>=LOWER_N:
-            last_result = res
-            break
+
         if len(res.reduced_flux) > 2*UPPER_N:
             simple_peaks = True
             solve_type = RAW
+        elif out_error < OUT_ERROR_THRESHOLD and len(res.reduced_flux)>=LOWER_N:
+            last_result = res
+            break
+
+        #if simple_peaks and len(res.reduced_flux) > 2*UPPER_N:
+        #    print("data reduction getting to many points")
+        #    last_result = res
+        #    break
         ythresh = 0.5*ythresh
         area = 0.5*area
         out_error_last = out_error
@@ -128,15 +167,15 @@ def reduce_dataset(years, values,flux_floor=0,max_tm_error=0):
     rr = last_result
     #find peaks for data rebalance and reporting
     peaks, _ = sig.find_peaks(rr.reduced_flux.values,width=3,rel_height=1)
-    if peaks.size == 0:
+    if peaks.size == 0 :
         peaks, _ = sig.find_peaks(rr.reduced_flux.values,width=2,rel_height=1)
         if peaks.size == 0:
             peaks, _ = sig.find_peaks(rr.reduced_flux.values,width=1,rel_height=1)
     pneg, _ = sig.find_peaks(-rr.reduced_flux.values,width=3,rel_height=1)
     if pneg.size == 0:
-        pneg, _ = sig.find_peaks(rr.reduced_flux.values,width=2,rel_height=1)
+        pneg, _ = sig.find_peaks(-rr.reduced_flux.values,width=2,rel_height=1)
         if pneg.size == 0:
-            pneg, _ = sig.find_peaks(rr.reduced_flux.values,width=1,rel_height=1)
+            pneg, _ = sig.find_peaks(-rr.reduced_flux.values,width=1,rel_height=1)
 
     peaks = rr.reduced_flux.times[peaks]
     pneg = rr.reduced_flux.times[pneg]
