@@ -63,13 +63,14 @@ class SolidWasteReleaseData:
         sub = self.df[self.df[SITE_COL]==site]
         x = sub[YEAR_COL].values
         y = sub[copc].values
+        idx = y < self.zero_below
 
         if self.zero_below is not None:
             idx = y < self.zero_below
             y[idx] = 0.0
-            msg = "Forcing values below '{}' to zero; happens at timesteps: {}"
+            msg = "{}: Forcing values below '{}' to zero; happens at timesteps: {} "
             logging.info(msg.format(
-                self.zero_below,
+                site, self.zero_below,
                 x[idx]
                 )
             )
