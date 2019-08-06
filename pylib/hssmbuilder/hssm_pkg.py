@@ -140,7 +140,7 @@ def build_pkg(file):
 #
 class hss_file():#data_reduction):
     def __init__(self, ofn,fn, k, i, j, sn, c,tol,sy,log_p,min_steps,flux_floor,
-                max_tm_error,units,dr=True):
+                max_tm_error,units,graph_name,copc,dr=True):
 
         #data_reduction.__init__(self,i,j)
         self.version = 0.1
@@ -165,6 +165,8 @@ class hss_file():#data_reduction):
         self.reduce_data = dr
         self.time = []
         self.flux = []
+        self.copc = copc
+        self.graph_name = graph_name
     def set_min_step(self, ms, day_unit):
         self.min_step = Decimal(ms)
         self.day_unit = day_unit
@@ -173,6 +175,7 @@ class hss_file():#data_reduction):
         self.day_unit = day_unit
     def set_logger(self,log):
         self.logger = log
+
     #---------------------------------------------------------------------------
     #
     def build_hssm_data(self,days,vals):
@@ -182,7 +185,7 @@ class hss_file():#data_reduction):
         error = (t_mass.values[-1] -r_t_mass.values[-1])
         for i in range(len(days)):
             segs.append([Decimal(days[i]),Decimal(vals[i]),r_t_mass.values[i]])
-        plt.summary_plot(self.days,self.vals,days, vals,self.iSource,self.jSource, self.log_path,self.units,self.start_year)
+        plt.summary_plot(self.days,self.vals,days, vals,self.iSource,self.jSource, self.log_path,self.units,self.start_year,self.graph_name,self.copc)
         if error != 0:
             self.logger.info("{0}-{1} tmass_error:{2}".format(self.iSource,self.jSource,error))
         return segs,error
@@ -301,6 +304,8 @@ class hssm_obj:
         self.min_reduction_steps = min_steps
         self.units = params["units"]
         self.data_reduction = params["data_reduction"]
+        self.graph_name = params["graph_name"]
+        self.copc = params["copc"]
         if "HSSpath" in params.keys():
             self.HSSpath = params["HSSpath"]
         else:
@@ -334,7 +339,7 @@ class hssm_obj:
             rec = hss_file(out_fileName,HSSFileName,k,i_ind,j_ind,1,self.head[i],
                             self.tolerance,self.start_year,self.log_path,
                             self.min_reduction_steps,self.flux_floor,
-                            self.max_tm_error,self.units,self.data_reduction)
+                            self.max_tm_error,self.units,self.graph_name,self.copc,self.data_reduction)
             values = self.cells.loc[:,self.head[i]].values
             rec.build_array(days,values)
 
@@ -466,7 +471,7 @@ class hssm_obj:
             fileName = os.path.join(self.misc_path,'net_error_by_year.csv')
             with open(fileName,"w") as outfile:
                 outfile.write(output)
-            plt.summary_plot(o_ts.times,o_ts.values,r_ts.times,r_ts.values,0,0, self.log_path,self.units,self.start_year,True)
+            plt.summary_plot(o_ts.times,o_ts.values,r_ts.times,r_ts.values,0,0, self.log_path,self.units,self.start_year,self.graph_name,self.copc,True)
     #---------------------------------------------------------------------------
     #
     def misc_files(self):

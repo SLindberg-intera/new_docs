@@ -3,6 +3,8 @@ import matplotlib
 #from matplotlib.ticker import EngFormatter
 #from matplotlib.ticker import ScalarFormatter
 import matplotlib.ticker as mtick
+from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
+                               AutoMinorLocator)
 import pylib.gwreducer.constants as c
 from pylib.gwreducer.config import config
 import numpy as np
@@ -24,19 +26,19 @@ def unit_conversion(ts,units,start_year):
     y = ts.values
     x = (x/365.25)+start_year
     y = y * 365.25
-    new_unit = ['ci/year','ci']
+    new_unit = ['Ci/year','Ci']
     factor = 1
     if units.lower() == 'pci':
         factor = 1e-12
     elif units.lower() in ['kg','g','ug']:
-        unit = ['kg/year','kg']
+        new_unit = ['kg/year','kg']
         if units.lower() == 'g':
             factor = 1e-3
         elif units.lower() == 'ug':
             factor = 1e-9
     new_ts = TimeSeries(x,y*factor,None,None)
     return new_ts, new_unit
-def reduced_timeseries_plot(o_flux,r_flux,i,j,unit,start_year,summary_plot):
+def reduced_timeseries_plot(o_flux,r_flux,i,j,unit,start_year,copc,summary_plot):
     """  makes a pretty plot of the reduction result """
     f, (ax1, ax2) = plt.subplots(2,1, sharex=True)
     #o_flux, _ = unit_conversion(o_flux,units,start_year)
@@ -50,7 +52,7 @@ def reduced_timeseries_plot(o_flux,r_flux,i,j,unit,start_year,summary_plot):
     o_steps = o_flux.times.size
     r_steps = r_flux.times.size
     r_line = "r."
-    g_title = "GW Model Surface {}-{}".format(i,j)
+    g_title = "{} GW Model Surface {}-{}".format(copc,i,j)
     title = 'Activity'
     o_label = "unreduced ({} data points)".format(o_steps)
     r_label = "reduced   ({} data points)".format(r_steps)
@@ -58,7 +60,7 @@ def reduced_timeseries_plot(o_flux,r_flux,i,j,unit,start_year,summary_plot):
         title = "Mass"
     if summary_plot:
         r_line = "r--"
-        g_title = "GW Model Total Surface {}".format(title)
+        g_title = "{}".format(copc)
         o_label = "unreduced"
         r_label = "reduced"
     ax1.plot(o_flux.times, o_flux.values, 'b',    label=o_label)
@@ -72,13 +74,15 @@ def reduced_timeseries_plot(o_flux,r_flux,i,j,unit,start_year,summary_plot):
 
     ax1.set_title(g_title)
 
-    ax1.set_ylabel("{} Transfer Rate ({})".format(title,unit[0]))
-    ax2.set_ylabel("{} ({})".format(title,unit[1]))
-    ax1.set_xlabel("Years")
-    ax2.set_xlabel("Years")
+    ax1.set_ylabel("Rate ({})".format(unit[0]))
+    ax2.set_ylabel("Cumulative ({})".format(unit[1]))
+    ax1.xaxis.set_minor_locator(AutoMinorLocator())
+    ax1.set_xlabel("Calendar Year")
+    ax2.set_xlabel("Calendar Year")
+    ax2.xaxis.set_minor_locator(AutoMinorLocator())
     return  f, ax1, ax2
 
-def summary_plot(o_time,o_flux,r_time,r_flux,i,j, output_folder,units,start_year,summary_plot = False):
+def summary_plot(o_time,o_flux,r_time,r_flux,i,j, output_folder,units,start_year,graph_name,copc,summary_plot = False):
     matplotlib.rcParams['axes.formatter.useoffset'] = False
     """ make a plot of hte reduction result and place it in output_folder"""
 
@@ -88,9 +92,9 @@ def summary_plot(o_time,o_flux,r_time,r_flux,i,j, output_folder,units,start_year
     o_flux, unit = unit_conversion(o_flux,units,start_year)
     r_flux, _ = unit_conversion(r_flux,units,start_year)
 
-    f, ax1, ax2 = reduced_timeseries_plot(o_flux,r_flux,i,j,unit,start_year,summary_plot)
-    file_name = "{}-{}.png".format(i, j)
+    f, ax1, ax2 = reduced_timeseries_plot(o_flux,r_flux,i,j,unit,start_year,copc,summary_plot)
+    file_name = "{}_{}-{}.png".format(graph_name,i, j)
     if summary_plot:
-        file_name = "0_Net_balance.png"
-    plt.savefig(os.path.join(output_folder, file_name),bbox_inches='tight')
+        file_name = "{}.png".format(graph_name)
+    plt.savefig(os.path.join(output_folder, file_name),bbox_inches='tight',dpi=1200)
     plt.close(f)
