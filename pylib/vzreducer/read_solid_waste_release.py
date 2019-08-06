@@ -65,12 +65,12 @@ class SolidWasteReleaseData:
         y = sub[copc].values
         idx = y < self.zero_below
 
-        if self.zero_below is not None:
-            idx = y < self.zero_below
+        if self.zero_below is not None and any(idx):
+            #idx = y < self.zero_below
             y[idx] = 0.0
-            msg = "{}: Forcing values below '{}' to zero; happens at timesteps: {} "
+            msg = "{}--{}: Forcing values below '{}' to zero; happens at timesteps: {} "
             logging.info(msg.format(
-                site, self.zero_below,
+                site, copc, self.zero_below,
                 x[idx]
                 )
             )
