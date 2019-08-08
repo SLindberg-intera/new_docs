@@ -81,13 +81,14 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         out_error = abs(res.relative_total_mass_error)
         if out_error < OUT_ERROR_THRESHOLD and len(res.reduced_flux)>=LOWER_N:
             last_result = res
+            out_error_last = res.relative_total_mass_error
             break
         if len(res.reduced_flux) > 2*UPPER_N:
             simple_peaks = True
             solve_type = RAW
         ythresh = 0.5*ythresh
         area = 0.5*area
-        out_error_last = out_error
+        out_error_last = res.relative_total_mass_error
         last_result = res
 
     if ix>=MAX_ITERATIONS - 1:
@@ -102,5 +103,5 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     used_area = area
     n_iterations = ix
     summary_info(last_result, summary_file, 
-            delta_mass, used_ythresh, used_area, n_iterations)
+            delta_mass, used_ythresh, used_area, n_iterations, out_error_last)
     log_info(last_result)

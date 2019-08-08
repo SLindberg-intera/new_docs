@@ -104,6 +104,7 @@ def main():
     logging.info("START execution")
     input_file = get_inputfile(args)
     input_data = parse_input_file(input_file)
+    logging.info(input_data)
     output_folder = get_output_folder(args)
     summary_filename = "summary.csv"
     summary_file = reset_summary_file(output_folder, summary_filename)

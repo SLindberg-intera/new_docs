@@ -12,6 +12,7 @@ def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass,
     x = timeseries.times
     y = timeseries.values
     peaks, _ = sig.find_peaks(y)
+
     peaks = x[peaks]
     pneg, _ = sig.find_peaks(-y)
     pneg = x[pneg]
@@ -33,17 +34,35 @@ def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass,
     if solve_type == SMOOTH:
         ts_smooth = tsmath.smooth(timeseries)
         y = ts_smooth.values
+
+
     r = redcon.reducer((x,y), 
             threshold_area=threshold_area,
             threshold_peak=threshold_peak,
     )
 
-    flat_reduced_x = set(redcon.flatten_reduced(r))
+    try:
+        flat_reduced_x = set(redcon.flatten_reduced(r))
+    except Exception:
+        input("exception thrown at flat_reduced_x")
+        input(flat_reduced_x)
+        print(Exception)
     required = {x[0],x[-1]}
 
-    xout = sorted(list(flat_reduced_x.union(required)\
-            .union(peaks).union(pneg).union(required_slope)
-           ))
+    try:
+        #xout = sorted(list(flat_reduced_x.union(required)\
+        #        .union(peaks).union(pneg).union(required_slope)
+        #       ))
+        xout = sorted([*flat_reduced_x,*required,*peaks,*pneg,*required_slope])
+
+    except Exception:
+        input(flat_reduced_x)
+        input("exception thrown at xout")
+
+        input(r)
+
+
+        print(Exception)
     reduced_flux = timeseries.subset(xout)
     reduced_mass = tsmath.integrate(reduced_flux)
 
