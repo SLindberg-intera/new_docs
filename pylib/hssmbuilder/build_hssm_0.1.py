@@ -8,6 +8,9 @@ Usage:          process MT3D Head and associated files to get cell saturation,
                 perform data reduction, and build HSSM package.
 '''
 #import numpy as np
+import sys, os
+sys.path.append(
+        os.path.join(os.path.dirname(__file__), '..','..'))
 from pathlib import Path
 
 from pylib.hssmbuilder.hssm_pkg import hssm_obj

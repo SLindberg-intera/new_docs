@@ -63,25 +63,26 @@ def make_user_summary():
             username=info.username
     )
 
-def make_qa_status():
+def make_qa_status(args):
     """ construct a string showing the QA Status"""
-    if is_clean_master_branch():
+    if is_clean_master_branch(args.gitpath):
         status = c.QA_QUALIFIED
     else:
         status = c.QA_TEST
     return config[c.QA_STATUS_TEMPLATE_KEY].format(status=status)
 
 
-def make_version():
-    version = get_version()
+def make_version(args):
+    version = get_version(args.gitpath)
     return config[c.VERSION_TEMPLATE_KEY].format(version=version)
 
 
 def log_header(args):
+    #set_git_path()
     notify_user(make_user_message(args), shell=True)
     notify_user(make_tool_use_message(args))
-    notify_user(make_version())
-    notify_user(make_qa_status())
+    notify_user(make_version(args))
+    notify_user(make_qa_status(args))
     notify_user(make_user_summary())
 
 def execute_program(args):
@@ -91,6 +92,7 @@ def execute_program(args):
 
 if __name__ == "__main__":
     args = parse_args()
+    print(args)
     configure_logger(args)
     log_header(args)
     execute_program(args)

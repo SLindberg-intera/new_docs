@@ -1,0 +1,1 @@
+py ../build_hssm_0.1.py config_tc-99.json
