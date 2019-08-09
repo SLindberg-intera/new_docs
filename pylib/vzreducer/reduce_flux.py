@@ -19,10 +19,16 @@ def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass,
     required_slope = x[np.divide(np.abs(np.diff(y,prepend=0)),y,
             where=(y>0.05*np.max(y)))>0.20]
 
+    zero_flux = np.argwhere(np.diff(y,prepend=0)==0)
+
     required_slope_lower = [i-1 for i in required_slope if i != x[0]]
     required_slope_upper = [i+1 for i in required_slope if i != x[-1]]
     required_slope = sorted([*{*[*required_slope, *required_slope_upper, *required_slope_lower]}])
 
+    deriv_y = tsmath.diff(timeseries)
+    required_first_deriv =  np.argwhere(np.diff(deriv_y.values,prepend=0) > 0.001).tolist()
+    #required_first_deriv = x[[item for sublist in required_first_deriv for item in sublist]]
+    required_first_deriv =x[[53,54,55,56,57]]
     if simple_peaks:
         peaks = [x[np.argmax(timeseries.values)]]
         pneg = []
@@ -53,8 +59,8 @@ def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass,
         #xout = sorted(list(flat_reduced_x.union(required)\
         #        .union(peaks).union(pneg).union(required_slope)
         #       ))
-        xout = sorted([*flat_reduced_x,*required,*peaks,*pneg,*required_slope])
-
+        xout = sorted(set([*flat_reduced_x,*required,*peaks,*pneg,*required_slope,*required_first_deriv]))
+        #xout = sorted(set([*flat_reduced_x, *required, *peaks, *pneg, *required_slope]))
     except Exception:
         input(flat_reduced_x)
         input("exception thrown at xout")

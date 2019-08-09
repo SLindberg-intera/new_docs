@@ -88,8 +88,9 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
             solve_type = RAW
         ythresh = 0.5*ythresh
         area = 0.5*area
-        out_error_last = res.relative_total_mass_error
-        last_result = res
+        if abs(out_error_last) > out_error or abs(out_error_last)==1: #trying adding logic that only if error is reduced replace the last result...
+            out_error_last = res.relative_total_mass_error
+            last_result = res
 
     if ix>=MAX_ITERATIONS - 1:
         logging.info("MAX ITERATIONS")
