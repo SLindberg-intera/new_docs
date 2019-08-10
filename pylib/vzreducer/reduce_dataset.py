@@ -7,8 +7,8 @@ import pylib.vzreducer.reduce_flux as red_flux
 import pylib.vzreducer.plots as p
 from pylib.vzreducer.summary_file import summary_info
 
-SMOOTH = "SMOOTH"
-RAW = "RAW"
+SMOOTH = "SMOOTH"  #MOVED TO INPUT file 08.09.2019
+RAW = "RAW"        #MOVED TO INPUT file 08.09.2019
 
 def log_info(reduction_result):
     msg = "{} {} reduced: {} E_m:{:.2g}%"
@@ -69,7 +69,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     # SLL--constant to move to vz-reducer-input.json file(I had bumped it up to 100 in testing)
     MAX_ITERATIONS = int(input_data[c.MAX_ITERATIONS_KEY])  #80
 
-    solve_type = SMOOTH
+    solve_type = input_data[c.SOLVE_TYPE_KEY]   #SMOOTH
     simple_peaks = False
 
     for ix in range(MAX_ITERATIONS):
