@@ -55,12 +55,13 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         #  we are removing anything under flux floor to help remove jidder
 
         non_zero_ind = np.where(values > flux_floor)[0]
-        # add last zero before flux increases above zero
+        # add last zero before flux increases above zero   isn't this the trailing zero after the last flux>0
         if non_zero_ind[-1] + 1 < values.size - 1 and non_zero_ind[-1] + 1 not in non_zero_ind:
             ind = non_zero_ind[-1] + 1
             non_zero_ind = np.append(non_zero_ind, [ind])
             low_val = values[ind]
             # if low_val is not 0 then find then next zero
+            #isn't the low_val always ZERO?
             if low_val != 0:
                 for i in range(ind, values.size):
                     if values[i] == 0:
@@ -71,7 +72,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
                         ind = i
                 if ind not in non_zero_ind:
                     non_zero_ind = np.append(non_zero_ind, [ind])
-        # add last zero before flux increases above zero
+        # add last zero before flux increases above zero  --isn't this the leading zero before the flux > 0
         if non_zero_ind[0] - 1 > 0 and non_zero_ind[0] - 1 not in non_zero_ind:
             ind = non_zero_ind[0] - 1
             non_zero_ind = np.append(non_zero_ind, [ind])
@@ -92,7 +93,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         # add first zero after data decreases to zero
         if non_zero_ind[-1] + 1 < values.size - 1:
             non_zero_ind = np.append(non_zero_ind, non_zero_ind[-1] + 1)
-        if 0 not in non_zero_ind:
+        if 0 not in non_zero_ind:  #insert at beginning?
             non_zero_ind = np.append(non_zero_ind, [0])
         if (values.size - 1) not in non_zero_ind:
             non_zero_ind = np.append(non_zero_ind, [(values.size - 1)])
@@ -126,9 +127,11 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         #                reduced_mass=r_ts.integrate())
         #        peaks, _ = sig.find_peaks(rr.reduced_flux.values,width=3,rel_height=1)
         #        return rr.reduced_flux.times, rr.reduced_flux.values,-rr.total_mass_error,peaks.size
-        elif (TimeSeries(years, values, None, None).integrate().values[-1]) < 1e12:  # equivalent of 1 ci
-            years_mod = years
-            values_mod = values
+
+        #commenting out this code for now--will go ahead and process all sites [looks like they are all over 1 Ci anyway
+        #elif (TimeSeries(years, values, None, None).integrate().values[-1]) < 1:  # equivalent of 1 ci
+        #    years_mod = years
+        #    values_mod = values
 
         # normalize Values
         maxval = np.max(values_mod)
