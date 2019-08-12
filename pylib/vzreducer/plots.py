@@ -52,13 +52,13 @@ def reduced_timeseries_plot(reduction_result):
     ax1.plot(dflux.times[:], dflux.values[:], 'k', label="diff [original-reduced]")
     ax2.plot(dmass.times[:], dmass.values[:], 'k')
 
-    #ax1.plot(flux.times[0:100], flux.values[0:100], 'b', label="input")
-    #ax1.plot(r_flux.times[0:40], r_flux.values[0:40], 'r.', label="reduced {}".format(len(r_flux.values)))
-    #ax2.plot(mass.times[0:100], mass.values[0:100], 'b')
-    #ax2.plot(r_mass.times[0:40], r_mass.values[0:40], 'r.')
+    #ax1.plot(flux.times[0:500], flux.values[0:500], 'b', label="input")
+    #ax1.plot(r_flux.times[0:22], r_flux.values[0:22], 'r.', label="reduced {}".format(len(r_flux.values)))
+    #ax2.plot(mass.times[0:500], mass.values[0:500], 'b')
+    #ax2.plot(r_mass.times[0:22], r_mass.values[0:22], 'r.')
 
-    #ax1.plot(dflux.times[0:100], dflux.values[0:100], 'k', label="diff [original-reduced]")
-    #ax2.plot(dmass.times[0:100], dmass.values[0:100], 'k')
+    #ax1.plot(dflux.times[0:500], dflux.values[0:500], 'k', label="diff [original-reduced]")
+    #ax2.plot(dmass.times[0:500], dmass.values[0:500], 'k')
 
     #ax1.yaxis.set_major_formatter(FORMATTER)
     #ax2.yaxis.set_major_formatter(FORMATTER)

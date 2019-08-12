@@ -12,17 +12,18 @@ def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass,
     x = timeseries.times
     y = timeseries.values
 
-    zero_flux = np.argwhere(y==0)
-    if np.all(y[zero_flux[1][0]:]==0):
-        timeseries.times =timeseries.times[:zero_flux[1][0]]
-        timeseries.values = timeseries.values[:zero_flux[1][0]]
-        x = timeseries.times
-        y = timeseries.values
-        x_zeros = x[zero_flux[1][0]+1:]
-        y_zeros = y[zero_flux[1][0]+1:]
+    #zero_flux = np.argwhere(y==0)
+    #if np.all(y[zero_flux[1][0]:]==0):
+    #    timeseries.times =timeseries.times[:zero_flux[1][0]]
+    #    timeseries.values = timeseries.values[:zero_flux[1][0]]
+    #    x = timeseries.times
+    #    y = timeseries.values
+    #    x_zeros = x[zero_flux[1][0]+1:]
+    #    y_zeros = y[zero_flux[1][0]+1:]
 
     #x = timeseries.times
     #y = timeseries.values
+
     peaks, _ = sig.find_peaks(y)
 
     peaks = x[peaks]
@@ -32,7 +33,7 @@ def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass,
     required = {x[0], x[-1]}
 
     required_slope = x[np.divide(np.abs(np.diff(y,prepend=0)),y,
-            where=(y>0.05*np.max(y)))>0.20]
+            where=(y>0.05*np.max(y)))>0.2]
 
 
 
@@ -41,14 +42,17 @@ def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass,
     required_slope = sorted([*{*[*required_slope, *required_slope_upper, *required_slope_lower]}])
 
     deriv_y = tsmath.diff(timeseries)
-    required_first_deriv_up =  np.argwhere((abs(deriv_y.values[0:-1]/deriv_y.values[1:] )> 1.5)).tolist()
-    required_first_deriv_down = np.argwhere((abs(deriv_y.values[0:-1]/deriv_y.values[1:] < 0.5))).tolist()
-    deriv_3 = x[[item for sublist in required_first_deriv_up for item in sublist if item <1000]]
-    deriv_4 = x[[item for sublist in required_first_deriv_down for item in sublist if item <1000]]
-    deriv_1 = x[[item + 1 for sublist in required_first_deriv_down for item in sublist if item < 1000]]
-    deriv_2= x[[item + 1 for sublist in required_first_deriv_up for item in sublist if item < 1000]]
-    required_first_deriv =[*deriv_1,*deriv_2,*deriv_3,*deriv_4]
+    required_first_deriv_up =  np.argwhere( (abs(deriv_y.values[0:-1]/deriv_y.values[1:] ) != float("Inf")) & (abs(deriv_y.values[0:-1]/deriv_y.values[1:] ) >1.1 )).tolist()
+    required_first_deriv_down = np.argwhere( (abs(deriv_y.values[0:-1]/deriv_y.values[1:] ) != float("Inf"))  &(abs(deriv_y.values[0:-1]/deriv_y.values[1:] ) != 0) & (abs(deriv_y.values[0:-1]/deriv_y.values[1:] ) < 0.9)).tolist()
+    deriv_3 = x[[item for sublist in required_first_deriv_up for item in sublist if item <1000 and y[item]> 0.005*np.max(y)]]
+    deriv_4 = x[[item for sublist in required_first_deriv_down for item in sublist if item <1000 and y[item]> 0.005* np.max(y)]]
+    deriv_1 = x[[item + 1 for sublist in required_first_deriv_down for item in sublist if item < 1000 ]]
+    deriv_2= x[[item + 1 for sublist in required_first_deriv_up for item in sublist if item < 1000 ]]
+    deriv_5 = x[[item-1 for sublist in required_first_deriv_down for item in sublist if item<1000 and item!=0]]
+    deriv_6 = x[[item-1 for sublist in required_first_deriv_up for item in sublist if item<1000 and item!=0]]
+    required_first_deriv =[*deriv_1,*deriv_2,*deriv_3,*deriv_4,*deriv_5,*deriv_6]
     #required_first_deriv =x[[52,53,54,55,56]]
+    required_hard_coded = x[[i for i in range(1000,10000,3500)]]
     if simple_peaks:
         peaks = [x[np.argmax(timeseries.values)]]
         pneg = []
@@ -84,6 +88,7 @@ def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass,
         #        .union(peaks).union(pneg).union(required_slope)
         #       ))
         xout = sorted(set([*flat_reduced_x,*required,*peaks,*pneg,*required_slope,*required_first_deriv]))
+        #xout = sorted(set([*flat_reduced_x, *required, *peaks, *pneg, *required_slope, *required_hard_coded]))
         #xout = sorted(set([*flat_reduced_x, *required, *peaks, *pneg, *required_slope]))
     except Exception:
         input(flat_reduced_x)

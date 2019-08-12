@@ -43,7 +43,11 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     if timeseries.are_all_zero():
         logging.info("Skipped {} {} - all zero".format(
             copc, site))
-        return False    
+        return False
+    else:
+    #normalize fluxes
+        max_val = np.max(timeseries.values)
+        timeseries.values = timeseries.values/max_val
     mx = np.argmax(timeseries.values)
     # unused variable...SLL
     points = [0, mx, len(timeseries)]
@@ -90,10 +94,15 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         area = 0.5*area
         if abs(out_error_last) > out_error or abs(out_error_last)==1: #trying adding logic that only if error is reduced replace the last result...
             out_error_last = res.relative_total_mass_error
+
             last_result = res
+            logging.info("Best fit consistent with current iteration")
+        else:
+            logging.info("Best fit occurred prior to current iteration")
 
     if ix>=MAX_ITERATIONS - 1:
         logging.info("MAX ITERATIONS")
+
 
     delta_mass = last_result.total_mass_error
 
