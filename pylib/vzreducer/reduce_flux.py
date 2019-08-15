@@ -16,22 +16,11 @@ def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass,
     x = timeseries.times
     y = timeseries.values
 
-    #zero_flux = np.argwhere(y==0)
-    #if np.all(y[zero_flux[1][0]:]==0):
-    #    timeseries.times =timeseries.times[:zero_flux[1][0]]
-    #    timeseries.values = timeseries.values[:zero_flux[1][0]]
-    #    x = timeseries.times
-    #    y = timeseries.values
-    #    x_zeros = x[zero_flux[1][0]+1:]
-    #    y_zeros = y[zero_flux[1][0]+1:]
-
-    #x = timeseries.times
-    #y = timeseries.values
-
-    peaks, _ = sig.find_peaks(y)
+    #peak height is hardcoded at this point...eventually move to the input config file?
+    peaks, _ = sig.find_peaks(y, height=1e-10)
 
     peaks = x[peaks]
-    pneg, _ = sig.find_peaks(-y)
+    pneg, _ = sig.find_peaks(-y,height=1e-10)
     pneg = x[pneg]
 
     required = {x[0], x[-1]}
@@ -45,18 +34,7 @@ def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass,
     required_slope_upper = [i+1 for i in required_slope if i != x[-1]]
     required_slope = sorted([*{*[*required_slope, *required_slope_upper, *required_slope_lower]}])
 
-    deriv_y = tsmath.diff(timeseries)
-    required_first_deriv_up =  np.argwhere( (abs(deriv_y.values[0:-1]/deriv_y.values[1:] ) != float("Inf")) & (abs(deriv_y.values[0:-1]/deriv_y.values[1:] ) >1.1 )).tolist()
-    required_first_deriv_down = np.argwhere( (abs(deriv_y.values[0:-1]/deriv_y.values[1:] ) != float("Inf"))  &(abs(deriv_y.values[0:-1]/deriv_y.values[1:] ) != 0) & (abs(deriv_y.values[0:-1]/deriv_y.values[1:] ) < 0.9)).tolist()
-    deriv_3 = x[[item for sublist in required_first_deriv_up for item in sublist if item <1000 and y[item]> 0.005*np.max(y)]]
-    deriv_4 = x[[item for sublist in required_first_deriv_down for item in sublist if item <1000 and y[item]> 0.005* np.max(y)]]
-    deriv_1 = x[[item + 1 for sublist in required_first_deriv_down for item in sublist if item < 1000 ]]
-    deriv_2= x[[item + 1 for sublist in required_first_deriv_up for item in sublist if item < 1000 ]]
-    deriv_5 = x[[item-1 for sublist in required_first_deriv_down for item in sublist if item<1000 and item!=0]]
-    deriv_6 = x[[item-1 for sublist in required_first_deriv_up for item in sublist if item<1000 and item!=0]]
-    required_first_deriv =[*deriv_1,*deriv_2,*deriv_3,*deriv_4,*deriv_5,*deriv_6]
-    #required_first_deriv =x[[52,53,54,55,56]]
-    #required_hard_coded = x[[i for i in range(1000,10000,3500)]]
+
     if simple_peaks:
         peaks = [x[np.argmax(timeseries.values)]]
         pneg = []
@@ -69,39 +47,24 @@ def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass,
         ts_smooth = tsmath.smooth(timeseries)
         y = ts_smooth.values
 
-    #zero_flux = np.argwhere(y == 0)
-    #if np.all(y[zero_flux[1][0]:] == 0):
-    #    x = x[:zero_flux[1][0]]
-    #    y = y[:zero_flux[1][0]]
+
 
     r = redcon.reducer((x,y), 
             threshold_area=threshold_area,
             threshold_peak=threshold_peak,
     )
 
-    try:
-        flat_reduced_x = set(redcon.flatten_reduced(r))
-    except Exception:
-        input("exception thrown at flat_reduced_x")
-        input(flat_reduced_x)
-        print(Exception)
+    flat_reduced_x = set(redcon.flatten_reduced(r))
     #required = {x[0],x[-1]}
 
-    try:
-        #xout = sorted(list(flat_reduced_x.union(required)\
-        #        .union(peaks).union(pneg).union(required_slope)
-        #       ))
-        xout = sorted(set([*flat_reduced_x,*required,*peaks,*pneg,*required_slope,*required_first_deriv]))
-        #xout = sorted(set([*flat_reduced_x, *required, *peaks, *pneg, *required_slope, *required_hard_coded]))
-        #xout = sorted(set([*flat_reduced_x, *required, *peaks, *pneg, *required_slope]))
-    except Exception:
-        input(flat_reduced_x)
-        input("exception thrown at xout")
 
-        input(r)
+    #xout = sorted(list(flat_reduced_x.union(required)\
+    #        .union(peaks).union(pneg).union(required_slope)
+    #       ))
+    #this is the same result for the above line of code but it is easier for me to read...
+    xout = sorted(set([*flat_reduced_x, *required, *peaks, *pneg, *required_slope]))
 
 
-        print(Exception)
     reduced_flux = timeseries.subset(xout)
     reduced_mass = tsmath.integrate(reduced_flux)
 
@@ -205,6 +168,7 @@ def get_inflection_points(flux,peaks,pneg,p_area):
     #set starting point
     start_val = 0
     #ignore leading zeros
+    #this grabs the last leading zero before flux > 0
     if y[start_val] == 0:
         start_val = np.where(y > 0)[0][0]-1
     s_ind = start_val
@@ -331,8 +295,10 @@ def build_segments(rr,peaks,pneg,inflection_area):
 
             timeseries = TimeSeries(seg_x,seg_y,None,None)
             segs_total_mass += timeseries.integrate().values[-1]
+        #these two lines were initially commented out...I uncommented them to enable the code to run...
         #timeseries = TimeSeries(r_x[r_seg],r_y[r_seg],None,None)
-        #timeseries = TimeSeries(r_x[r_start:r_end],r_y[r_start:r_end],None,None)
+        timeseries = TimeSeries(r_x[r_start:r_end],r_y[r_start:r_end],None,None)
+
         segments.append(timeseries)
     return segments, segs_total_mass
 #-------------------------------------------------------------------------------

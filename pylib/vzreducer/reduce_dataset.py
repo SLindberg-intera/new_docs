@@ -11,9 +11,10 @@ from pylib.timeseries.timeseries import TimeSeries
 from pylib.datareduction.reduction_result import ReductionResult
 import scipy.signal as sig
 
-SMOOTH = "SMOOTH"  #MOVED TO INPUT file 08.09.2019
-RAW = "RAW"        #MOVED TO INPUT file 08.09.2019
-flux_floor = 1e-15
+#SMOOTH = "SMOOTH"  #MOVED TO INPUT file 08.09.2019
+#RAW = "RAW"        #MOVED TO INPUT file 08.09.2019
+
+
 def log_info(reduction_result):
     msg = "{} {} reduced: {} E_m:{:.2g}%"
     rr = reduction_result
@@ -42,6 +43,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     write a summary into summary_folder
 
     """
+    flux_floor = float(input_data[c.FLUX_FLOOR_KEY])  # 1e-15
     copc = timeseries.copc
     site = timeseries.site
     if timeseries.are_all_zero():
@@ -61,17 +63,22 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
             non_zero_ind = np.append(non_zero_ind, [ind])
             low_val = values[ind]
             # if low_val is not 0 then find then next zero
-            #isn't the low_val always ZERO?
+    #SLL: this is  needed because if there are values less than the flux floor they not zero but also NOT in non_zero_ind
             if low_val != 0:
-                for i in range(ind, values.size):
-                    if values[i] == 0:
+                #for i in range(ind, values.size):
+                for i, flux in enumerate(values[ind:]):
+                    #if values[i] == 0:
+                    if flux ==0:
                         ind = i
                         break
-                    elif values[i] < low_val:
-                        low_val = values[i]
+                    #elif values[i] < low_val:
+                    elif flux < low_val:
+                        #low_val = values[i]
+                        low_val = flux
                         ind = i
                 if ind not in non_zero_ind:
                     non_zero_ind = np.append(non_zero_ind, [ind])
+
         # add last zero before flux increases above zero  --isn't this the leading zero before the flux > 0
         if non_zero_ind[0] - 1 > 0 and non_zero_ind[0] - 1 not in non_zero_ind:
             ind = non_zero_ind[0] - 1
@@ -90,11 +97,17 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
                     non_zero_ind = np.append(non_zero_ind, [ind])
         if non_zero_ind[0] - 1 > 0:
             non_zero_ind = np.append(non_zero_ind, non_zero_ind[0] - 1)
+
         # add first zero after data decreases to zero
+        #isn't this adding the ZERO just before the flux increases above zero?
         if non_zero_ind[-1] + 1 < values.size - 1:
             non_zero_ind = np.append(non_zero_ind, non_zero_ind[-1] + 1)
-        if 0 not in non_zero_ind:  #insert at beginning?
+
+        #add 0 index to the nonzero index array if not already there...
+        if 0 not in non_zero_ind:  #insert at beginning? non_zero_ind = np.insert(non_zero_ind,0,0) ?
             non_zero_ind = np.append(non_zero_ind, [0])
+
+        #add last index of values to array if not already there....
         if (values.size - 1) not in non_zero_ind:
             non_zero_ind = np.append(non_zero_ind, [(values.size - 1)])
         #    zero = np.where(values > 0)[0][0]-1
@@ -134,6 +147,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         #    values_mod = values
 
         # normalize Values
+        # consider converting to pCi [multiply by 1e-12] prior to normalizing to eliminate floating point errors?
         maxval = np.max(values_mod)
         values_mod = values_mod / maxval
         o_timeseries = TimeSeries(years, values / maxval, None, None)
@@ -163,6 +177,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     UPPER_N =  int(input_data[c.UPPER_N_KEY]) #50
     LOWER_N = int(input_data[c.LOWER_N_KEY]) #15
 
+
     last_result = None
 
     # SLL--constant to move to vz-reducer-input.json file(I had bumped it up to 100 in testing)
@@ -180,25 +195,20 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         out_error = abs(res.relative_total_mass_error)
         if out_error < OUT_ERROR_THRESHOLD and len(res.reduced_flux)>=LOWER_N:
             last_result = res
-            out_error_last = res.relative_total_mass_error
+
             break
         if len(res.reduced_flux) > 2*UPPER_N:
             simple_peaks = True
             solve_type = RAW
+
         ythresh = 0.5*ythresh
         area = 0.5*area
-        if abs(out_error_last) > out_error or abs(out_error_last)==1: #trying adding logic that only if error is reduced replace the last result...
-            out_error_last = res.relative_total_mass_error
 
-            last_result = res
-            logging.info("Best fit consistent with current iteration")
-        else:
-            logging.info("Best fit occurred prior to current iteration")
 
     if ix>=MAX_ITERATIONS - 1:
         logging.info("MAX ITERATIONS")
 
-
+#this is the original code--commented out to incorporate the GW reducer's functionality to distribute error to valleys
     #delta_mass = last_result.total_mass_error
 
     #last_result = red_flux.rebalance(last_result)
@@ -218,16 +228,20 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
 
     rr = last_result
     #find peaks for data rebalance and reporting
-    peaks, _ = sig.find_peaks(rr.reduced_flux.values,width=3,rel_height=1)
-    if peaks.size == 0 :
-        peaks, _ = sig.find_peaks(rr.reduced_flux.values,width=2,rel_height=1)
-        if peaks.size == 0:
-            peaks, _ = sig.find_peaks(rr.reduced_flux.values,width=1,rel_height=1)
-    pneg, _ = sig.find_peaks(-rr.reduced_flux.values,width=3,rel_height=1)
-    if pneg.size == 0:
-        pneg, _ = sig.find_peaks(-rr.reduced_flux.values,width=2,rel_height=1)
-        if pneg.size == 0:
-            pneg, _ = sig.find_peaks(-rr.reduced_flux.values,width=1,rel_height=1)
+    peaks, _ = sig.find_peaks(rr.reduced_flux.values)
+#SSL commenting out the following; going with just the peaks and not depending on the peak width for now....
+    #peaks, _ = sig.find_peaks(rr.reduced_flux.values,width=3,rel_height=1)
+    #if peaks.size == 0 :
+    #    peaks, _ = sig.find_peaks(rr.reduced_flux.values,width=2,rel_height=1)
+    #    if peaks.size == 0:
+    #        peaks, _ = sig.find_peaks(rr.reduced_flux.values,width=1,rel_height=1)
+    pneg, _ = sig.find_peaks((-rr.reduced_flux.values))
+# SSL commenting out the following; going with just the peaks and not depending on the peak width for now....
+    #pneg, _ = sig.find_peaks(-rr.reduced_flux.values,width=3,rel_height=1)
+    #if pneg.size == 0:
+    #    pneg, _ = sig.find_peaks(-rr.reduced_flux.values,width=2,rel_height=1)
+    #    if pneg.size == 0:
+    #        pneg, _ = sig.find_peaks(-rr.reduced_flux.values,width=1,rel_height=1)
 
     peaks = rr.reduced_flux.times[peaks]
     pneg = rr.reduced_flux.times[pneg]
@@ -235,7 +249,9 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     peaks = np.isin(o_timeseries.times,peaks)
     pneg = np.isin(o_timeseries.times,pneg)
     peaks = np.where(peaks)
-    pneg = np.where(peaks)
+#made the following change [peaks --> pneg] to code and commented out the old stuff....
+    #pneg = np.where(peaks)
+    pneg = np.where(pneg)
 
     peaks = peaks[0]
     pneg = pneg[0]

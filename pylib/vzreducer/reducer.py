@@ -88,8 +88,11 @@ def reduce_input_data(filekey, input_data, summary_file, output_folder):
                 if not worked:
                     continue
             except TypeError as e:
-                raise Exception(e)
+#SLL: switched the order of the following two lines so that the error will be logged if an exception is thrown...
                 logging.error("failed at {} {}".format(copc, site))
+                raise Exception(e)
+
+
 def main():
     """ 
         parse the input arguments, configure the logger
