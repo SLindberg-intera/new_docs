@@ -1,8 +1,12 @@
+import sys, os
+sys.path.append(
+        os.path.join(os.path.dirname(__file__), '..','..'))
 import logging
 import pandas as pd
 import numpy as np
 import os.path
 #from pylib.hssmbuilder.time_series_reduction import data_reduction
+
 from multiprocessing import get_context as context
 from multiprocessing import cpu_count
 from decimal import *
@@ -70,7 +74,7 @@ def build_pkg(file):
                 r_mass = TimeSeries(file.days[non_zero_ind],file.vals[non_zero_ind],None,None).integrate().values[-1]
 
                 #check if allowing only steps greater than flux floor reduces steps to below min_reduction_steps
-                if abs(o_mass - r_mass) < .001 and non_zero_ind.size < file.min_reduction_steps:
+                if abs(o_mass - r_mass) < .001 and non_zero_ind.size < file.min_reduction_steps and file.reduce_data:
 
                     days = file.days[non_zero_ind]
                     vals = file.vals[non_zero_ind]

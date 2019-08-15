@@ -99,6 +99,7 @@ class mass_obj:
         for filename in os.listdir(self.input_dir):
             size = 0
             if filename.endswith(".csv"):
+                self.logger.info("loading file:  {}".format(filename))
                 dir_file = self.input_dir+filename
                 self.logger.info("   processing File: {0}".format(dir_file))
                 head_row = -1
@@ -195,45 +196,46 @@ class mass_obj:
                     #Find the index of the last time step before cell goes dry
                     self.logger.info("      Time_step:  {0}".format(time_step))
                     t_rows = self.cells.loc[:,'days'] > time_step
-                    first_dry_ind = min(t_rows[t_rows].index)
-                    self.logger.info ("      index of first dry time step: {0}, {1}".format(first_dry_ind,self.cells.loc[first_dry_ind,"days"]))
-                    #make copy of the rows to be distributed
-                    cell_loss = self.cells.loc[first_dry_ind:,i_j].copy()
-                    self.logger.info("      {0} size: {1}".format(cell_loss.name,cell_loss.size))
-                    #check if data to be moved has any flux > 0  otherwise ignore
-                    if (cell_loss > 0).any():
-                        self.logger.info("      Cell {0}: dry after time step {1} ".format(i_j,cell[0]))
-                        faces = cell[1]
-                        more_dry_cells = True
-                        #clear copied data from column
-                        self.cells.loc[first_dry_ind:,i_j] = 0
-                        self.logger.debug("Debug, sliced cell data: {0}".format(cell_loss))
-                        #find and create proportional data
-                        prcnt = self.find_proportion(faces,0)
-                        #log_row = []
+                    if t_rows[t_rows].index.size > 0:
+                        first_dry_ind = min(t_rows[t_rows].index)
+                        self.logger.info ("      index of first dry time step: {0}, {1}".format(first_dry_ind,self.cells.loc[first_dry_ind,"days"]))
+                        #make copy of the rows to be distributed
+                        cell_loss = self.cells.loc[first_dry_ind:,i_j].copy()
+                        self.logger.info("      {0} size: {1}".format(cell_loss.name,cell_loss.size))
+                        #check if data to be moved has any flux > 0  otherwise ignore
+                        if (cell_loss > 0).any():
+                            self.logger.info("      Cell {0}: dry after time step {1} ".format(i_j,cell[0]))
+                            faces = cell[1]
+                            more_dry_cells = True
+                            #clear copied data from column
+                            self.cells.loc[first_dry_ind:,i_j] = 0
+                            self.logger.debug("Debug, sliced cell data: {0}".format(cell_loss))
+                            #find and create proportional data
+                            prcnt = self.find_proportion(faces,0)
+                            #log_row = []
 
-                        if prcnt > 0:
-                            temp = self.create_proportional_data(faces[0],cell_loss,prcnt)
-                            proportional_data = pd.concat([proportional_data,temp],axis=1)
-                            #if i_j in move_log.index:
-                            #    log_row = move_log.loc[i_j,"from"].values
-                            #else:
-                            #    log_row = temp[faces[1]].sum()
-                            #move_log.loc[faces[0],"from"][i_j] = log_row
-                        prcnt = self.find_proportion(faces,1)
-                        if prcnt > 0:
-                            temp = self.create_proportional_data(faces[1],cell_loss,prcnt)
-                            proportional_data = pd.concat([proportional_data,temp],axis=1)
+                            if prcnt > 0:
+                                temp = self.create_proportional_data(faces[0],cell_loss,prcnt)
+                                proportional_data = pd.concat([proportional_data,temp],axis=1)
+                                #if i_j in move_log.index:
+                                #    log_row = move_log.loc[i_j,"from"].values
+                                #else:
+                                #    log_row = temp[faces[1]].sum()
+                                #move_log.loc[faces[0],"from"][i_j] = log_row
+                            prcnt = self.find_proportion(faces,1)
+                            if prcnt > 0:
+                                temp = self.create_proportional_data(faces[1],cell_loss,prcnt)
+                                proportional_data = pd.concat([proportional_data,temp],axis=1)
 
-                        prcnt = self.find_proportion(faces,2)
-                        if prcnt > 0:
-                            temp = self.create_proportional_data(faces[2],cell_loss,prcnt)
-                            proportional_data = pd.concat([proportional_data,temp],axis=1)
+                            prcnt = self.find_proportion(faces,2)
+                            if prcnt > 0:
+                                temp = self.create_proportional_data(faces[2],cell_loss,prcnt)
+                                proportional_data = pd.concat([proportional_data,temp],axis=1)
 
-                        prcnt = self.find_proportion(faces,3)
-                        if prcnt > 0:
-                            temp = self.create_proportional_data(faces[3],cell_loss,prcnt)
-                            proportional_data = pd.concat([proportional_data,temp],axis=1)
+                            prcnt = self.find_proportion(faces,3)
+                            if prcnt > 0:
+                                temp = self.create_proportional_data(faces[3],cell_loss,prcnt)
+                                proportional_data = pd.concat([proportional_data,temp],axis=1)
 
 
             self.cells = pd.concat([self.cells,proportional_data],axis=1)

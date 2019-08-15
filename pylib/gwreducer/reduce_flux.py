@@ -200,13 +200,17 @@ def adjust_flux(data,error):
                     flux_diff = -.1
 
             adjusted[x[0]] = y[0]
+            max_flux = max(y)
+
             #for each value (except first and last values) adjust value by percent (flux_diff)
             for i in range(1,x.size-1):
 
                 new_val = y[i]+(y[i] * flux_diff)
+                if new_val > max_flux:
+                    new_val = y[i] + ((max_flux - y[i]) * .1)
                 #should not happen but just in case negative numbers not allowed
-                #if new_val < 0:
-                #    new_val = float(0.0)
+                if new_val < 0:
+                    new_val = float(0.0)
                 adjusted[x[i]] = new_val
 
     return adjusted
