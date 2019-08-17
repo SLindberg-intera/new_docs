@@ -186,8 +186,11 @@ def get_inflection_points(flux,peaks,pneg,p_area):
             e_ind = peaks[index]
             if e_ind > s_ind and (e_ind - s_ind) > 0 and e_ind <= last_val: #skip time step 0 as that will always be a starting point
                 #find the deepest part of the valley
+                #changed the following line of code...
+                #v_ind = np.where((pneg>s_ind) & (pneg< e_ind))
                 v_ind = np.where((pneg > s_ind) & (pneg < e_ind))
-                v_ind = v_ind[0]
+                #v_ind = v_ind[0]
+                v_ind = pneg[v_ind]
                 if v_ind.size == 1:
                     v_ind = v_ind[0]
                 elif v_ind.size > 1:
@@ -296,10 +299,10 @@ def build_segments(rr,peaks,pneg,inflection_area):
             timeseries = TimeSeries(seg_x,seg_y,None,None)
             segs_total_mass += timeseries.integrate().values[-1]
         #these two lines were initially commented out...I uncommented them to enable the code to run...
-        #timeseries = TimeSeries(r_x[r_seg],r_y[r_seg],None,None)
-        timeseries = TimeSeries(r_x[r_start:r_end],r_y[r_start:r_end],None,None)
+            #timeseries = TimeSeries(r_x[r_seg],r_y[r_seg],None,None)
+            #timeseries = TimeSeries(r_x[r_start:r_end],r_y[r_start:r_end],None,None)
 
-        segments.append(timeseries)
+            segments.append(timeseries)
     return segments, segs_total_mass
 #-------------------------------------------------------------------------------
 # rebalance reduced time series by adjusting valleys to be deeper/shallower without

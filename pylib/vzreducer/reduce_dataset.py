@@ -11,8 +11,10 @@ from pylib.timeseries.timeseries import TimeSeries
 from pylib.datareduction.reduction_result import ReductionResult
 import scipy.signal as sig
 
-#SMOOTH = "SMOOTH"  #MOVED TO INPUT file 08.09.2019
-#RAW = "RAW"        #MOVED TO INPUT file 08.09.2019
+
+#check other branch for code change here....
+SMOOTH = "SMOOTH"  #MOVED TO INPUT file 08.09.2019
+RAW = "RAW"        #MOVED TO INPUT file 08.09.2019
 
 
 def log_info(reduction_result):
@@ -57,7 +59,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         #  we are removing anything under flux floor to help remove jidder
 
         non_zero_ind = np.where(values > flux_floor)[0]
-        # add last zero before flux increases above zero   isn't this the trailing zero after the last flux>0
+        # add last zero before flux increases above zero   isn't this the first zero after the last flux>0
         if non_zero_ind[-1] + 1 < values.size - 1 and non_zero_ind[-1] + 1 not in non_zero_ind:
             ind = non_zero_ind[-1] + 1
             non_zero_ind = np.append(non_zero_ind, [ind])
@@ -79,7 +81,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
                 if ind not in non_zero_ind:
                     non_zero_ind = np.append(non_zero_ind, [ind])
 
-        # add last zero before flux increases above zero  --isn't this the leading zero before the flux > 0
+        # add last zero before flux increases above zero
         if non_zero_ind[0] - 1 > 0 and non_zero_ind[0] - 1 not in non_zero_ind:
             ind = non_zero_ind[0] - 1
             non_zero_ind = np.append(non_zero_ind, [ind])
@@ -99,7 +101,6 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
             non_zero_ind = np.append(non_zero_ind, non_zero_ind[0] - 1)
 
         # add first zero after data decreases to zero
-        #isn't this adding the ZERO just before the flux increases above zero?
         if non_zero_ind[-1] + 1 < values.size - 1:
             non_zero_ind = np.append(non_zero_ind, non_zero_ind[-1] + 1)
 
@@ -146,11 +147,15 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         #    years_mod = years
         #    values_mod = values
 
-        # normalize Values
+        # normalize Values--commented out for now [08.16.2019]
         # consider converting to pCi [multiply by 1e-12] prior to normalizing to eliminate floating point errors?
         maxval = np.max(values_mod)
-        values_mod = values_mod / maxval
-        o_timeseries = TimeSeries(years, values / maxval, None, None)
+        #values_mod = values_mod / maxval
+
+
+        #o_timeseries = TimeSeries(years, values / maxval, None, None)
+        #o_mass = o_timeseries.integrate()
+        o_timeseries = TimeSeries(years, values, None, None)
         o_mass = o_timeseries.integrate()
         timeseries = TimeSeries(years_mod, values_mod, None, None)
 
@@ -195,6 +200,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         out_error = abs(res.relative_total_mass_error)
         if out_error < OUT_ERROR_THRESHOLD and len(res.reduced_flux)>=LOWER_N:
             last_result = res
+            out_error_last = out_error
 
             break
         if len(res.reduced_flux) > 2*UPPER_N:
@@ -249,7 +255,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     peaks = np.isin(o_timeseries.times,peaks)
     pneg = np.isin(o_timeseries.times,pneg)
     peaks = np.where(peaks)
-#made the following change [peaks --> pneg] to code and commented out the old stuff....
+#made the following change [peaks --> pneg] to code and commented out the old stuff....check with Neil on this change...
     #pneg = np.where(peaks)
     pneg = np.where(pneg)
 
@@ -262,11 +268,24 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         if abs(rr.total_mass_error) < abs(last_result.total_mass_error):
             last_result = rr
         iter += 1
+    last_result.flux.values = last_result.flux.values*maxval
+    last_result.reduced_flux.values = last_result.reduced_flux.values*maxval
 
-    out_times = last_result.reduced_flux.times
-    out_values = last_result.reduced_flux.values
+    #out_times = last_result.reduced_flux.times
+    #out_values = last_result.reduced_flux.values
     #return the reduced data, undo normalize of the values (*maxval)
-    return out_times, out_values*maxval,-(last_result.total_mass_error * maxval),peaks.size
+    #return out_times, out_values*maxval,-(last_result.total_mass_error * maxval),peaks.size
+#end of Neil's code...
+    delta_mass = last_result.total_mass_error
+    #last_result. = red_flux.rebalance(last_result)
+    plot_file = summary_plot(last_result, output_folder)
+    last_result.to_csv(output_folder)
+    used_ythresh = ythresh
+    used_area = area
+    n_iterations = ix
+    summary_info(last_result, summary_file,
+            delta_mass, used_ythresh, used_area, n_iterations, out_error_last)
+    log_info(last_result)
 #-------------------------------------------------------------------------------
 #
 def add_zero_markers(o_ts,r_ts,flux_floor):
