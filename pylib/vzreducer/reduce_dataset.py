@@ -58,59 +58,59 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         #  anything less than Flux floor is considered to be zero
         #  we are removing anything under flux floor to help remove jidder
 
-        non_zero_ind = np.where(values > flux_floor)[0]
+        #non_zero_ind = np.where(values > flux_floor)[0]
         # add last zero before flux increases above zero   isn't this the first zero after the last flux>0
-        if non_zero_ind[-1] + 1 < values.size - 1 and non_zero_ind[-1] + 1 not in non_zero_ind:
-            ind = non_zero_ind[-1] + 1
-            non_zero_ind = np.append(non_zero_ind, [ind])
-            low_val = values[ind]
+        #if non_zero_ind[-1] + 1 < values.size - 1 and non_zero_ind[-1] + 1 not in non_zero_ind:
+        #    ind = non_zero_ind[-1] + 1
+        #    non_zero_ind = np.append(non_zero_ind, [ind])
+        #    low_val = values[ind]
             # if low_val is not 0 then find then next zero
     #SLL: this is  needed because if there are values less than the flux floor they not zero but also NOT in non_zero_ind
-            if low_val != 0:
+        #    if low_val != 0:
                 #for i in range(ind, values.size):
-                for i, flux in enumerate(values[ind:]):
+        #        for i, flux in enumerate(values[ind:]):
                     #if values[i] == 0:
-                    if flux ==0:
-                        ind = i
-                        break
+        #            if flux ==0:
+        #                ind = i
+        #                break
                     #elif values[i] < low_val:
-                    elif flux < low_val:
+        #            elif flux < low_val:
                         #low_val = values[i]
-                        low_val = flux
-                        ind = i
-                if ind not in non_zero_ind:
-                    non_zero_ind = np.append(non_zero_ind, [ind])
+        #                low_val = flux
+        #                ind = i
+        #        if ind not in non_zero_ind:
+        #            non_zero_ind = np.append(non_zero_ind, [ind])
 
         # add last zero before flux increases above zero
-        if non_zero_ind[0] - 1 > 0 and non_zero_ind[0] - 1 not in non_zero_ind:
-            ind = non_zero_ind[0] - 1
-            non_zero_ind = np.append(non_zero_ind, [ind])
-            low_val = values[ind]
+        #if non_zero_ind[0] - 1 > 0 and non_zero_ind[0] - 1 not in non_zero_ind:
+        #    ind = non_zero_ind[0] - 1
+        #    non_zero_ind = np.append(non_zero_ind, [ind])
+        #    low_val = values[ind]
             # if low_val is not 0 then find the previous zero
-            if low_val != 0:
-                for i in range(ind, 0, -1):
-                    if values[i] == 0:
-                        ind = i
-                        break
-                    elif values[i] < low_val:
-                        low_val = values[i]
-                        ind = i
-                if ind not in non_zero_ind:
-                    non_zero_ind = np.append(non_zero_ind, [ind])
-        if non_zero_ind[0] - 1 > 0:
-            non_zero_ind = np.append(non_zero_ind, non_zero_ind[0] - 1)
+        #    if low_val != 0:
+        #        for i in range(ind, 0, -1):
+        #            if values[i] == 0:
+        #                ind = i
+        #                break
+        #            elif values[i] < low_val:
+        #                low_val = values[i]
+        #                ind = i
+        #        if ind not in non_zero_ind:
+        #            non_zero_ind = np.append(non_zero_ind, [ind])
+        #if non_zero_ind[0] - 1 > 0:
+        #    non_zero_ind = np.append(non_zero_ind, non_zero_ind[0] - 1)
 
         # add first zero after data decreases to zero
-        if non_zero_ind[-1] + 1 < values.size - 1:
-            non_zero_ind = np.append(non_zero_ind, non_zero_ind[-1] + 1)
+        #if non_zero_ind[-1] + 1 < values.size - 1:
+        #    non_zero_ind = np.append(non_zero_ind, non_zero_ind[-1] + 1)
 
         #add 0 index to the nonzero index array if not already there...
-        if 0 not in non_zero_ind:  #insert at beginning? non_zero_ind = np.insert(non_zero_ind,0,0) ?
-            non_zero_ind = np.append(non_zero_ind, [0])
+        #if 0 not in non_zero_ind:  #insert at beginning? non_zero_ind = np.insert(non_zero_ind,0,0) ?
+        #    non_zero_ind = np.append(non_zero_ind, [0])
 
         #add last index of values to array if not already there....
-        if (values.size - 1) not in non_zero_ind:
-            non_zero_ind = np.append(non_zero_ind, [(values.size - 1)])
+        #if (values.size - 1) not in non_zero_ind:
+        #    non_zero_ind = np.append(non_zero_ind, [(values.size - 1)])
         #    zero = np.where(values > 0)[0][0]-1
         #    if zero > 0 and zero not in non_zero_ind:
         #        non_zero_ind = np.append(non_zero_ind,[zero])
@@ -124,13 +124,13 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         #    if floor < years.size-1 and floor not in non_zero_ind:
         #        non_zero_ind = np.append(non_zero_ind,[floor])
 
-        non_zero_ind = np.sort(non_zero_ind)
-        years_mod = years[non_zero_ind]
-        values_mod = values[non_zero_ind]
-        if years_mod.size < 3:
-            years_mod = years
-            values_mod = values
-            values_mod = 0
+        #non_zero_ind = np.sort(non_zero_ind)
+        #years_mod = years[non_zero_ind]
+        #values_mod = values[non_zero_ind]
+        #if years_mod.size < 3:
+        #    years_mod = years
+        #    values_mod = values
+        #    values_mod = 0
         #    elif years_mod.size < 200:
         #        o_ts = TimeSeries(years,values,None,None)
         #        r_ts = TimeSeries(years_mod,values_mod,None,None)
@@ -149,15 +149,16 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
 
         # normalize Values--commented out for now [08.16.2019]
         # consider converting to pCi [multiply by 1e-12] prior to normalizing to eliminate floating point errors?
-        maxval = np.max(values_mod)
+        #maxval = np.max(values_mod)
         #values_mod = values_mod / maxval
 
 
         #o_timeseries = TimeSeries(years, values / maxval, None, None)
         #o_mass = o_timeseries.integrate()
-        o_timeseries = TimeSeries(years, values, None, None)
+        o_timeseries = TimeSeries(years, values, copc, site)
         o_mass = o_timeseries.integrate()
-        timeseries = TimeSeries(years_mod, values_mod, None, None)
+        #timeseries = TimeSeries(years_mod, values_mod, None, None)
+        timeseries = TimeSeries(years, values, copc, site)
 
     #normalize fluxes
     #    max_val = np.max(timeseries.values)
@@ -215,14 +216,14 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         logging.info("MAX ITERATIONS")
 
 #this is the original code--commented out to incorporate the GW reducer's functionality to distribute error to valleys
-    #delta_mass = last_result.total_mass_error
+    delta_mass = last_result.total_mass_error
 
     #last_result = red_flux.rebalance(last_result)
     #plot_file = summary_plot(last_result, output_folder)
     #last_result.to_csv(output_folder)
-    #used_ythresh = ythresh
-    #used_area = area
-    #n_iterations = ix
+    used_ythresh = ythresh
+    used_area = area
+    n_iterations = ix
     #summary_info(last_result, summary_file,
     #        delta_mass, used_ythresh, used_area, n_iterations, out_error_last)
     #log_info(last_result)
@@ -262,25 +263,36 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     peaks = peaks[0]
     pneg = pneg[0]
     iter = 0
-    while abs(last_result.total_mass_error*maxval) != 0 and iter < 100:
+    #while abs(last_result.total_mass_error * maxval) != 0 and iter < 100:
+
+    max_err = last_result.total_mass_error
+    min_err = last_result.total_mass_error
+    while abs(last_result.total_mass_error) != 0 and iter < 100: #100:
         rr = red_flux.rebalance_valleys(rr,peaks,pneg)
         #keep the lowest total_mass_error
         if abs(rr.total_mass_error) < abs(last_result.total_mass_error):
             last_result = rr
+            min_err = rr.total_mass_error
+            #max_err = last_result.total_mass_error
+        else:
+            #min_err = last_result.total_mass_error
+            max_err = rr.total_mass_error
+
         iter += 1
-    last_result.flux.values = last_result.flux.values*maxval
-    last_result.reduced_flux.values = last_result.reduced_flux.values*maxval
+    logging.info("min error: {}; max error: {}--after rebalance iterations {}".format(min_err,max_err,iter))
+    last_result.flux.values = last_result.flux.values
+    last_result.reduced_flux.values = last_result.reduced_flux.values
 
     #out_times = last_result.reduced_flux.times
     #out_values = last_result.reduced_flux.values
     #return the reduced data, undo normalize of the values (*maxval)
     #return out_times, out_values*maxval,-(last_result.total_mass_error * maxval),peaks.size
 #end of Neil's code...
-    delta_mass = last_result.total_mass_error
+    #delta_mass = last_result.total_mass_error
     #last_result. = red_flux.rebalance(last_result)
     plot_file = summary_plot(last_result, output_folder)
     last_result.to_csv(output_folder)
-    used_ythresh = ythresh
+    #used_ythresh = ythresh
     used_area = area
     n_iterations = ix
     summary_info(last_result, summary_file,
