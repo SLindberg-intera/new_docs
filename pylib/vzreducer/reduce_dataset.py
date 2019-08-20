@@ -10,11 +10,16 @@ from pylib.vzreducer.summary_file import summary_info
 from pylib.timeseries.timeseries import TimeSeries
 from pylib.datareduction.reduction_result import ReductionResult
 import scipy.signal as sig
+import datetime
 
+from pylib.pygit.git import get_version
 
 #check other branch for code change here....
 SMOOTH = "SMOOTH"  #MOVED TO INPUT file 08.09.2019
 RAW = "RAW"        #MOVED TO INPUT file 08.09.2019
+
+
+
 
 
 def log_info(reduction_result):
@@ -295,10 +300,15 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     #last_result. = red_flux.rebalance(last_result)
     plot_file = summary_plot(last_result, output_folder)
     filename = last_result.to_csv(output_folder)
+
+    # eventually update a module with insert_header information functionality but keeping it here for now...
+    header_info = 'Site Name: {}\n Date Created: {}\n Script Version: {} \nCOPC: {} \n'.format(rr.mass.site, datetime.datetime.now().strftime('%Y/%m/%d'),get_version(), rr.mass.copc )
+
+
     with open(filename,'r+') as f:
         old = f.read()
         f.seek(0)
-        f.write('this is a test of inserting at the top of the file\n' +old)
+        f.write(header_info +old)
     #used_ythresh = ythresh
     used_area = area
     n_iterations = ix
