@@ -183,7 +183,7 @@ def reduce_dataset(years, values,flux_floor=0,max_tm_error=0):
     peaks = np.isin(o_timeseries.times,peaks)
     pneg = np.isin(o_timeseries.times,pneg)
     peaks = np.where(peaks)
-    pneg = np.where(peaks)
+    pneg = np.where(pneg)
 
     peaks = peaks[0]
     pneg = pneg[0]
