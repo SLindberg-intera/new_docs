@@ -188,6 +188,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
 
     # SLL--constant to move to vz-reducer-input.json file(I had bumped it up to 100 in testing)
     MAX_ITERATIONS = int(input_data[c.MAX_ITERATIONS_KEY])  #80
+    MAX_ERR_ITERATIONS = int(input_data[c.MAX_ERR_ITERATIONS_KEY])
 
     solve_type = input_data[c.SOLVE_TYPE_KEY]   #SMOOTH
     simple_peaks = False
@@ -263,19 +264,21 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     peaks = peaks[0]
     pneg = pneg[0]
     iter = 0
-    #while abs(last_result.total_mass_error * maxval) != 0 and iter < 100:
 
+    # for tracking reduction of error through the iterations....
     max_err = last_result.total_mass_error
     min_err = last_result.total_mass_error
-    while abs(last_result.total_mass_error) != 0 and iter < 100: #100:
+    # got rid of multiplying mass error by maxval (currently not normalizing fluxes-08.2019)
+    # while abs(last_result.total_mass_error * maxval) != 0 and iter < 100:
+    while abs(last_result.total_mass_error) != 0 and iter < MAX_ERR_ITERATIONS: #100:
         rr = red_flux.rebalance_valleys(rr,peaks,pneg)
         #keep the lowest total_mass_error
         if abs(rr.total_mass_error) < abs(last_result.total_mass_error):
             last_result = rr
             min_err = rr.total_mass_error
-            #max_err = last_result.total_mass_error
+
         else:
-            #min_err = last_result.total_mass_error
+
             max_err = rr.total_mass_error
 
         iter += 1
@@ -291,11 +294,17 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     #delta_mass = last_result.total_mass_error
     #last_result. = red_flux.rebalance(last_result)
     plot_file = summary_plot(last_result, output_folder)
-    last_result.to_csv(output_folder)
+    filename = last_result.to_csv(output_folder)
+    with open(filename,'r+') as f:
+        old = f.read()
+        f.seek(0)
+        f.write('this is a test of inserting at the top of the file\n' +old)
     #used_ythresh = ythresh
     used_area = area
     n_iterations = ix
-    summary_info(last_result, summary_file,
+
+    summary_template = input_data["SUMMARY_TEMPLATE"] + '\n'
+    summary_info(last_result, filename, summary_file, summary_template,
             delta_mass, used_ythresh, used_area, n_iterations, out_error_last)
     log_info(last_result)
 #-------------------------------------------------------------------------------

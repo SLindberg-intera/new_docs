@@ -110,7 +110,8 @@ def main():
     logging.info(input_data)
     output_folder = get_output_folder(args)
     summary_filename = "summary.csv"
-    summary_file = reset_summary_file(output_folder, summary_filename)
+    summary_header = ','.join(input_data['SUMMARY_HEADER']) +'\n'
+    summary_file = reset_summary_file(output_folder, summary_filename,summary_header)
 
     #replaced the area keys with source files key in case the areas change?
     #for filekey in [c._200E_KEY, c._200W_KEY]:

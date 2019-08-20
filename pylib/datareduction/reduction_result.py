@@ -28,7 +28,7 @@ def to_csv(reduction_result, filename):
         "Reduced Total Mass (Ci)":pd.Series(reduced_total_mass)
     }
     df = pd.DataFrame(data)
-    df.to_csv(filename, index=False)
+    df.to_csv(filename, index=False,)
     
 
 
@@ -57,6 +57,7 @@ class ReductionResult:
         fname = "{}_{}.csv".format(self.flux.site, self.flux.copc)
         filename = os.path.join(dirname, fname)
         to_csv(self, filename)
+        return filename
 
     @property
     def num_reduced_points(self):
