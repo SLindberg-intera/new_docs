@@ -18,6 +18,7 @@
 "data_reduction": true,
 "flux_floor": 1e-3,
 "max_tm_error": 2.25e7,
+"units":"pci",
 "HSSpath":"../../../hss/tc99/",
 "copc":"Tc-99",
 "graph_name":"Tc-99_basecase_v1"}
