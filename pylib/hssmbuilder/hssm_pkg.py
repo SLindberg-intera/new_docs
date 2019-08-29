@@ -38,12 +38,12 @@ def setup_logger(name, log_file, formatter, level=logging.INFO):
 #-------------------------------------------------------------------------------
 def build_pkg(file):
     #try:
-        file.set_min_step(Decimal(10*365.25),True)
+        #file.set_min_step(Decimal(10*365.25),True)
         #file.set_max_step(Decimal(500*365.25),True)
-        file.set_max_step(Decimal(50*365.25),True)
-        max_steps=0
+        #file.set_max_step(Decimal(50*365.25),True)
+        #max_steps=0
         new_data = []
-        output =""
+        #output =""
         if file.time:
             time_arr = file.data
         else:
@@ -64,7 +64,7 @@ def build_pkg(file):
             r_ts = TimeSeries(file.days,file.vals,None,None)
             #non_zero_ind = np.where(file.vals > (file.flux_floor * 365.25))[0]
             if file.has_data == False:# or non_zero_ind.size < file.min_reduction_steps:
-                msg_str = ("Skipping Cell i{0}-j{1}: flux never exceeds {2}".format(file.iSource,file.jSource,file.flux_floor))
+                msg_str = ("Skipping Cell i{0}-j{1}: flux never exceeds {2} {3}/day".format(file.iSource,file.jSource,file.flux_floor, file.units))
                 file.logger.info(msg_str)
                 print(msg_str)
             else:
@@ -179,6 +179,7 @@ class hss_file():#data_reduction):
         self.day_unit = day_unit
     def set_logger(self,log):
         self.logger = log
+        self.logger.info("Initiated Data reduction for cell {0}-{1}")
 
     #---------------------------------------------------------------------------
     #
@@ -373,9 +374,11 @@ class hssm_obj:
         new_data = []
         max_lines = []
         data = self.build_data()
-        procs = cpu_count()
+        procs = cpu_count()-1
         if procs > 3:
             procs = 3
+        elif procs <1:
+            procs = 1
         #with context("spawn").Pool(processes=procs) as pool:
         with context("spawn").Pool(processes=1) as pool:
             self.reduced_data = pool.map(build_pkg,data )
@@ -397,7 +400,7 @@ class hssm_obj:
             outfile.write(output)
 
         #self.misc_files()
-        self.misc_file_generation()
+        #-- function is broken, data is in it is wrong self.misc_file_generation()
         self.misc_files()
         self.error_check()
     #---------------------------------------------------------------------------
@@ -542,9 +545,9 @@ class hssm_obj:
                 first = False
         output = "days,total flux(pCi), total cumulative(pCi),total cumulative(ci){0}\n{1}".format(cols,output)
         yearly_output = "years,total flux(Ci), total cumulative(Ci)\n{0}".format(yearly_output)
-        fileName = os.path.join(self.misc_path,'full_data_set.csv')
-        with open(fileName,"w") as outfile:
-            outfile.write(output)
+        #fileName = os.path.join(self.misc_path,'full_data_set.csv')
+        #with open(fileName,"w") as outfile:
+        #    outfile.write(output)
         fileName = os.path.join(self.misc_path,'cumulative_data_set_by_year.csv')
         with open(fileName,"w") as outfile:
             outfile.write(yearly_output)

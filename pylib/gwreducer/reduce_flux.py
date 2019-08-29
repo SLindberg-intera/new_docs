@@ -132,7 +132,9 @@ def get_inflection_points(flux,peaks,pneg,p_area):
             e_ind = peaks[index]
             if e_ind > s_ind and (e_ind - s_ind) > 0 and e_ind <= last_val: #skip time step 0 as that will always be a starting point
                 #find the deepest part of the valley
-                v_ind = np.where((pneg > s_ind) & (pneg < e_ind))
+                min_val = min(y[s_ind:e_ind])
+                v_ind = np.where(pneg==min_val)
+                #v_ind = np.where((pneg > s_ind) & (pneg < e_ind))
                 v_ind = v_ind[0]
                 if v_ind.size == 1:
                     v_ind = v_ind[0]

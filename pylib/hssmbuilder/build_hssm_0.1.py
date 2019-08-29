@@ -161,15 +161,15 @@ def main():
             params["sat_lvl"],'sat_obj')
     #load mass/flux data
     mass = mass_obj(params["input"],'mass_obj',misc_dir)
-    mass.cells.to_csv(os.path.join(misc_dir,r'all_cells.csv'), header=True)
+    mass.cells.to_csv(os.path.join(misc_dir,r'01_all_cells_after_cell_merge.csv'), header=True)
     sat.flow_obj.to_csv(os.path.join(misc_dir,r'dry_cells.csv'), header=True)
     #convert flux to daily from yearly and add column for time in days
     mass.convert_to_daily(params["start_year"],params["end_year"])
-    mass.cells.to_csv(os.path.join(misc_dir,r'all_cell_by_day.csv'), header=True)
+    mass.cells.to_csv(os.path.join(misc_dir,r'02_all_cell_by_day.csv'), header=True)
     #Shift mass out of dry cells and move to saturated all_cells
     if params['mass_shift']:
         mass.process_dry_cells(sat.flow_obj, True)
-        mass.cells.to_csv(os.path.join(misc_dir,r'all_cell_by_day_dry_cell_shifted.csv'), header=True)
+        mass.cells.to_csv(os.path.join(misc_dir,r'03_all_cell_by_day_dry_cell_shifted.csv'), header=True)
     #create object to process data into HSSM package
     hssm = hssm_obj(sat.sat_obj,mass.cells,params,'hssm_obj',log_dir,misc_dir)
     #Create HSSM packages

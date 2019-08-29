@@ -136,7 +136,7 @@ class mass_obj:
                 #cells = cells.merge(df, left_index=True,right_index=True, how='outer')
 
         #change all NaN to 0
-        cells.fillna(0)
+        cells = cells.fillna(0)
         # convert all cells from string to float
         cells = cells.astype('float64')
         # change negative numbers to 0
@@ -171,12 +171,28 @@ class mass_obj:
         #self.cells = pd.concat([self.cells,tmp_cell],axis=1)
         return tmp_cell
     #-----------------------------------------------------------------------
+    # log where mass came from and where it went
+    def add_sum_to_log(self, df,f_ij,t_ij,data):
+        if t_ij not in df.index:
+            df = df.append(pd.Series(name=t_ij))
+            # convert all cells from string to float
+            df = df.astype('float64')
+        if f_ij not in df.columns:
+            df[f_ij] = pd.Series(name=f_ij, index=df.index)
+            # convert all cells from string to float
+            df = df.astype('float64')
+        #change all NaN to 0
+        df = df.fillna(0.0)
+        #if np.isnan(df.at[t_ij,f_ij]):
+        #    df.at[t_ij,f_ij] = float64(0)
+        df.at[t_ij,f_ij] +=  data.sum(axis = 0, skipna = True)
+        return df
+    #-----------------------------------------------------------------------
     #
     def process_dry_cells(self,dry_cells,intrmdt_flag):
         more_dry_cells = True
-#        ml_cols = ["i-j","from"]
-#        move_log = pd.DataFrame(columns=ml_log)
-#        move_log = move_log.set_index("i-j")
+        move_log = pd.DataFrame(columns=["i-j"])
+        move_log = move_log.set_index("i-j")
 
         iteration = 0
         self.logger.info("Processing Flux from Cells that have have gone dry:")
@@ -212,37 +228,32 @@ class mass_obj:
                             self.logger.debug("Debug, sliced cell data: {0}".format(cell_loss))
                             #find and create proportional data
                             prcnt = self.find_proportion(faces,0)
-                            #log_row = []
-
                             if prcnt > 0:
                                 temp = self.create_proportional_data(faces[0],cell_loss,prcnt)
                                 proportional_data = pd.concat([proportional_data,temp],axis=1)
-                                #if i_j in move_log.index:
-                                #    log_row = move_log.loc[i_j,"from"].values
-                                #else:
-                                #    log_row = temp[faces[1]].sum()
-                                #move_log.loc[faces[0],"from"][i_j] = log_row
+                                move_log = self.add_sum_to_log(move_log,i_j,'{0}-{1}'.format(faces[0][0],faces[0][1]),temp)
                             prcnt = self.find_proportion(faces,1)
                             if prcnt > 0:
                                 temp = self.create_proportional_data(faces[1],cell_loss,prcnt)
                                 proportional_data = pd.concat([proportional_data,temp],axis=1)
-
+                                move_log = self.add_sum_to_log(move_log,i_j,'{0}-{1}'.format(faces[1][0],faces[1][1]),temp)
                             prcnt = self.find_proportion(faces,2)
                             if prcnt > 0:
                                 temp = self.create_proportional_data(faces[2],cell_loss,prcnt)
                                 proportional_data = pd.concat([proportional_data,temp],axis=1)
-
+                                move_log = self.add_sum_to_log(move_log,i_j,'{0}-{1}'.format(faces[2][0],faces[2][1]),temp)
                             prcnt = self.find_proportion(faces,3)
                             if prcnt > 0:
                                 temp = self.create_proportional_data(faces[3],cell_loss,prcnt)
                                 proportional_data = pd.concat([proportional_data,temp],axis=1)
-
+                                move_log = self.add_sum_to_log(move_log,i_j,'{0}-{1}'.format(faces[3][0],faces[3][1]),temp)
 
             self.cells = pd.concat([self.cells,proportional_data],axis=1)
             #change all NaN to 0
-            self.cells.fillna(0)
+            self.cells=self.cells.fillna(0)
             #Sum together the duplicate columns that were just added
             # to the existing columns
             if intrmdt_flag:
                 self.cells.to_csv(os.path.join(self.misc_path,r'dry_cell_flux_shift_itteration_{0}.csv'.format(iteration)),header = True)
             self.cells = self.cells.groupby(lambda x:x, axis=1).sum()
+        move_log.to_csv(os.path.join(self.misc_path,r'flux_mass_shift_mapping.csv'.format(iteration)),header = True)
