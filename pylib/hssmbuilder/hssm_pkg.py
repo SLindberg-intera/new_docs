@@ -379,8 +379,8 @@ class hssm_obj:
             procs = 3
         elif procs <1:
             procs = 1
-        #with context("spawn").Pool(processes=procs) as pool:
-        with context("spawn").Pool(processes=1) as pool:
+        with context("spawn").Pool(processes=procs) as pool:
+        #with context("spawn").Pool(processes=1) as pool:
             self.reduced_data = pool.map(build_pkg,data )
 
         file_str = ""
@@ -400,7 +400,7 @@ class hssm_obj:
             outfile.write(output)
 
         #self.misc_files()
-        #-- function is broken, data is in it is wrong self.misc_file_generation()
+        self.misc_file_generation()
         self.misc_files()
         self.error_check()
     #---------------------------------------------------------------------------
@@ -482,7 +482,7 @@ class hssm_obj:
     #---------------------------------------------------------------------------
     #
     def misc_files(self):
-        cols = ['cell','#pts','total_mass_error','%error','peaks_found']
+        cols = ['cell','#pts','total_mass','total_mass_error','%error','peaks_found']
         cells = pd.DataFrame(columns=cols)
         days = self.cells.loc[:,'days'].values
         for x in self.reduced_data:
@@ -492,7 +492,7 @@ class hssm_obj:
                 total_mass = ts.integrate().values[-1]
                 p_error = x[3]/total_mass
 
-                temp = pd.DataFrame(np.array([[x[0],len(x[1]),x[3],p_error,x[5]]]),columns=cols)
+                temp = pd.DataFrame(np.array([[x[0],len(x[1]),total_mass,x[3],p_error,x[5]]]),columns=cols)
                 cells = cells.append(temp)
 
         fileName = os.path.join(self.misc_path,'cell_error.csv')
@@ -505,49 +505,79 @@ class hssm_obj:
         yearly_output = ""
         output = ""
         cols = ""
+        error_str = ""
+        e_cols = ""
         first = True
         total_cum = 0
+        #index should be in years
         keys = self.cells.index.values
         keys.sort()
 
         for i in range(len(keys)):
             total_flux = self.cells.loc[keys[i], self.cells.columns != 'days'].sum()
-            #days = self.cells.loc[keys[i],'days'].values
+            #days column is the number of days since start_year
             days = self.cells.loc[keys[i],'days']
             # if prev rec is set then calculate cumulative mass
             if i > 0:
-                total_cum += total_flux *  (keys[i] - keys[i-1])
+                total_cum += (total_flux * 365.25) #*  (keys[i] - keys[i-1])
             # else this is the first rec so no calculation needed.
             else:
-                total_cum = total_flux
+                total_cum = total_flux * 365.25
             #convert to ci (1E-12) from pCi, for second cumulative column
-            total_cum_ci = total_cum * .000000000001
+            factor = 1
+            unit = self.units
+            if self.units.lower() == 'ug':
+                unit = 'kg'
+                factor = 1e-9
+            elif self.units.lower() == 'pci':
+                unit = "Ci"
+                factor = 1e-12
+            total_cum_ci = total_cum * factor
             output += "{0},{1},{2},{3}".format(days,total_flux,total_cum,total_cum_ci)
-            yearly_output += "{0},{1},{2}\n".format(keys[i] /365.25 + self.start_year,(total_flux * 365.25)*.000000000001,total_cum_ci)
+            #yearly_output += "{0},{1},{2}\n".format(keys[i] /365.25 + self.start_year,(total_flux * 365.25)*factor,total_cum_ci)
+            yearly_output += "{0},{1},{2}\n".format(keys[i],(total_flux * 365.25)*factor,total_cum_ci)
+
             for x in self.reduced_data:
                 if (len(x) > 0):
 
                     if (len(x[1]) > i):
                         cur_rec = x[1][i]
                         #logger.debug(cur_rec)
+                        temp = x[0][x[0].rfind('/i')+2:x[0].rfind('_h')]
+                        ij = "{0}-{1}".format(temp[:temp.rfind('j')],temp[temp.rfind('j')+1:])
                         if first:
-                            cols += ",day,{0},cumulative".format(x[0])
+                            cols += ",day,{0},cumulative".format(ij)#x[0])
+                            e_cols += "{},original rate, reduced rate, percent error,".format(ij)
                         #if len(output) < 1:
                         #    output += "{0},{1},{2}".format(cur_rec[0],cur_rec[1],cur_rec[2])
                         #else:
                         output += ",{0},{1},{2}".format(cur_rec[0],cur_rec[1],cur_rec[2])
+                        #check error on flux
+                        year = (cur_rec[0]/Decimal('365.25'))+self.start_year
 
+                        flux = self.cells.loc[int(year),ij]
+                        error = (flux-float(cur_rec[1]))/flux
+                        if error > .001:
+                            error_str += "{0},{1},{2},{3},".format(year,flux,cur_rec[1],error)
+                        else:
+                            error_str  += "{},--,--,--,".format(year)
                     else:
                         output += ",,,"
+                        error_str  += ",,,,"
 
             if len(cols) > 3:
                 output += "\n"
+                error_str += "\n"
                 first = False
-        output = "days,total flux(pCi), total cumulative(pCi),total cumulative(ci){0}\n{1}".format(cols,output)
-        yearly_output = "years,total flux(Ci), total cumulative(Ci)\n{0}".format(yearly_output)
-        #fileName = os.path.join(self.misc_path,'full_data_set.csv')
-        #with open(fileName,"w") as outfile:
-        #    outfile.write(output)
+        output = "days,total flux({2}/day), total cumulative({2}),total cumulative({3}){0}\n{1}".format(cols,output,self.units,unit)
+        error_str = "{0}\n{1}".format(e_cols,error_str)
+        yearly_output = "years,total flux({1}/year), total cumulative({1})\n{0}".format(yearly_output,unit)
+        fileName = os.path.join(self.misc_path,'full_data_set.csv')
+        with open(fileName,"w") as outfile:
+            outfile.write(output)
         fileName = os.path.join(self.misc_path,'cumulative_data_set_by_year.csv')
         with open(fileName,"w") as outfile:
             outfile.write(yearly_output)
+        fileName = os.path.join(self.misc_path,'rate_error_check.csv')
+        with open(fileName,"w") as outfile:
+            outfile.write(error_str)
