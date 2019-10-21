@@ -48,12 +48,6 @@
 			  "help":"Log file mode: (a)ppend or (w)rite; default=w",
 			  "default":"w",
 			  "choices":["a","w"]
-			},
-			{
-			  "ARG":"--gitpath",
-			  "help":"path to .git directory",
-			  "default":"."
-			  
 			}
 			
 		]
