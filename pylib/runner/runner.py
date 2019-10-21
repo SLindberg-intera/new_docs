@@ -97,7 +97,7 @@ def get_gitpath(pathtool):
     for path in p.parents:
         if (path.joinpath('.git').exists()):
             return(path.joinpath('.git'))
-    return 'not a repository' 
+    return 'Not a repository' 
     
 def get_filename(path_file):
     return Path(path_file).name
@@ -135,7 +135,7 @@ def make_version(path):
         version = get_version(str(path))
         
     else:
-        version = ' Tool ' + path  
+        version = path  
     
     return config[c.VERSION_TEMPLATE_KEY].format(version=version)
 
@@ -144,9 +144,11 @@ def log_header(args,runner_gpath, tool_gpath):
     #set_git_path()
     notify_user(make_user_message(args), shell=True)
     notify_user(make_tool_use_message(args))
+    
     #need to check versioning of both the runner and the tool being invoked....
     notify_user(make_version(runner_gpath))
     notify_user(make_version(tool_gpath))
+    
     notify_user(make_qa_status(args,tool_gpath))
     notify_user(make_qa_status(args,tool_gpath))
     notify_user(make_user_summary())
@@ -159,17 +161,15 @@ def execute_program(args):
 if __name__ == "__main__":
     
     thisdir = get_currdir()
-    input(thisdir)
-    runner_gitpath = get_gitpath(Path(thisdir))
-    input(runner_gitpath)
     
+    runner_gitpath = get_gitpath(Path(thisdir))
+   
     args = parse_args()
     #NOTE: there could be more than one tool associated file that needs to have path verified (ie CAST that uses several files...libraries etc) 
     #may need to have a list of paths returned and add iterating through the lists in the subsequent function calls.
     path_tool = get_pathtool(args)
     tool_gitpath = get_gitpath(path_tool)
     
-    input(tool_gitpath)
     
     configure_logger(args)
     log_header(args,runner_gitpath, tool_gitpath)
