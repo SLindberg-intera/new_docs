@@ -51,7 +51,8 @@
 			},
 			{
 			  "ARG":"--gitpath",
-			  "help":"path to .git directory"
+			  "help":"path to .git directory",
+			  "default":"."
 			  
 			}
 			
