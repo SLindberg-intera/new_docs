@@ -6,6 +6,7 @@
 import hashlib
 import os
 import argparse
+import datetime
 
 BLOCKSIZE = 2**20
 
@@ -42,10 +43,18 @@ def extract_fingerprints(target):
             yield [p, fingerprint_file(p)]
     yield ["Total for {} files".format(count), hasher.hexdigest()]
 
+
+SEP = "\t"
 def to_file(filename, extract_fingerprints_itr):
+    all_items = list(extract_fingerprints_itr)
     with open(filename, 'w') as f:
-        for title, fprint in extract_fingerprints_itr:
-            f.write("\t".join([title, fprint]))
+        f.write("Fingerprint generated at {}\n".format(
+            datetime.datetime.now()))
+        f.write(SEP.join(all_items[-1]))
+        f.write("\n")
+        f.write("\n")
+        for line in all_items[0:-1]:
+            f.write(SEP.join(line))
             f.write("\n")
 
 def setupArgParse():
@@ -53,10 +62,11 @@ def setupArgParse():
     pa.add_argument("target", 
             type=str,
             help="The target file or directory you would like to fingerprint")
-    pa.add_argument("output",
-            default="fingerprint.txt",
+    pa.add_argument("-o", "--output",
             type=str,
-            help="The name of the output fingerprint file.  The default is 'fingerprint.txt'")
+            help="The name of the output fingerprint file.  The default is 'fingerprint.txt'",
+            default="fingerprint.txt"
+            )
 
 
     return pa
