@@ -1,5 +1,4 @@
 """
-
 utility to help traverse the ICF blockchain with Python
 
 """
@@ -9,7 +8,6 @@ import json
 
 HASH = 'Hash'
 INHERITANCE = 'Inheritance'
-
 
 class Block:
     """ represents a block in the blockchain """
