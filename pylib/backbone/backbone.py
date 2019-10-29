@@ -1,5 +1,6 @@
 """
-utility to help traverse the ICF blockchain with Python
+utilities to help traverse the ICF blockchain with Python
+
 
 """
 import sys
@@ -26,8 +27,11 @@ def get_dirs(start_path):
 
 class Connection:
     """
-        a connection between two nodes.  Useful in building
+        a connection between two objects.  Useful in building
         a force diagram in D3
+
+        this relates a source to a target
+
     """
     def __init__(self, source, target, value=1):
         self.source = source
@@ -45,10 +49,13 @@ class Connection:
 
 
 class Block:
-    """ represents a block in the blockchain 
+    """ represents a "block" in the blockchain 
     
     
         corresponds to the contents of an ICF_BLOCK_FILENAME file
+
+
+        the path is the path to the physical ICF blockchain file
     """
     def __init__(self, path, hashkey, inheritance=[]):
         self.path = path
@@ -105,6 +112,7 @@ class Block:
                     " ".join(map(str, self.inheritance)))
         return "[{}]".format(self.path)    
 
+
 def get_fingerprint(filepath, sep="\t"):
     """
         read the fingerprint from a valid fingerprint file
@@ -118,6 +126,7 @@ def get_fingerprint(filepath, sep="\t"):
     return fingerline.split(sep)[1]    
 
 def get_version(frompath):
+    """ given a path, get the version number """
     vstr = os.path.split(frompath)
     return versions.parse_version_str(vstr[-1])
 
@@ -144,6 +153,12 @@ class WorkProductVersion:
     def __init__(self, path):
         self.path = path
 
+    def __eq__(self, other):
+        if (other.fingerprint==self.fingerprint):
+            if(other.version_number==self.version_number):
+                return True
+        return False    
+
     @property
     def meta_path(self):
         return os.path.join(self.path, META_DIR)
@@ -155,6 +170,11 @@ class WorkProductVersion:
     @property
     def fingerprint_path(self):
         return os.path.join(self.meta_path, FINGER_FILENAME)
+
+    @property
+    def work_product_path(self):
+        wpp, version = os.path.split(self.path)
+        return wpp
 
     @property
     def block_path(self):
@@ -177,6 +197,27 @@ class WorkProductVersion:
         """ obtain a Block instance from this version """
         return Block.from_path(self.block_path)
 
+    @property
+    def work_product_name(self):
+        return os.path.split(self.work_product_path)[1]
+
+    @classmethod
+    def from_block(cls, block):
+        blockpath, blockfile = os.path.split(os.path.abspath(block.path))
+        version_path, metadir = os.path.split(blockpath)
+        return cls(version_path)
+
+    def get_summary(self, sep=" "):
+        block = self.block
+        s = []
+        for node in block.nodes:
+            parent = WorkProductVersion.from_block(Block.from_path(node))
+            s.append(sep.join([
+                parent.work_product_name, parent.version_str, parent.path
+                ]
+                ))
+        return "\n".join(s)
+    
 
 class WorkProduct:
     """
@@ -193,8 +234,8 @@ class WorkProduct:
 
 
     """
-    def __init__(self, key, root=DEVELOPMENT_PATH):
-        self.key = key
+    def __init__(self, path)
+        self.path = path
 
     @property
     def versions(self, ):
@@ -204,16 +245,3 @@ class WorkProduct:
     def most_recent_version(self, ):
         raise NotImplemented()
 
-    @property
-    def path(self):
-        return os.path.join(DEVELOPMENT_PATH, self.key)
-
-
-if __name__ == "__main__":
-    try:
-        blockpath = sys.argv[1]
-        block = Block.from_path(blockpath)
-        print("Nodes", block.nodes)
-        print("Connections", ", ".join(map(str, block.connections)))
-    except IndexError:
-        pass
