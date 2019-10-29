@@ -100,7 +100,7 @@ class WorkProductVersion:
         self.path = path
 
     @property
-    def version_number(self):
+    def version_number:
         pass
 
     @property
