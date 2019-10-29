@@ -18,11 +18,22 @@ try:
 except Exception as e:
     raise e
 
-"""********** TEST HELPERS *******************"""
+"""********** TEST HELPERS *******************
+This section 
+    sets up a structure where there are two work products
+    (one version each)
+
+    work product 2 references work product 1
+    work product 1 references nothing
+
+    these files are created on disk along with fingerprints
+    and a block chain
+
+"""
 START_DIR = os.path.join("ignore", "temp")
 
-KEY = 'HSDB'
-KEY2 = 'HSDB2'
+KEY = 'Work Product 1'
+KEY2 = 'Work Product 2'
 version = 'v1.2.3'
 version2 = 'v0a'
 
@@ -38,7 +49,7 @@ metadir = os.path.join(versiondir, 'meta')
 meta2dir = os.path.join(version2dir, 'meta')
 
 FILE_CONTENTS = 'HELLO WORLD\n'
-""" The above represents a dummy data file.
+""" The above represents a dummy data file associated with a work product.
 
     don't change the above line; it will change the fingerprint
     that is referenced in the tests
@@ -52,8 +63,10 @@ def create_data(filename):
 def create_path(pathname):
     try:
         os.makedirs(pathname)
-    except FileExistsError:
-        pass
+    except FileExistsError as e:
+        if os.path.isdir(pathname):
+            return
+        raise e 
 
 def remove_path(pathname):
     try:
@@ -66,7 +79,7 @@ def make_blockfile(fingerprint, inheritance, outfile):
     with open(outfile, 'w') as f:
         f.write(json.dumps(d))
 
-FINGERPRINT = "fingerprint.txt"
+FINGERPRINT = backbone.FINGER_FILENAME 
 INHERITANCE1 = []
 INHERITANCE2 = [os.path.join("..","..", "..", KEY, version)]
 BLOCK1 = os.path.join(metadir, backbone.ICF_BLOCK_FILENAME)
@@ -123,8 +136,7 @@ class TestWorkProductVersion(unittest.TestCase):
         self.wp2 = backbone.WorkProductVersion(version2dir)
     
     def tearDown(self):
-        #destroy_test_data()
-        pass
+        destroy_test_data()
 
     def test_setUp(self):
         self.assertTrue(os.path.isdir(metadir))
@@ -165,6 +177,28 @@ class TestWorkProductVersion(unittest.TestCase):
         self.assertEqual(len(block2.nodes), 2)
         self.assertEqual(len(block2.connections), 1)
         
+    def test_from_block(self):
+        block = self.wp1.block
+        wp3 = backbone.WorkProductVersion.from_block(block)
+        self.assertEqual(wp3, self.wp1)
+        self.assertNotEqual(wp3, self.wp2)
+
+    def test_work_product_name(self):
+        wp1 = self.wp1.work_product_name
+        wp2 = self.wp2.work_product_name
+        self.assertEqual(wp1, KEY)
+        self.assertEqual(wp2, KEY2)
+
+    def test_summary(self):
+        summary = self.wp2.get_summary()
+        self.assertTrue( KEY in summary)
+        self.assertTrue( KEY2 in summary)
+        self.assertTrue(self.wp2.path in summary)
+        self.assertTrue(self.wp1.path in summary)
+
+        summary = self.wp1.get_summary()
+        self.assertTrue(self.wp1.path in summary)
+        self.assertFalse(self.wp2.path in summary)
 
 if __name__=="__main__":
     unittest.main()
