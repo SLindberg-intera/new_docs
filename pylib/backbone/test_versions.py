@@ -32,11 +32,13 @@ class TestVersionStr(unittest.TestCase):
         v4 = self.f("v3a.0.0")
         v5 = self.f("v3b.0.0")
         v6 = self.f("v0.0.0")
+        v7 = self.f("v01.0.0")
         self.assertTrue(v1<v2)
         self.assertTrue(v2<v3)
         self.assertTrue(v5>v4)
         self.assertTrue(v5>v3)
         self.assertTrue(v6<v1)
+        self.assertTrue(v7>v6)
         
     def test_valid_sep(self):
         v1 = self.f("v1_3_3", sep="_")
