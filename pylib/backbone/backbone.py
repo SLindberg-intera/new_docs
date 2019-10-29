@@ -5,6 +5,7 @@ utility to help traverse the ICF blockchain with Python
 import sys
 import json
 import os
+import versions
 
 
 HASH = 'Hash'
