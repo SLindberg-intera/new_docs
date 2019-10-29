@@ -12,6 +12,13 @@ HASH = 'Hash'
 INHERITANCE = 'Inheritance'
 DEVELOPMENT = 'Development'
 DEVELOPMENT_PATH = os.path.join("S:\\", "PSC","!HANFORD","ICF", "TEST")
+FINGER_FILENAME = "fingerprint.txt"
+ICF_BLOCK_FILENAME = "icfblock.block"
+META_DIR = 'meta' 
+DATA_DIR = 'data'
+
+def version_path_to_blockfile(version_path):
+    return os.path.join(version_path, META_DIR, ICF_BLOCK_FILENAME)
 
 def get_dirs(start_path):
     """ get a list of the directories in a path"""
@@ -38,7 +45,11 @@ class Connection:
 
 
 class Block:
-    """ represents a block in the blockchain """
+    """ represents a block in the blockchain 
+    
+    
+        corresponds to the contents of an ICF_BLOCK_FILENAME file
+    """
     def __init__(self, path, hashkey, inheritance=[]):
         self.path = path
         self.hashkey = hashkey 
@@ -50,10 +61,15 @@ class Block:
         with open(filepath, 'r') as f:
             d = json.load(f)
             p = []
+            rootpath = os.path.dirname(filepath)
             for path in d[INHERITANCE]:
+                path = os.path.abspath(
+                        version_path_to_blockfile(
+                            os.path.join(rootpath, path) 
+                            ))
                 p.append(cls.from_path(path))
 
-            return cls(filepath, d[HASH], p)
+            return cls(os.path.abspath(filepath), d[HASH], p)
 
     def __itr_nodes(self,):
         """returns an iterator over nodes
@@ -89,6 +105,23 @@ class Block:
                     " ".join(map(str, self.inheritance)))
         return "[{}]".format(self.path)    
 
+def get_fingerprint(filepath, sep="\t"):
+    """
+        read the fingerprint from a valid fingerprint file
+
+    """
+    with open(filepath, 'r') as f:
+        lines = f.readlines()
+    fingerline = lines[1]
+    if "Total" not in fingerline:
+        raise ValueError("Invalid fingerprint file")
+    return fingerline.split(sep)[1]    
+
+def get_version(frompath):
+    vstr = os.path.split(frompath)
+    return versions.parse_version_str(vstr[-1])
+
+
 
 class WorkProductVersion:
     """
@@ -96,21 +129,54 @@ class WorkProductVersion:
 
         This corresponds to an commited ICF work product.
 
+        self.path  should be the path to the version directory
+            i.e
+
+            /workproduct/
+                /v1.2/ <--- this is "path" in constructor 
+                    /data
+                        [data files go here]
+                    /meta
+                        [meta files go here, blockchain and fingerprint]
+                        
+
     """
     def __init__(self, path):
         self.path = path
 
     @property
+    def meta_path(self):
+        return os.path.join(self.path, META_DIR)
+    
+    @property
+    def data_path(self):
+        return os.path.join(self.PATH, DATA_DIR)
+
+    @property
+    def fingerprint_path(self):
+        return os.path.join(self.meta_path, FINGER_FILENAME)
+
+    @property
+    def block_path(self):
+        return os.path.join(self.meta_path, ICF_BLOCK_FILENAME)
+
+    @property
     def version_number(self):
-        pass
+        return get_version(self.path)
+
+    @property
+    def version_str(self):
+        return os.path.split(self.path)[-1]
+
+    @property
+    def fingerprint(self):
+        return get_fingerprint(self.fingerprint_path)
 
     @property
     def block(self):
         """ obtain a Block instance from this version """
-        return Block.from_path(
-                os.path.join(self.path, "meta", "icfblock.block") 
-                )
-    
+        return Block.from_path(self.block_path)
+
 
 class WorkProduct:
     """
