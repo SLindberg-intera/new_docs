@@ -200,5 +200,12 @@ class TestWorkProductVersion(unittest.TestCase):
         self.assertTrue(self.wp1.path in summary)
         self.assertFalse(self.wp2.path in summary)
 
+    def test_explain_version(self):
+        e1 = backbone.WorkProductVersion.explain_version(versiondir)
+        e2 = backbone.WorkProductVersion.explain_version(version2dir)
+        self.assertTrue("Summary of" in e1)
+        print(e2)
+
+
 if __name__=="__main__":
     unittest.main()
