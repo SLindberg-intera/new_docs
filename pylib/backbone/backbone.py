@@ -281,6 +281,12 @@ class WorkProductVersion:
     def children(self):
         return [WorkProductVersion(i) for i in self._get_children_paths()]
 
+    @property
+    def parents(self):
+        items = [WorkProductVersion.from_block(Block.from_path(i))
+                for i in self.block.nodes]
+        # remove 'self' from the list of parents
+        return [i for i in items if i !=self]
 
 
 class WorkProduct:

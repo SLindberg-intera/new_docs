@@ -218,10 +218,22 @@ class TestWorkProductVersion(unittest.TestCase):
         )
 
     def test_children(self):
+        """ same as _get_children_paths except class instances """
         p = self.wp1.children
         self.assertTrue(p[0]==self.wp2)
         p2 = self.wp2.children
         self.assertTrue(p2==[])
+    
+    def test_parents(self):
+        """
+        wp1 should have no parents
+        wp2 should have one parent (wp1)
+        """
+        p2 = self.wp2.parents
+        p1 = self.wp1.parents
+        self.assertTrue(len(p1)==0)
+        self.assertTrue(len(p2)==1)
+        self.assertTrue(p2[0]==self.wp1)
 
 
 if __name__=="__main__":
