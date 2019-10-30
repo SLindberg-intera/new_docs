@@ -298,10 +298,6 @@ class WorkProduct:
         instances.  This class represents the collection of work
         product verions
 
-        
-        sketching this out for now;
-        problably should move to another module
-
 
     """
     def __init__(self, path):
@@ -321,5 +317,10 @@ class WorkProduct:
 
     @property
     def most_recent_version(self, ):
-        raise NotImplemented()
+        vlist = [(v.version_number, v) for v in self.versions]
+        out = sorted(vlist, key=lambda x: x[0])
+        try:
+            return out[0][1]
+        except IndexError:
+            return None
 

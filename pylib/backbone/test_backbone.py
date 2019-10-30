@@ -235,6 +235,11 @@ class TestWorkProductVersion(unittest.TestCase):
         self.assertTrue(len(p2)==1)
         self.assertTrue(p2[0]==self.wp1)
 
+    def test_WorkProduct(self):
+        wps = backbone.WorkProducts(self.wp1.all_work_products_path)
+        versions = [wp.most_recent_version for wp in wps]
+        self.assertTrue(v in [self.wp1, self.wp2] for v in versions)
+
 
 if __name__=="__main__":
     unittest.main()
