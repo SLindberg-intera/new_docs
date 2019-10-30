@@ -7,6 +7,7 @@ import sys
 import json
 import os
 import versions
+import itertools
 
 
 """ constants used below """
@@ -131,6 +132,26 @@ def get_version(meta_folder_path):
     vstr = os.path.split(meta_folder_path)
     return versions.parse_version_str(vstr[-1])
 
+class WorkProducts:
+    """
+        represents all the work products in an ICF data structure
+
+        path is the directory where these are stored
+    """
+    def __init__(self, path):
+        self.path = path
+
+    @property
+    def all(self):
+        l = lambda x: WorkProduct(x)
+        paths = [os.path.abspath(os.path.join(self.path, i))
+                for i in os.listdir(self.path)]
+        return list(map(l, paths)) 
+
+    def __iter__(self):
+        yield from self.all
+
+
 class WorkProductVersion:
     """
         Represents a particular version of a work product.
@@ -157,6 +178,20 @@ class WorkProductVersion:
             if(other.version_number==self.version_number):
                 return True
         return False    
+
+    @property
+    def other_versions_path(self):
+        """ return path folder containing other versions of this
+        work product version
+        """
+        return os.path.abspath(os.path.join(self.path, ".."))
+
+    @property
+    def all_work_products_path(self):
+        """return path of folder containing ICF data structure
+           (the "work products" directory)
+        """
+        return os.path.abspath(os.path.join(self.other_versions_path, ".."))
 
     @property
     def meta_path(self):
@@ -224,6 +259,29 @@ class WorkProductVersion:
         outstr = "Summary of '{}':\n{}".format(path, c.get_summary('\t'))
         return outstr
 
+    def _get_children_paths(self):
+        """
+            traverse the directory structure and identify other
+            work product versions which reference this one in
+            their inheritance.
+        """
+        all_products_path = self.all_work_products_path
+        block_path = self.block.path
+        work_products = WorkProducts(all_products_path)
+        versions = [[i.path for i in work_product.versions
+                    if (block_path in i.block.nodes)]
+                for work_product in work_products]
+
+        # remove "this" from the children and make a flat list 
+        return list(set(itertools.chain(*
+                [i for i in versions if os.path.abspath(self.path)
+            not in i]
+                )))
+    @property
+    def children(self):
+        return [WorkProductVersion(i) for i in self._get_children_paths()]
+
+
 
 class WorkProduct:
     """
@@ -241,11 +299,19 @@ class WorkProduct:
 
     """
     def __init__(self, path):
-        self.path = path
+        if os.path.isdir(path):
+            self.path = path
+            return
+        raise ValueError("'{}' is not a valid path".format(path))
+
+    def __str__(self, ):
+        return os.path.split(self.path)[1]
 
     @property
     def versions(self, ):
-        raise NotImplemented()
+        return [WorkProductVersion(
+                os.path.abspath(os.path.join(self.path, version)))
+                for version in os.listdir(self.path)]
 
     @property
     def most_recent_version(self, ):
