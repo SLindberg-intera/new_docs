@@ -215,9 +215,16 @@ class WorkProductVersion:
             s.append(sep.join([
                 parent.work_product_name, parent.version_str, parent.path
                 ]
-                ))
+            ))
         return "\n".join(s)
-    
+
+
+    @classmethod
+    def explain_version(cls, path):
+        c = cls(path)
+        outstr = "Summary of '{}':\n{}".format(path, c.get_summary('\t'))
+        return outstr
+
 
 class WorkProduct:
     """
@@ -234,7 +241,7 @@ class WorkProduct:
 
 
     """
-    def __init__(self, path)
+    def __init__(self, path):
         self.path = path
 
     @property
