@@ -18,6 +18,8 @@ META_DIR = 'meta'  # name of the "meta" directory
 DATA_DIR = 'data' # name of the "data" directory
 
 def version_path_to_blockfile(version_path):
+    """ given a path to a work product version directory, return
+    the path to the icf blockfile """
     return os.path.join(version_path, META_DIR, ICF_BLOCK_FILENAME)
 
 def get_dirs(start_path):
@@ -124,12 +126,10 @@ def get_fingerprint(filepath, sep="\t"):
         raise ValueError("Invalid fingerprint file")
     return fingerline.split(sep)[1]    
 
-def get_version(frompath):
-    """ given a path, get the version number """
-    vstr = os.path.split(frompath)
+def get_version(meta_folder_path):
+    """ given a path to a meta folder, get the version number """
+    vstr = os.path.split(meta_folder_path)
     return versions.parse_version_str(vstr[-1])
-
-
 
 class WorkProductVersion:
     """
