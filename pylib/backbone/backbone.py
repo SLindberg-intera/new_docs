@@ -9,14 +9,13 @@ import os
 import versions
 
 
-HASH = 'Hash'
-INHERITANCE = 'Inheritance'
-DEVELOPMENT = 'Development'
-DEVELOPMENT_PATH = os.path.join("S:\\", "PSC","!HANFORD","ICF", "TEST")
-FINGER_FILENAME = "fingerprint.txt"
-ICF_BLOCK_FILENAME = "icfblock.block"
-META_DIR = 'meta' 
-DATA_DIR = 'data'
+""" constants used below """
+HASH = 'Hash' # key in the blockchain file's JSON object
+INHERITANCE = 'Inheritance' # key in the blockchain's JSON object
+FINGER_FILENAME = "fingerprint.txt" # the name of the fingerprint files
+ICF_BLOCK_FILENAME = "icfblock.block" # the name of the blockchain files
+META_DIR = 'meta'  # name of the "meta" directory
+DATA_DIR = 'data' # name of the "data" directory
 
 def version_path_to_blockfile(version_path):
     return os.path.join(version_path, META_DIR, ICF_BLOCK_FILENAME)
