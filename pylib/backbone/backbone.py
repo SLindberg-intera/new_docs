@@ -136,7 +136,12 @@ class WorkProducts:
     """
         represents all the work products in an ICF data structure
 
-        path is the directory where these are stored
+        path is the directory where work products are listed as
+        folders
+
+        this should be something like
+                    ...\ICF\Test\
+                or  ...\ICF\Prod\
     """
     def __init__(self, path):
         self.path = path
@@ -251,7 +256,6 @@ class WorkProductVersion:
                 ]
             ))
         return "\n".join(s)
-
 
     @classmethod
     def explain_version(cls, path):
