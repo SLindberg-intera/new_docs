@@ -11,6 +11,7 @@ import backbone
 import os
 import sys
 import json
+import itertools
 
 try:
     sys.path.append("pylib\\fingerprint")
@@ -204,7 +205,23 @@ class TestWorkProductVersion(unittest.TestCase):
         e1 = backbone.WorkProductVersion.explain_version(versiondir)
         e2 = backbone.WorkProductVersion.explain_version(version2dir)
         self.assertTrue("Summary of" in e1)
-        print(e2)
+
+    def test_get_children_paths(self):
+        """
+        wp1 should have 1 child (wp2)
+        wp2 should have no children
+        """
+        self.assertTrue(len(self.wp2._get_children_paths())==0)
+        self.assertTrue(len(self.wp1._get_children_paths())==1)
+        self.assertTrue(
+                self.wp1._get_children_paths()[0]==os.path.abspath(self.wp2.path)
+        )
+
+    def test_children(self):
+        p = self.wp1.children
+        self.assertTrue(p[0]==self.wp2)
+        p2 = self.wp2.children
+        self.assertTrue(p2==[])
 
 
 if __name__=="__main__":
