@@ -14,9 +14,16 @@ import itertools
 HASH = 'Hash' # key in the blockchain file's JSON object
 INHERITANCE = 'Inheritance' # key in the blockchain's JSON object
 FINGER_FILENAME = "fingerprint.txt" # the name of the fingerprint files
+TIMESTAMP = 'Timestamp' # the time stamp in the blockchain's JSON object
 ICF_BLOCK_FILENAME = "icfblock.block" # the name of the blockchain files
 META_DIR = 'meta'  # name of the "meta" directory
 DATA_DIR = 'data' # name of the "data" directory
+
+ICF_TEST_DIR = os.path.join("ICF", "Test")
+ICF_PROD_DIR = os.path.join("ICF", "Prod")
+TEST = 'TEST'
+PROD = 'PROD'
+
 
 def version_path_to_blockfile(version_path):
     """ given a path to a work product version directory, return
@@ -49,6 +56,21 @@ class Connection:
           "source":self.source, 
           "target":self.target, "value":self.value}
 
+def check_against_prod_path(in_path):
+    """ if possible, swap TEST path for PROD"""
+    if(ICF_TEST_DIR in in_path):
+        prod = in_path.replace(ICF_TEST_DIR, ICF_PROD_DIR)
+        if os.path.exists(prod):
+            return prod
+    return in_path    
+
+def check_against_test_path(in_path):
+    """ if possible, swap PROD path for TEST"""
+    if(ICF_PROD_DIR in in_path):
+        test = in_path.replace(ICF_PROD_DIR, ICF_TEST_DIR)
+        if os.path.exists(test):
+            return test
+    return in_path 
 
 class Block:
     """ represents a "block" in the blockchain 
@@ -59,14 +81,22 @@ class Block:
 
         the path is the path to the physical ICF blockchain file
     """
-    def __init__(self, path, hashkey, inheritance=[]):
+    def __init__(self, path, hashkey, inheritance=[], timestamp=None):
         self.path = path
         self.hashkey = hashkey 
         self.inheritance = inheritance 
+        self.timestamp = timestamp
 
     @classmethod
     def from_path(cls, filepath):
-        """ read a block from the blockchain"""
+        """ read a block from the blockchain
+        
+        will first check if the QA version exists and will return that
+        otherwise, will return the test version
+        
+        """
+        filepath = check_against_prod_path(filepath)
+
         with open(filepath, 'r') as f:
             d = json.load(f)
             p = []
@@ -76,9 +106,13 @@ class Block:
                         version_path_to_blockfile(
                             os.path.join(rootpath, path) 
                             ))
+                path = check_against_prod_path(path)        
                 p.append(cls.from_path(path))
+            timestamp = d.get(TIMESTAMP, None)    
 
-            return cls(os.path.abspath(filepath), d[HASH], p)
+            return cls(os.path.abspath(filepath), d[HASH].strip(), p,
+                    timestamp
+                    )
 
     def __itr_nodes(self,):
         """returns an iterator over nodes
@@ -132,6 +166,12 @@ def get_version(meta_folder_path):
     vstr = os.path.split(meta_folder_path)
     return versions.parse_version_str(vstr[-1])
 
+
+def version_has_block(version_path):
+    vp = os.path.abspath(version_path)
+    return os.path.exists(os.path.join(vp, 
+        META_DIR, ICF_BLOCK_FILENAME))
+
 class WorkProducts:
     """
         represents all the work products in an ICF data structure
@@ -166,17 +206,26 @@ class WorkProductVersion:
         self.path  should be the path to the version directory
             i.e
 
-            /workproduct/
+            ICF/{Test or Prod}/workproduct/
                 /v1.2/ <--- this is "path" in constructor 
                     /data
                         [data files go here]
                     /meta
                         [meta files go here, blockchain and fingerprint]
-                        
-
     """
     def __init__(self, path):
+        path = check_against_prod_path(path)
+        if(ICF_TEST_DIR in path)>0:
+            self._QA = TEST
+        elif(ICF_PROD_DIR in path)>0:
+            self._QA = PROD
+        else:
+            raise ValueError("'{}' Is not a valid ICF Path".format(path))
         self.path = path
+
+    @property
+    def qa_status(self):
+        return self._QA
 
     def __eq__(self, other):
         if (other.fingerprint==self.fingerprint):
@@ -196,7 +245,9 @@ class WorkProductVersion:
         """return path of folder containing ICF data structure
            (the "work products" directory)
         """
-        return os.path.abspath(os.path.join(self.other_versions_path, ".."))
+        return check_against_test_path(
+                os.path.abspath(os.path.join(
+                    self.other_versions_path, "..")))
 
     @property
     def meta_path(self):
@@ -252,7 +303,8 @@ class WorkProductVersion:
         for node in block.nodes:
             parent = WorkProductVersion.from_block(Block.from_path(node))
             s.append(sep.join([
-                parent.work_product_name, parent.version_str, parent.path
+                parent.work_product_name, parent.version_str, parent.path,
+                parent.qa_status
                 ]
             ))
         return "\n".join(s)
@@ -260,7 +312,9 @@ class WorkProductVersion:
     @classmethod
     def explain_version(cls, path):
         c = cls(path)
-        outstr = "Summary of '{}':\n{}".format(path, c.get_summary('\t'))
+        outstr = "Summary of '{}':\n\tQA Status = {}\n{}".format(
+                path, c.qa_status, c.get_summary('\t'))
+
         return outstr
 
     def _get_children_paths(self):
@@ -272,15 +326,17 @@ class WorkProductVersion:
         all_products_path = self.all_work_products_path
         block_path = self.block.path
         work_products = WorkProducts(all_products_path)
-        versions = [[i.path for i in work_product.versions
+        _versions = [[i.path for i in work_product.versions
                     if (block_path in i.block.nodes)]
                 for work_product in work_products]
 
         # remove "this" from the children and make a flat list 
-        return list(set(itertools.chain(*
-                [i for i in versions if os.path.abspath(self.path)
+        x = list(set(itertools.chain(*
+                [i for i in _versions if os.path.abspath(
+                    self.path)
             not in i]
                 )))
+        return x
     @property
     def children(self):
         return [WorkProductVersion(i) for i in self._get_children_paths()]
@@ -317,7 +373,9 @@ class WorkProduct:
     def versions(self, ):
         return [WorkProductVersion(
                 os.path.abspath(os.path.join(self.path, version)))
-                for version in os.listdir(self.path)]
+                for version in os.listdir(self.path)
+                    if version_has_block(os.path.join(self.path, version))
+                ]
 
     @property
     def most_recent_version(self, ):
