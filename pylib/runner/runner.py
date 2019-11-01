@@ -3,7 +3,7 @@ import sys, os
 from config import config, parse_args
 import logging
 from pylib.info.info import Info
-from pylib.pygit.gitb import get_version, is_clean_master_branch, get_remote_master_version 
+from pylib.pygit.git import get_version, is_clean_master_branch, get_remote_master_version 
 from pathlib import Path
 
 import subprocess
@@ -131,7 +131,7 @@ def is_on_qualified_list(args):
 
 # this conditional statement may need to be updated depending upon how the CAST tool is called by the tool runner
     if command[-4:] == '.exe':
-        tool = get_filename(command)
+        tool_command = get_filename(command)
     if command =='java':
         tool_command = "PENDING--not sure what to do with CAST...java library and a .jar file"
     else:
