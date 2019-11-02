@@ -6,7 +6,10 @@ utilities to help traverse the ICF blockchain with Python
 import sys
 import json
 import os
-import versions
+try:
+    from . import versions
+except ImportError:
+    import versions
 import itertools
 
 
@@ -59,7 +62,8 @@ class Connection:
 def check_against_prod_path(in_path):
     """ if possible, swap TEST path for PROD"""
     if(ICF_TEST_DIR in in_path):
-        prod = in_path.replace(ICF_TEST_DIR, ICF_PROD_DIR)
+        prod = in_path.replace(
+                ICF_TEST_DIR, ICF_PROD_DIR)
         if os.path.exists(prod):
             return prod
     return in_path    
@@ -67,7 +71,8 @@ def check_against_prod_path(in_path):
 def check_against_test_path(in_path):
     """ if possible, swap PROD path for TEST"""
     if(ICF_PROD_DIR in in_path):
-        test = in_path.replace(ICF_PROD_DIR, ICF_TEST_DIR)
+        test = in_path.upper().replace(
+                ICF_PROD_DIR, ICF_TEST_DIR)
         if os.path.exists(test):
             return test
     return in_path 
@@ -88,7 +93,7 @@ class Block:
         self.timestamp = timestamp
 
     @classmethod
-    def from_path(cls, filepath):
+    def from_path(cls, filepath, rootpath=""):
         """ read a block from the blockchain
         
         will first check if the QA version exists and will return that
@@ -101,12 +106,12 @@ class Block:
             d = json.load(f)
             p = []
             rootpath = os.path.dirname(filepath)
+
+
             for path in d[INHERITANCE]:
-                path = os.path.abspath(
-                        version_path_to_blockfile(
-                            os.path.join(rootpath, path) 
-                            ))
-                path = check_against_prod_path(path)        
+
+                path = check_against_prod_path(
+                    os.path.join(rootpath, path))
                 p.append(cls.from_path(path))
             timestamp = d.get(TIMESTAMP, None)    
 
@@ -215,9 +220,9 @@ class WorkProductVersion:
     """
     def __init__(self, path):
         path = check_against_prod_path(path)
-        if(ICF_TEST_DIR in path)>0:
+        if(ICF_TEST_DIR.upper() in path.upper())>0:
             self._QA = TEST
-        elif(ICF_PROD_DIR in path)>0:
+        elif(ICF_PROD_DIR.upper() in path.upper())>0:
             self._QA = PROD
         else:
             raise ValueError("'{}' Is not a valid ICF Path".format(path))

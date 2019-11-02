@@ -100,7 +100,8 @@ def make_blockfile(fingerprint, inheritance, outfile):
 
 FINGERPRINT = backbone.FINGER_FILENAME 
 INHERITANCE1 = []
-INHERITANCE2 = [os.path.join("..","..", "..", KEY, version)]
+INHERITANCE2 = [os.path.join("..","..", "..", 
+    KEY, version, "meta","icfblock.block")]
 BLOCK1 = os.path.join(metadir, backbone.ICF_BLOCK_FILENAME)
 BLOCK2 = os.path.join(meta2dir, backbone.ICF_BLOCK_FILENAME)
 
@@ -150,6 +151,7 @@ def create_test_data():
         pass
 
 def destroy_test_data():
+    return
     os.remove(datafile)
     os.remove(data2file)
     os.remove(data3file)
@@ -318,7 +320,7 @@ class TestBlockchain(unittest.TestCase):
         """
             when there are ancestors, inheritance should reflect
             that and there should be a hash that is not equal to the
-            input has, because of the addition of the inheritance
+            input hash, because of the addition of the inheritance
         """
         p, raw = blockchain.get_ancestors_from_file(self.input_file)
         paths = blockchain.ancestors_to_relative_blockchain_paths(raw)
