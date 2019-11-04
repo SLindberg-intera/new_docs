@@ -1,0 +1,27 @@
+{
+	"columns" :["copc","mdl_id","shp_file_id","year","max","p95","p90","p75","p50","shp_file_nm","unit_out"],
+  "key_cols" : ["copc","mdl_id","shp_file_id","year"],
+	"graph_index":"shp_file_id",
+	"graph_names":"shp_file_nm",
+	"models_used":[3,6,9,11],
+	"models" : ["0","1","2","Average","4","Average CTET 41","Average CTET 630","7","8","Maximum","Maximum CTET 41","Maximum CTET 630","12","13","14","15","16","17","18","19","20"],
+	"scenarios" : ["0","1","2","Example Action Scenario","4","Example Action Scenario","Example Action Scenario","7","8","No Further Action Scenario","10","No Further Action Scenario"],
+	"ARGPARSE_SECTION":{
+		"description":"CACIE Tool Runner",
+		"ARGUMENTS":[
+						 			{
+						 			  "ARG":"input",
+						 			  "help":"directory of data to plotted.  If doing single then include file name of the model to be used"
+						 			},
+						 			{
+						 			  "ARG":"output",
+						 			  "help":"path to put plots in."
+						 			},
+									{
+										"ARG":"-alt_config",
+										"default":"",
+						 			  "help":"alternat config for columns, keys, models,scenarios"
+									}
+						 		]
+		 	}
+}
