@@ -5,6 +5,18 @@
 	"User Notification Template":"Starting {Name}\tLogging to \"{logfile}\"",
 	"Tool Notification Template":"Invoking: \tCommand:\"{Name}\"\tArguments:\"{Arguments}\"",
 	"Output Log Template":"Output is being logged to {Logfile} ",
+	"Approved Tools":[
+		{
+		"name":"my name", "command":"myscript.py", "description":"this is a description"
+		},
+		{
+		"name":"my name", "command":"reducer.py", "description":"this is a description"
+		},{
+		"name":"my name", "command":"myscript.py", "description":"this is a description"
+		},{
+		"name":"my name", "command":"myscript.py", "description":"this is a description"
+		}
+	],
 	"LOGGER":{
 		"format":"%(levelname)s--%(asctime)s--%(message)s",
 		"datefmt":"%m/%d/%Y %I:%M:%S %p"
