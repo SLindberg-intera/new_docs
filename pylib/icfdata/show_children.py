@@ -55,4 +55,4 @@ def make_argparse():
 if __name__=="__main__":
     parser= make_argparse()
     args = parser.parse_args()
-    print(summarize_version(args.workProduct, args.version))
+    print(summarize_version(args.workProduct.upper(), args.version))
