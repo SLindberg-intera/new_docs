@@ -24,6 +24,9 @@ def get_remote_master_version(path):
         NOTE: could be modified further to pass the branch in as an argument to make it more generic--the command
         doesn't necesarily have to be a "remote branch...string returned has a hard return so only returning the #[0:40]"
     """
+    cmd = "fetch"
+    #run git fetch to fetch most recent remote version (this is not a pull--does not affect branches)
+    run_command(cmd)
     cmd = "--git-dir={} rev-parse origin/master".format(path)
 
     return run_command(cmd)[0:40]
