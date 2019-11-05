@@ -29,8 +29,9 @@ def summarize_version():
         wp = backbone.WorkProduct(wppath)
         versions = wp.versions
         if len(versions)>0:
-            s = "{} {}".format(str(wp), 
-                    "  ".join(map(lambda x: x.version_str, wp.versions))
+            s = "\n{}\n\t{}".format(str(wp), 
+                    "\n\t".join(map(lambda x: "{}\t{}\t{}".format(
+                        x.version_str, x.path, x.qa_status), wp.versions))
                     )
             yield s
 
