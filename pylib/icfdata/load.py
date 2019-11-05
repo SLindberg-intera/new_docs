@@ -16,7 +16,7 @@ try:
     from ..backbone import blockchain as blockchain
     from ..backbone import backbone
 
-except ImportError, ValueError:
+except (ImportError, ValueError):
     reporoot = os.path.abspath(
         os.path.join(os.path.abspath(__file__), '..','..'))
     if reporoot not in sys.path:
