@@ -10,7 +10,7 @@
 import pandas as pd
 import logging
 
-from timeseries import TimeSeries
+from pylib.timeseries.timeseries import TimeSeries
 
 SITE_COL = 'Site_Name'
 YEAR_COL = 'Year'
