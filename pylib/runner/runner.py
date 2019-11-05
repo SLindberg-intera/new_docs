@@ -69,6 +69,7 @@ def make_user_summary():
             username=info.username
     )
 
+
 def get_approved_tools():
     return config[c.APPROVED_TOOL_KEY]
 
@@ -149,6 +150,7 @@ def log_header(args,runner_gpath, tool_gpath):
     notify_user(make_version(tool_gpath))
     notify_user(make_qa_status(args,tool_gpath))
     notify_user(make_qa_status(args,tool_gpath))
+
     notify_user(make_user_summary())
 
 def execute_program(args):
@@ -167,7 +169,6 @@ if __name__ == "__main__":
     #may need to have a list of paths returned and add iterating through the lists in the subsequent function calls.
     path_tool = get_pathtool(args)
     tool_gitpath = get_gitpath(path_tool)
-    
     
     configure_logger(args)
     log_header(args,runner_gitpath, tool_gitpath)

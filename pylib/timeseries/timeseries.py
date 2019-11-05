@@ -2,9 +2,7 @@
 import scipy.signal as signal
 from scipy.integrate import cumtrapz as cumtrapz, trapz
 import numpy as np
-from pylib.vzreducer.config import config
-import pylib.vzreducer.constants as c
-import pylib.vzreducer.timeseries_math as ts_math
+import pylib.timeseries.timeseries_math as ts_math
 
 
 class TimeSeries:

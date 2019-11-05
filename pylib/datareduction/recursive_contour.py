@@ -92,14 +92,15 @@ def make_signal():
     end = 2*np.pi
     x = np.arange(start, end, 0.0001)
     y = np.zeros(len(x))
-    y[232] = 234
-    y[233] = 800
-    y[234:237] = 20000
-    y[237:10600] = 53
+    maxy = 20000
+    y[232] = maxy/2
+    y[233] = maxy/3
+    y[234:237] = maxy
+    y[237:10600] = maxy/10
 
-    y[800:900] = 1000
-    #y = 5*np.sin(8*x)*np.sin(x)/x-x+5
-    y=10*np.random.rand(len(y))+y
+    y[800:900] = maxy/20
+    y = 5*np.sin(8*x)*np.sin(x)/x-x+5
+    #y=1*np.random.rand(len(y))+y
     return x, y
 
 
@@ -108,9 +109,9 @@ if __name__ == "__main__":
     signal = make_signal()
     line = make_line(signal)
     x, y = signal
-    area = integrate(signal)
+    area = np.std(y)*(x[-1]-x[0])
     #np.max(y)
-    ytol = 0.0005*np.max(y)
+    ytol = np.std(y)/10.
     #np.max(y)
     
     

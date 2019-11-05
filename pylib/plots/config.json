@@ -1,0 +1,62 @@
+{
+	"m_200e" : {"afarms":"A Farms","atrenches":"A Trenches","b3abponds":"B-3A/B Ponds",
+						  "b3cpond":"B-3C Pond","b3pond":"B-3 Pond","b63":"B-63",
+						  "bccribs":"BC Cribs & Trenches","bfarms":"B Farms","bplant":"B Plant",
+						  "c-9_pond":"C-9 Pond","mpond":"M Pond","purex":"Purex"},
+	"m_200w" : {"lwcrib":"LW Crib","pfp":"PFP","redox":"Redox","rsp":"Redox Swamp/Pond",
+						  "sfarms":"S Farms","salds":"SALDS","tfarms":"T Farms","tplant":"T Plant",
+						  "u10":"U-10 West","ufarm":"U Farm","uplant":"U Plant"},
+	"m_pa" : {"wmac_past_leaks":"WMA C Past Leaks","wmac":"WMA C","erdf":"ERDF",
+						"idf":"IDF","usecology":"US Ecology"},
+	"colors" : {"afarms":"lime","atrenches":"red","b3abponds":"peru",
+							"b3cpond":"steelblue","b3pond":"teal","b63":"deeppink",
+							"bccribs":"deepskyblue","bfarms":"royalblue","bplant":"maroon",
+							"c-9_pond":"black","mpond":"orangered","purex":"fuchsia",
+							"lwcrib":"royalblue","pfp":"grey","redox":"navy","rsp":"maroon",
+							"sfarms":"orange","salds":"brown","tfarms":"Peru","tplant":"red",
+						  "u10":"deeppink","ufarm":"aqua","uplant":"green",
+							"wmac_past_leaks":"red","wmac":"orange","erdf":"purple",
+							"idf":"blue","usecology":"green"},
+	"copcs_chems" : ["cn","cr","no3","u"],
+	"copcs_rads" : ["h-3","i-129","sr-90","tc-99","cl-36","c-14","np-237","re-187",
+									"th-232","ra-226","u-232","u-233","u-234","u-235","u-236","u-238"],
+	"copcs" : {"cn":"CN","cr":"CR","no3":"NO3","u":"Total U","h-3":"H-3",
+						 "c-14":"C-14","cl-36":"Cl-36","np-237":"NP-237","re-187":"Re-187",
+			 			 "i-129":"I-129","sr-90":"SR-90","tc-99":"TC-99","u-232":"U-232",
+					   "u-233":"U-233","u-234":"U-234","u-235":"U-235","u-236":"U-236",
+					   "U-238":"U-238","th-232":"Th-232","ra-226":"Ra-226"},
+	"ARGPARSE_SECTION":{
+		"description":"CACIE Tool Runner",
+		"ARGUMENTS":[
+						 			{
+						 			  "ARG":"input",
+						 			  "help":"directory of data to plotted.  If doing single then include file name of the model to be used"
+						 			},
+						 			{
+						 			  "ARG":"output",
+						 			  "help":"path to put plots in."
+						 			},
+						 			{
+						 			  "ARG":"-startyear",
+										"default":-1,
+						 			  "help":"year to start plot, defaults to start of data"
+						 			},
+						 			{
+						 			  "ARG":"-endyear",
+										"default":-1,
+						 			  "help":"year to end the plot, defaults to end of data"
+						 			},
+									{
+										"ARG":"-alt_config",
+										"default":"",
+						 			  "help":"alternat config for sites,copcs, and colors"
+									},
+						 			{
+						 			  "ARG":"-single",
+						 			  "help":"build plot of a single model with each individual cell: true, false; default=false",
+						 			  "default":false,
+						 			  "choices":[true,false]
+						 			}
+						 		]
+		 	}
+}

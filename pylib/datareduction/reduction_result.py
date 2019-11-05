@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import pandas as pd
-import pylib.vzreducer.timeseries_math as tsmath
+import pylib.timeseries.timeseries_math as tsmath
 
 def to_csv(reduction_result, filename):
     """
