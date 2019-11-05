@@ -22,8 +22,8 @@ ICF_BLOCK_FILENAME = "icfblock.block" # the name of the blockchain files
 META_DIR = 'meta'  # name of the "meta" directory
 DATA_DIR = 'data' # name of the "data" directory
 
-ICF_TEST_DIR = os.path.join("ICF", "Test")
-ICF_PROD_DIR = os.path.join("ICF", "Prod")
+ICF_TEST_DIR = os.path.join("ICF", "TEST")
+ICF_PROD_DIR = os.path.join("ICF", "PROD")
 TEST = 'TEST'
 PROD = 'PROD'
 
@@ -71,7 +71,7 @@ def check_against_prod_path(in_path):
 def check_against_test_path(in_path):
     """ if possible, swap PROD path for TEST"""
     if(ICF_PROD_DIR in in_path):
-        test = in_path.upper().replace(
+        test = in_path.replace(
                 ICF_PROD_DIR, ICF_TEST_DIR)
         if os.path.exists(test):
             return test
@@ -337,6 +337,10 @@ class WorkProductVersion:
         all_products_path = self.all_work_products_path
         block_path = self.block.path
         work_products = WorkProducts(all_products_path)
+
+        def temp(item):
+            return item
+        
         _versions = [[i.path for i in work_product.versions
                     if (block_path in i.block.nodes)]
                 for work_product in work_products]
