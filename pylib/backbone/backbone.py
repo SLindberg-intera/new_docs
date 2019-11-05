@@ -302,6 +302,12 @@ class WorkProductVersion:
         version_path, metadir = os.path.split(blockpath)
         return cls(version_path)
 
+    def short_desc(self):
+        outstr = "{}\t{}\t{}\t{}".format(
+                self.work_product_name,
+                self.version_str, self.path, self.qa_status)
+        return outstr
+
     def get_summary(self, sep=" "):
         block = self.block
         s = []
