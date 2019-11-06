@@ -22,18 +22,21 @@ except (ImportError, ModuleNotFoundError):
     from backbone import backbone
 
 
-def summarize_version():
+def show_all(as_str=True):
     path = os.path.join(ICF_HOME)
     for work_product in os.listdir(path):
         wppath = os.path.join(path, work_product)
         wp = backbone.WorkProduct(wppath)
         versions = wp.versions
         if len(versions)>0:
-            s = "\n{}\n\t{}".format(str(wp), 
-                    "\n\t".join(map(lambda x: "{}\t{}\t{}".format(
-                        x.version_str, x.path, x.qa_status), wp.versions))
-                    )
-            yield s
+            if as_str:
+                s = "\n{}\n\t{}".format(str(wp), 
+                        "\n\t".join(map(lambda x: "{}\t{}\t{}".format(
+                            x.version_str, x.path, x.qa_status), wp.versions))
+                        )
+                yield s
+            else:
+                yield from wp.versions
 
 if __name__=="__main__":
-    print("\n".join(summarize_version()))
+    print("\n".join(show_all()))
