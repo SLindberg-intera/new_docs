@@ -1,8 +1,11 @@
 import os
-import backbone 
 import datetime
 import hashlib
 
+try:
+    from backbone import backbone
+except ImportError:
+    import backbone
 
 def compute_hash(instr):
     f = hashlib.sha256()
@@ -25,7 +28,7 @@ def itr_inheritance(version_path, inheritance_list):
                     "Invalid Blockchain.  "
                     "Could not resolve block at '{}'".format(parentpath))
         yield {
-                'path':os.path.join("..", "..", parent_product,
+                'path':os.path.join("..", "..", "..",parent_product,
                     parent_version, 
                     backbone.META_DIR, backbone.ICF_BLOCK_FILENAME),
                 'hashkey': parent.hashkey
@@ -88,9 +91,15 @@ def get_ancestors_from_file(infile, sep=","):
                 continue
             if line.strip() == '':
                 continue
+            if line.strip().lower().startswith("work product,"):
+                continue
+
             yield list(map(lambda x: x.strip(), line.split(sep)[0:2]))
-    items = list(itr_inheritance())[1:]
-    return (items[0], sorted(items[1:]))
+    items = list(itr_inheritance())
+    try:
+        return (items[0], sorted(items[1:]))
+    except IndexError:
+        return (items[0], [])
 
 def ancestors_to_relative_blockchain_paths(ancestors):
     """
