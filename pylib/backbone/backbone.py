@@ -54,7 +54,7 @@ class Connection:
         return "Connection(source={}, target={}, value={})".format(
                 self.source, self.target, self.value)
     
-    def as_dict():
+    def as_dict(self):
         return {
           "source":self.source, 
           "target":self.target, "value":self.value}
@@ -164,7 +164,7 @@ def get_fingerprint(filepath, sep="\t"):
     fingerline = lines[1]
     if "Total" not in fingerline:
         raise ValueError("Invalid fingerprint file")
-    return fingerline.split(sep)[1]    
+    return fingerline.split(sep)[1].strip()    
 
 def get_version(meta_folder_path):
     """ given a path to a meta folder, get the version number """
@@ -274,6 +274,10 @@ class WorkProductVersion:
     @property
     def block_path(self):
         return os.path.join(self.meta_path, ICF_BLOCK_FILENAME)
+
+    @property
+    def timestamp(self):
+        return self.block.timestamp
 
     @property
     def version_number(self):
