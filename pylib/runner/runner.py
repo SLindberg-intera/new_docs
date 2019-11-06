@@ -3,7 +3,7 @@ import sys, os
 from config import config, parse_args
 import logging
 from pylib.info.info import Info
-from pylib.pygit.git import get_version, is_clean_master_branch, get_remote_master_version , get_branch
+from pylib.pygit.git import get_version, is_clean_master_branch, get_remote_master_version , get_tag
 from pathlib import Path
 
 import subprocess
@@ -153,7 +153,7 @@ def make_qa_status(args, tool, path):
     """ construct a string showing the QA Status"""
     
     #DEBUG
-    input(get_branch())
+    
     input('{} : {}'.format(tool,path))
     input('checking to see if {} is in a repository {}'.format(tool, path))
     if path:
@@ -174,10 +174,13 @@ def make_qa_status(args, tool, path):
 def make_version(tool, path):
     if path:
         version = get_version(path)
+        release = get_tag(path)
     else:
-        version =   "Not a git repository"  
+        version =   "Not a git repository"
+    if release == 'show':
+        release = 'not a QA_QUALIFIED version'
     
-    return config[c.VERSION_TEMPLATE_KEY].format(version='{} : {}'.format(version,tool))
+    return config[c.VERSION_TEMPLATE_KEY].format(version='{} {}: {}'.format(version, release,tool))
 
 
 def log_header(args,tg_dict):

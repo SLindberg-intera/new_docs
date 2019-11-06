@@ -31,6 +31,22 @@ def get_remote_master_version(path):
 
     return run_command(cmd)[0:40]
 
+def get_tag(path):
+    cmd = 'fetch'
+    run_command(cmd)
+    cmd = '--git-dir={} show-ref --tags'.format(path)
+    #cmd = '--git-dir={} ls-remote --tags --quiet'.format(path)
+    res = run_command(cmd)
+    #res = res.split('\n')[0:-1]
+    input(res)
+    hash_tagdict = dict(hashtag.split(' ') for hashtag in res.split('\n')[0:-1])
+    input(hash_tagdict)
+    try:
+        return hash_tagdict[get_version(path)].split('/')[-1]
+    except KeyError:
+        return 'Local/Remote Repositories not synced'
+    
+    
 
 def get_version(path):
     """ get the current tool version by inspecting git """
@@ -66,7 +82,7 @@ def is_clean_master_branch(path):
 
 
 def get_branch():
-    """ returns the current branch name"""
+    """ returns the current branch name--currently [11.06.2019] doesn't return branch name"""
     cmd = "branch"
     input('getting the branch name....'.format(run_command(cmd)))
     res = run_command(cmd).split()[2]
