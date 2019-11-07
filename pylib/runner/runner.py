@@ -121,19 +121,6 @@ def is_same_version(gitpath):
 
 #def is_on_qualified_list(args):
 def is_on_qualified_list(tool_command):
-#determine which tool being invoked by the runner (if .exe (or ?) then = tool_name; if script then = 1st argument)
-# the following assumes that the command line statement is as follows:
-# .. python ..\runner.py 'perl|python|*.exe' "arguments [if perl or python, script first argument is tool script filename...]"
-    #command = get_invoked_tool_name(args)
-
-# this conditional statement may need to be updated depending upon how the CAST tool is called by the tool runner
-    #if command[-4:] == '.exe':
-    #    tool_command = get_filename(command)
-    #if command =='java':
-    #    tool_command = "PENDING--not sure what to do with CAST...java library and a .jar file"
-    #else:
-    #    path_tool = get_invoked_tool_arguments(args).split(' ')[0]
-    #    tool_command = get_filename(path_tool)
 
     approved_tools = get_approved_tools()
     for tool in approved_tools:
@@ -145,7 +132,7 @@ def is_on_qualified_list(tool_command):
 def make_qa_status(args, tool, path):
     """ construct a string showing the QA Status"""
 
-    if path and is_same_version(path) and is_clean_master_branch(path) and is_on_qualified_list(tool) and is_same_version(path):
+    if path and is_same_version(path) and is_clean_master_branch(path) and is_on_qualified_list(get_filename(tool)) and is_same_version(path):
         status = c.QA_QUALIFIED
     else:
         status = c.QA_TEST
@@ -177,7 +164,7 @@ def log_header(args,tg_dict):
 
     for tool, gitpath in tg_dict.items():
         #note: args is a artifact--not currently used in the code for checking qa status
-        notify_user(make_qa_status(args,get_filename(tool), gitpath))
+        notify_user(make_qa_status(args, tool, gitpath))
     notify_user(make_user_summary())
 
 def execute_program(args):
