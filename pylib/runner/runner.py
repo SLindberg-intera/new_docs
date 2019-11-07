@@ -76,11 +76,8 @@ def get_pathtools(args):
     '''
 # the following assumes that the command line statement is as follows:
 # .. python ..\runner.py 'java|perl|python|*.exe' "arguments [if script (perl or python) first argument is tool script filename...java is a little more complex]"
-    #input('in get path tools')
     command = get_invoked_tool_name(args)
 
-    
-# this conditional statement may need to be updated depending upon how the CAST tool is called by the tool runner
     if command[-4:] == '.exe':
         return [command]
     elif command == 'java':
@@ -99,7 +96,6 @@ def get_gitpath(pathfile):
     p = Path(pathfile)
     for path in p.parents:
         if (path.joinpath('.git').exists()):
-            #input(path.joinpath('.git'))
             return(str(path.joinpath('.git')))
     return False 
     
@@ -141,28 +137,14 @@ def is_on_qualified_list(tool_command):
 
     approved_tools = get_approved_tools()
     for tool in approved_tools:
-        #input('{} :{}'.format(tool_command,tool))
         if tool_command == tool['command']:
-            #input(tool_command)
-            #input(tool['command'])
             return True
     return False
 
 #note: args is a artifact--not currently used in the code for checking qa status
 def make_qa_status(args, tool, path):
     """ construct a string showing the QA Status"""
-    
-    #DEBUG
-    
-    #input('{} : {}'.format(tool,path))
-    #input('checking to see if {} is in a repository {}'.format(tool, path))
-    #if path:
-    #    input ('checking to see if {} is in a clean master branch {}'.format(tool,is_clean_master_branch(path)))
-    #input('checking to see if {} is is on the qualified tool list {}'.format(tool,is_on_qualified_list(tool)))
-    ##if path:
-    #    input('checking to see if local {} is same version as remote {}'.format(get_version(path), get_remote_master_version(path)))
-    #END DEBUG    
-    
+
     if path and is_same_version(path) and is_clean_master_branch(path) and is_on_qualified_list(tool) and is_same_version(path):
         status = c.QA_QUALIFIED
     else:
