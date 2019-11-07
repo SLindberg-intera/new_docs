@@ -38,9 +38,9 @@ def get_tag(path):
     #cmd = '--git-dir={} ls-remote --tags --quiet'.format(path)
     res = run_command(cmd)
     #res = res.split('\n')[0:-1]
-    input(res)
+    #input(res)
     hash_tagdict = dict(hashtag.split(' ') for hashtag in res.split('\n')[0:-1])
-    input(hash_tagdict)
+    #input(hash_tagdict)
     try:
         return hash_tagdict[get_version(path)].split('/')[-1]
     except KeyError:
@@ -60,33 +60,33 @@ def get_version(path):
 def is_clean_master_branch(path):
     """ True if we are on the last commit of the master branch
     with nothing changed """
-    input('in the is clean master branch function')
+    #input('in the is clean master branch function')
     cmd = "--work-tree={} status".format(path[0:-5])
     cmd = make_cmd(path,cmd)
     #cmd = '-C {} --work-tree={} status'.format(path,path[0:-4])
-    input(cmd)
+    #input(cmd)
     res = run_command(cmd)
-    input(res)
+    #input(res)
     if "On branch master" not in res:
-        input('in the first if statement and returning false from there')
+        #input('in the first if statement and returning false from there')
         return False
     
     #version 1.9.1 =  nothing to commit, working directory clean
     #version 2.21.0.windows.1 = nothing to commit, working tree clean
     #update this conditional statement when git version on olive is updated
     if "nothing to commit, working " and " clean" in res:
-        input('in the second if statement and returning true')
+        #input('in the second if statement and returning true')
         return True
-    input('passed both if statements and returning last false')
+    #input('passed both if statements and returning last false')
     return False 
 
 
 def get_branch():
     """ returns the current branch name--currently [11.06.2019] doesn't return branch name"""
     cmd = "branch"
-    input('getting the branch name....'.format(run_command(cmd)))
+    #input('getting the branch name....'.format(run_command(cmd)))
     res = run_command(cmd).split()[2]
-    input('the result is {}'.format(res))
+    #input('the result is {}'.format(res))
     return res
 
 def make_cmd(path, cmd):
@@ -97,7 +97,7 @@ def run_command(command_str):
     """ runs a git command in the shell and returns the results as a text string"""
     shell_command = [GIT_COMMAND]
     shell_command += command_str.split(" ")
-    input(shell_command)
+    #input(shell_command)
     proc = subprocess.Popen(shell_command, 
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT)
