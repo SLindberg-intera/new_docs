@@ -141,10 +141,10 @@ def is_on_qualified_list(tool_command):
 
     approved_tools = get_approved_tools()
     for tool in approved_tools:
-        input('{} :{}'.format(tool_command,tool))
+        #input('{} :{}'.format(tool_command,tool))
         if tool_command == tool['command']:
-            input(tool_command)
-            input(tool['command'])
+            #input(tool_command)
+            #input(tool['command'])
             return True
     return False
 
@@ -154,13 +154,13 @@ def make_qa_status(args, tool, path):
     
     #DEBUG
     
-    input('{} : {}'.format(tool,path))
-    input('checking to see if {} is in a repository {}'.format(tool, path))
-    if path:
-        input ('checking to see if {} is in a clean master branch {}'.format(tool,is_clean_master_branch(path)))
-    input('checking to see if {} is is on the qualified tool list {}'.format(tool,is_on_qualified_list(tool)))
-    if path:
-        input('checking to see if local {} is same version as remote {}'.format(get_version(path), get_remote_master_version(path)))
+    #input('{} : {}'.format(tool,path))
+    #input('checking to see if {} is in a repository {}'.format(tool, path))
+    #if path:
+    #    input ('checking to see if {} is in a clean master branch {}'.format(tool,is_clean_master_branch(path)))
+    #input('checking to see if {} is is on the qualified tool list {}'.format(tool,is_on_qualified_list(tool)))
+    ##if path:
+    #    input('checking to see if local {} is same version as remote {}'.format(get_version(path), get_remote_master_version(path)))
     #END DEBUG    
     
     if path and is_same_version(path) and is_clean_master_branch(path) and is_on_qualified_list(tool) and is_same_version(path):
@@ -175,10 +175,12 @@ def make_version(tool, path):
     if path:
         version = get_version(path)
         release = get_tag(path)
+        if release == 'show':
+            release = 'not a QA_QUALIFIED version'
     else:
-        version =   "Not a git repository"
-    if release == 'show':
-        release = 'not a QA_QUALIFIED version'
+        version =   'Not a git repository'
+        release = ''
+    
     
     return config[c.VERSION_TEMPLATE_KEY].format(version='{} {}: {}'.format(version, release,tool))
 
