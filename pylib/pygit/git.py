@@ -43,7 +43,7 @@ def get_tag(path):
     try:
         return hash_tagdict[get_version(path)].split('/')[-1]
     except KeyError:
-        return 'Local/Remote Repositories not synced'
+        return 'Local repo SHA-1 has does not correspond to a remote repo release version'
     
     
 
