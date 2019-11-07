@@ -67,6 +67,7 @@ def make_user_summary():
             username=info.username
     ) 
 
+
 def get_approved_tools():
     return config[c.APPROVED_TOOL_KEY]
 
@@ -157,6 +158,7 @@ def make_version(tool, path):
 def log_header(args,tg_dict):
     notify_user(make_user_message(args), shell=True)
     notify_user(make_tool_use_message(args))
+
     
     #check versioning (first for loop) and QA status (second for loop) of both the runner and the tool(s) being invoked....
     for tool, gitpath in tg_dict.items():
@@ -165,6 +167,7 @@ def log_header(args,tg_dict):
     for tool, gitpath in tg_dict.items():
         #note: args is a artifact--not currently used in the code for checking qa status
         notify_user(make_qa_status(args, tool, gitpath))
+
     notify_user(make_user_summary())
 
 def execute_program(args):
@@ -179,6 +182,7 @@ if __name__ == "__main__":
 
      
     args = parse_args()
+
 
     #get the tool(s) being invoked by runner and add to tool/gitpath dictionary--CAST references a library and jar file in repository--not handled at this time
     tool_list = get_pathtools(args)
