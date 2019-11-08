@@ -33,6 +33,7 @@ def extract_fingerprints(target):
     count = 0
     if is_file(target):
         yield [target, fingerprint_file(target)]
+        return
     hasher = get_hasher()
     for dirpath, dirnames, filenames in os.walk(target):
         for filename in filenames:
@@ -41,6 +42,7 @@ def extract_fingerprints(target):
             hasher.update(finger_print.encode())
             count+=1
             yield [p, fingerprint_file(p)]
+            
     yield ["Total for {} files".format(count), hasher.hexdigest()]
 
 
@@ -67,7 +69,6 @@ def setupArgParse():
             help="The name of the output fingerprint file.  The default is 'fingerprint.txt'",
             default="fingerprint.txt"
             )
-
 
     return pa
 
