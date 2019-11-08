@@ -132,7 +132,7 @@ def is_on_qualified_list(tool_command):
 def make_qa_status(args, tool, path):
     """ construct a string showing the QA Status"""
 
-    if path and is_same_version(path) and is_clean_master_branch(path) and is_on_qualified_list(get_filename(tool)) and is_same_version(path):
+    if path and is_same_version(path) and is_clean_master_branch(path) and is_on_qualified_list(get_filename(tool)):
         status = c.QA_QUALIFIED
     else:
         status = c.QA_TEST
