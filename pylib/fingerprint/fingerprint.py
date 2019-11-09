@@ -35,6 +35,8 @@ def extract_fingerprints(target):
         yield [target, fingerprint_file(target)]
         return
     hasher = get_hasher()
+    if not is_dir(target):
+        raise FileNotFoundError("Could not find '{}'".format(target))
     for dirpath, dirnames, filenames in os.walk(target):
         for filename in filenames:
             p = os.path.join(dirpath, filename)
@@ -44,7 +46,6 @@ def extract_fingerprints(target):
             yield [p, fingerprint_file(p)]
             
     yield ["Total for {} files".format(count), hasher.hexdigest()]
-
 
 SEP = "\t"
 def to_file(filename, extract_fingerprints_itr):
