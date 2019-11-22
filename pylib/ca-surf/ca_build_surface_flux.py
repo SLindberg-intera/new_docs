@@ -234,7 +234,7 @@ def main():
     parser.add_argument("-b","--boundaries",type=str, help="turn on boundaries for solute flux and Aqueous Volumetric. exampe: BNS will turn on bottom, North, and South. example 2(default): B will turn on bottom only. ", default="B")
     args = parser.parse_args()
     text_dic = {}
-
+    contaminates = []
     sim = 0;
 
     try:
