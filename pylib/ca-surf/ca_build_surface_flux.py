@@ -1,6 +1,6 @@
 """
     build_surface_flux.py
-	version 1.1:  Fixed issues with grid axis having multiple lines 
+	version 1.1:  Fixed issues with grid axis having multiple lines
 				  in the get_variables function, Neil Powers, 20190610
 -----------------------
 Description:
@@ -50,18 +50,19 @@ comment += '#--  Script version:\n'
 comment += '#--       1.0\n'
 #-------------------------------------------------------------------------------
 # validate contaminates
-def validate_contaminates(contaminates):
-    legal_names = ['U-232','U-233','U-234','U-235','U-236','U-238',
-                          'Th-230','Ra-226','C-14','Cl-36','H-3','I-129',
-                          'Np-237','Re-187','Sr-90','Tc-99']
-    bad_names = []
-    for name in contaminates:
-        if name not in legal_names:
-            bad_names.append(name)
-    if len(bad_names) > 0:
-        logger.info('ERROR: Invalid contaminate names:  {0}'.format(bad_names))
-        return False
-    return True
+# 22 Nov 2019, EOP, removed as obsolete do to requirement changed
+#def validate_contaminates(contaminates):
+#    legal_names = ['U-232','U-233','U-234','U-235','U-236','U-238',
+#                          'Th-230','Ra-226','C-14','Cl-36','H-3','I-129',
+#                          'Np-237','Re-187','Sr-90','Tc-99']
+#    bad_names = []
+#    for name in contaminates:
+#        if name not in legal_names:
+#            bad_names.append(name)
+#    if len(bad_names) > 0:
+#        logger.info('ERROR: Invalid contaminate names:  {0}'.format(bad_names))
+#        return False
+#    return True
 
 
 #-------------------------------------------------------------------------------
@@ -233,7 +234,7 @@ def main():
     parser.add_argument("-b","--boundaries",type=str, help="turn on boundaries for solute flux and Aqueous Volumetric. exampe: BNS will turn on bottom, North, and South. example 2(default): B will turn on bottom only. ", default="B")
     args = parser.parse_args()
     text_dic = {}
-    contaminates = ['Tc99','I129','Sr90','U233','U235','U238']
+    contaminates = []
     sim = 0;
 
     try:
@@ -293,6 +294,7 @@ def main():
                 logger.critical('Invalid inputs: {0} '.format(shpfile))
                 logger.critical('                File not found, exiting script.')
                 return ValueError('Invalid file')
+#        22 Nov 2019 removed due to requirement change
 #        if args.valcontam:
 #            if not validate_contaminates(contaminates):
 #                logger.critical('                invalid contaminates, exiting script.')
@@ -405,8 +407,7 @@ def main():
             count += temp_count
         #******
         #** find all of the y indexes that fall in each shapefile grid
-        y_nodes = []
-        x_nodes = []
+
         text_dic['csv'] = 'shape node, x_start, x_end, y_start, y_end, i_start, i_end, j_start, j_end,\n'
         for rec in nodes:
             x = 1
