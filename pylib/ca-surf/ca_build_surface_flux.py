@@ -158,7 +158,7 @@ def build_shp_grid(shpfile,ind_x,ind_y,num_x,num_y):
     shapes = sf.shapes()
     shapeRecs = sf.shapeRecords()
     fields = sf.fields[1:]
-    logger.info([field[0] for field in fields])
+    logging.info([field[0] for field in fields])
     i = 0
     nodes = []
     x_start = float(ind_x[0])
@@ -176,7 +176,7 @@ def build_shp_grid(shpfile,ind_x,ind_y,num_x,num_y):
                     nodes.append({'x':float(bbox[0]), 'y':float(bbox[1]),'x_end':float(bbox[2]),'y_end':float(bbox[3]),
                               'node':shaperec.record[5],'row':shaperec.record[0],'column':shaperec.record[1],'delx':shaperec.record[2],'dely':shaperec.record[3]})
     if len(nodes) < 1:
-        logger.critical('ERROR: could not find grids between(x:{0},y:{1} and x:{2},y:{3}): {0}'.format(x_start,y_start,x_end, y_end))
+        logging.critical('ERROR: could not find grids between(x:{0},y:{1} and x:{2},y:{3}): {0}'.format(x_start,y_start,x_end, y_end))
         raise
     return sorted(nodes, key=itemgetter('y','x'))
 #-------------------------------------------------------------------------------
@@ -194,13 +194,13 @@ def write_outputs(template):
             values = (yield)
             os.makedirs(os.path.dirname(values['csv_outfile'] ), exist_ok=True)
             filename = str(values['csv_outfile']).rstrip()# + 'input.txt'
-            logger.info('writing csv grid conversion: {0}'.format(filename))
+            logging.info('writing csv grid conversion: {0}'.format(filename))
             with open(filename, "w") as out:
                 out.write(values['csv'])
             #output = o.format(**values)
             os.makedirs(os.path.dirname(values['outfile'] ), exist_ok=True)
             filename = values['outfile'].rstrip()# + 'input.txt'
-            logger.info('writing file: {0}'.format(filename))
+            logging.info('writing file: {0}'.format(filename))
             with open(str(filename), "w") as out:
                 out.write(values['surface_flux'])
 
@@ -208,18 +208,11 @@ def write_outputs(template):
 
     except GeneratorExit:
         None
-        logger.info('Finished building input files')
+        logging.info('Finished building input files')
 #-------------------------------------------------------------------------------
 # main function
 #-------------------------------------------------------------------------------
 def main():
-    # define a Handler which writes INFO messages or higher to the sys.stderr
-    console = logging.StreamHandler()
-    console.setLevel(lvl)
-    # tell the handler to use specified format
-    console.setFormatter(formatter)
-    # add the handler to the root logger
-    logging.getLogger('logger').addHandler(console)
     ####
     # Setup Arguments
     parser = argparse.ArgumentParser()
@@ -233,6 +226,21 @@ def main():
     parser.add_argument("-csv","--csvfile", type=str, help="location to create csv file to check shapefile grid to stomp grid conversion. default: csv/{model}/{date}/{model}_grid_conversion.csv")
     parser.add_argument("-b","--boundaries",type=str, help="turn on boundaries for solute flux and Aqueous Volumetric. exampe: BNS will turn on bottom, North, and South. example 2(default): B will turn on bottom only. ", default="B")
     args = parser.parse_args()
+
+    if not os.path.isdir('log'):
+        os.mkdir('log')
+    log = "error_modify_cards_log_"+cur_date.strftime("%Y%m%d")+".txt"
+
+    lvl = logging.INFO
+    logger = setup_logger('logger', 'log/'+log, lvl)
+    # define a Handler which writes INFO messages or higher to the sys.stderr
+    console = logging.StreamHandler()
+    console.setLevel(lvl)
+    # tell the handler to use specified format
+    console.setFormatter(formatter)
+    # add the handler to the root logger
+    logging.getLogger('logger').addHandler(console)
+
     text_dic = {}
     contaminates = []
     sim = 0;
@@ -490,11 +498,6 @@ if __name__ == "__main__":
     # build globals
     cur_date  = datetime.date.today()
     time = datetime.datetime.utcnow()
-    if not os.path.isdir('log'):
-        os.mkdir('log')
-    log = "error_modify_cards_log_"+cur_date.strftime("%Y%m%d")+".txt"
     formatter = logging.Formatter('%(asctime)-9s: %(levelname)-8s: %(message)s','%H:%M:%S')
-    lvl = logging.INFO
-    logger = setup_logger('logger', 'log/'+log, lvl)
     #logger.info('\n{0}'.format(comment))
     testout = main()
