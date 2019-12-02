@@ -78,14 +78,16 @@ def get_pathtools(args):
 # the following assumes that the command line statement is as follows:
 # .. python ..\runner.py 'java|perl|python|*.exe' "arguments [if script (perl or python) first argument is tool script filename...java is a little more complex]"
     command = get_invoked_tool_name(args)
+    formatted_command = command.strip().lower()
 
-    if command[-4:] == '.exe':
+    if formatted_command.endswith('.exe'):
         return [command]
-    elif command == 'java':
+
+    if formatted_command == 'java':
         return get_filepathlist(args.Arguments)
-    else:
-        get_invoked_tool_arguments(args)
-        return [get_invoked_tool_arguments(args).split(' ')[0]]
+
+    # get_invoked_tool_arguments(args)  --- this appears to be unused
+    return [get_invoked_tool_arguments(args).split(' ')[0]]
          
 
 def get_currdir():
