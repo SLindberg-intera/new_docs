@@ -46,15 +46,18 @@ def getArgs():
     return parser
 
 def parse_file(inputfile, sep):
-    """ read the file and extract the things to fingerprint"""
-    def split(line, sep):
-        if sep=="s":
+    """ read the file and extract the things to fingerprint
+    
+        sep is an item delimeter string ",", "_", etc
+    """
+    def split(line):
+        if sep.strip().lower() =="s":
             return line.split()
         return line.split(sep)
 
     def itr_lines(lines):
         for line in lines:
-            pline = line.strip()
+            pline = line.strip().rstrip(sep)
             if pline.startswith("#"):
                 continue
             if pline == "":
@@ -94,6 +97,16 @@ def make_fingerprint_name(fingerprint_path, rename=None):
         return str_template.format(name)
     return str_template.format(rename)
 
+def are_same_paths(fingerprint_path, output_path):
+    """ true if both exist and are equivalent:
+           for example, c:\\my_file  and C:\\MY_FILE\\ are the same -> True
+
+    """
+    try:
+        return os.path.samefile(fingerprint_path, output_path)
+    except FileNotFoundError:
+        return False 
+
 def apply_fingerprint(fingerprint_path, output_path):
     """ make the fingerprint and write it to file"""
     s = fingerprint.extract_fingerprints(fingerprint_path)
@@ -103,9 +116,10 @@ def make_handprint(input_path, output_path, sep):
     inputs = parse_file(input_path, sep)
     for fingerpath, *rename in inputs:
         name = make_fingerprint_name(fingerpath, *rename)
-        apply_fingerprint(
-                fingerpath,
-                os.path.join(output_path, name))
+        output_file_path = os.path.join(output_path, name)
+        if are_same_paths(fingerpath, output_file_path):
+            print("Warning: overwriting output file {} with output from fingerprint {}".format( output_file_path, fingerpath))
+        apply_fingerprint(fingerpath, output_file_path)
 
 if __name__=="__main__":
     parser = getArgs()
