@@ -7,6 +7,7 @@ import hashlib
 import os
 import argparse
 import datetime
+import sys
 
 BLOCKSIZE = 2**20
 
@@ -74,7 +75,6 @@ def setupArgParse():
     return pa
 
 if __name__=="__main__":
-    import sys
     pa = setupArgParse()
     args = pa.parse_args()
     start = args.target
