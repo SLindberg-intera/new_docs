@@ -62,7 +62,7 @@ def parse_file(inputfile, sep):
                 continue
             if pline == "":
                 continue
-            yield split(pline, sep)
+            yield split(pline)
 
     with open(inputfile, 'r') as f:
         lines = f.readlines()
