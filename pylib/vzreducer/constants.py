@@ -19,9 +19,31 @@ CONFIG_FILE = os.path.abspath(
 SOURCE_FILES_KEY = "Source Files"
 _200E_KEY = "200 E"
 _200W_KEY = "200 W"
+
 ZERO_BELOW_KEY = "Zero Below"
-WASTE_SITES_KEY = 'Waste Sites'
+
+SUMMARY_TEMPLATE_KEY = "SUMMARY_TEMPLATE"
+
 COPCS_KEY = "COPCs"
+WASTE_SITES_KEY = 'Waste Sites'
+#end of original constants/input file values
+
+#start of constants added to migrate from hard-coded values
+OUT_ERROR_THRESHOLD_KEY = "Output Error Threshold"
+
+LOWER_N_KEY = "Lower Reduced Datapoint Limit"
+UPPER_N_KEY = "Upper Reduced Datapoint Limit"
+
+MIN_ITERATIONS_KEY = "Minimum Iterations"
+MAX_ITERATIONS_KEY = "Maximum Iterations"
+
+MAX_ERR_ITERATIONS_KEY = "Maximum Error Iterations"
+
+#DELTA_SLOPE_TOL_KEY = "Delta Slope Tolerance"
+FLUX_FLOOR_KEY = "Flux Floor"
+SOLVE_TYPE_KEY = "Solve Type"
+""" End of keys used in the input file """
+
 PLOTS_KEY = "PLOTS"
 RAW = "RAW"
 SMOOTHED = "SMOOTHED"
@@ -34,14 +56,6 @@ CUTOFF_FREQUENCY = "CUTOFF_FREQUENCY"
 ERROR_TITLE = "ERROR_TITLE"
 SIGNAL_TITLE = "SIGNAL_TITLE"
 AVERAGE_ERROR_LABEL = "AVERAGE_ERROR_LABEL"
-SUMMARY_TEMPLATE_KEY = "SUMMARY_TEMPLATE"
 
-OUT_ERROR_THRESHOLD_KEY = "Output Error Threshold"
-UPPER_N_KEY = "Upper Reduced Datapoint Limit"
-LOWER_N_KEY = "Lower Reduced Datapoint Limit"
-MIN_ITERATIONS_KEY = "Minimum Iterations"
-MAX_ITERATIONS_KEY = "Maximum Iterations"
-MAX_ERR_ITERATIONS_KEY = "Maximum Error Iterations"
-#DELTA_SLOPE_TOL_KEY = "Delta Slope Tolerance"
-FLUX_FLOOR_KEY = "Flux Floor"
-SOLVE_TYPE_KEY = "Solve Type"
+
+

@@ -1,7 +1,8 @@
 import logging
 import os
 try:
-    from pylib.config import config, parse_args 
+#this config file is not in sync with the code--the config.py file located in runner\ is the one with the config and
+    from pylib.config import config, parse_args
 except ModuleNotFoundError:
     from config import config, parse_args
 import pylib.vzreducer.constants as c
