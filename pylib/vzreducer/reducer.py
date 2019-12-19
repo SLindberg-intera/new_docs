@@ -39,7 +39,7 @@ def get_site_list(input_data, solid_waste_release):
     """ get sites to reduce"""
     if len(input_data[c.WASTE_SITES_KEY])>0:
         logging.info("Reduction will be performed for the following user-defined waste sites : {}".format(', '.join(set(input_data[c.WASTE_SITES_KEY])&set(solid_waste_release.sites))))
-        return sorted(set(input_data[c.WASTE_SITES_KEY])&set(solid_waste_release.sites))
+        return sorted(list((set(input_data[c.WASTE_SITES_KEY])&set(solid_waste_release.sites))))
     logging.info("Reduction will be executed for all waste sites included in the solid waste inventory")
     return sorted(solid_waste_release.sites)
 
