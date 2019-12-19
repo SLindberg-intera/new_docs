@@ -15,7 +15,7 @@ CONFIG_FILE = os.path.abspath(
 )
 
 
-""" These keys are used in the input file """
+""" These keys are used in the input JSON file """
 SOURCE_FILES_KEY = "Source Files"
 _200E_KEY = "200 E"
 _200W_KEY = "200 W"
@@ -42,20 +42,24 @@ MAX_ERR_ITERATIONS_KEY = "Maximum Error Iterations"
 #DELTA_SLOPE_TOL_KEY = "Delta Slope Tolerance"
 FLUX_FLOOR_KEY = "Flux Floor"
 SOLVE_TYPE_KEY = "Solve Type"
-""" End of keys used in the input file """
+""" End of keys used in the input JSON file """
+
+""" These keys are used in the config JSON file [for plotting/graphing?]--move to input JSON? """
+SMOOTH_KEY = "SMOOTHING"
+BUTTER_INDEX_KEY = "BUTTERWORTH_FACTOR"
+CUTOFF_FREQUENCY = "CUTOFF_FREQUENCY"
 
 PLOTS_KEY = "PLOTS"
+ERROR_TITLE = "ERROR_TITLE"
+SIGNAL_TITLE = "SIGNAL_TITLE"
+AVERAGE_ERROR_LABEL = "AVERAGE_ERROR_LABEL"
+
 RAW = "RAW"
 SMOOTHED = "SMOOTHED"
 ERROR = "ERROR"
 COLOR = "COLOR"
 SYMBOL = "SYMBOL"
-SMOOTH_KEY = "SMOOTHING"
-BUTTER_INDEX_KEY = "BUTTERWORTH_FACTOR"
-CUTOFF_FREQUENCY = "CUTOFF_FREQUENCY"
-ERROR_TITLE = "ERROR_TITLE"
-SIGNAL_TITLE = "SIGNAL_TITLE"
-AVERAGE_ERROR_LABEL = "AVERAGE_ERROR_LABEL"
+""" End of keys used in the config JSON file """
 
 
 
