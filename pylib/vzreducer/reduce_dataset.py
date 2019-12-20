@@ -50,7 +50,10 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     write a summary into summary_folder
 
     """
+    #grab user-defined constant values from input JSON file
     flux_floor = float(input_data[c.FLUX_FLOOR_KEY])  # 1e-15
+    peak_height = float(input_data[c.PEAK_HEIGHT_KEY]) #1e-10 (for 08.20.2019 reduction for review)
+
     copc = timeseries.copc
     site = timeseries.site
     if timeseries.are_all_zero():
@@ -60,6 +63,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     else:
         years = timeseries.times
         values = timeseries.values
+############FLUX FLOOR TO ZERO--not used for the 08.20.2019 reduction provided for review###############################
         #  anything less than Flux floor is considered to be zero
         #  we are removing anything under flux floor to help remove jidder
 
@@ -146,6 +150,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         #                reduced_mass=r_ts.integrate())
         #        peaks, _ = sig.find_peaks(rr.reduced_flux.values,width=3,rel_height=1)
         #        return rr.reduced_flux.times, rr.reduced_flux.values,-rr.total_mass_error,peaks.size
+############END OF COMMENTED OUT FLUX FLOOR to Zero CODE################################################################
 
         #commenting out this code for now--will go ahead and process all sites [looks like they are all over 1 Ci anyway
         #elif (TimeSeries(years, values, None, None).integrate().values[-1]) < 1:  # equivalent of 1 ci
@@ -156,22 +161,26 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         # consider converting to pCi [multiply by 1e-12] prior to normalizing to eliminate floating point errors?
         #maxval = np.max(values_mod)
         #values_mod = values_mod / maxval
-
-
         #o_timeseries = TimeSeries(years, values / maxval, None, None)
         #o_mass = o_timeseries.integrate()
+
         o_timeseries = TimeSeries(years, values, copc, site)
         o_mass = o_timeseries.integrate()
+
         #timeseries = TimeSeries(years_mod, values_mod, None, None)
         timeseries = TimeSeries(years, values, copc, site)
 
     #normalize fluxes
     #    max_val = np.max(timeseries.values)
     #    timeseries.values = timeseries.values/max_val
+
+    #find timestep of max flux
     mx = np.argmax(timeseries.values)
+
     # unused variable...SLL
     points = [0, mx, len(timeseries)]
     x = timeseries.times
+
     # unused variable...SLL
     mass = timeseries.integrate()
 
@@ -183,7 +192,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     # tracked but unused variable?...SLL
     out_error_last = out_error
 
-    # SLL--constants to move to vz-reducer-input.json file
+    # SLL--constants to move to vz-reducer-input.json file--original assigned values in comments
     OUT_ERROR_THRESHOLD = float(input_data[c.OUT_ERROR_THRESHOLD_KEY]) #1e-2
     UPPER_N =  int(input_data[c.UPPER_N_KEY]) #50
     LOWER_N = int(input_data[c.LOWER_N_KEY]) #15
@@ -191,8 +200,10 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
 
     last_result = None
 
-    # SLL--constant to move to vz-reducer-input.json file(I had bumped it up to 100 in testing)
+    # SLL--constant to move to JSON input file--original assigned values in comments
+    #the maximum number of reduction iterations
     MAX_ITERATIONS = int(input_data[c.MAX_ITERATIONS_KEY])  #80
+    #the maximum number of error redistribution iterations
     MAX_ERR_ITERATIONS = int(input_data[c.MAX_ERR_ITERATIONS_KEY])
 
     solve_type = input_data[c.SOLVE_TYPE_KEY]   #SMOOTH
@@ -200,7 +211,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
 
     for ix in range(MAX_ITERATIONS):
 
-        res = red_flux.reduce_flux(timeseries, area, ythresh, 
+        res = red_flux.reduce_flux(timeseries, area, ythresh, peak_height,
                 solve_type=solve_type,
                 simple_peaks=simple_peaks
                 )

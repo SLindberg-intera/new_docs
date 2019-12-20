@@ -11,16 +11,16 @@ import math
 SMOOTH = "SMOOTH"
 RAW = "RAW"
 
-def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass,
+def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass, peak_height,
         solve_type=RAW, simple_peaks=False):
     x = timeseries.times
     y = timeseries.values
 
     #peak height is hardcoded at this point...eventually move to the input config file?
-    peaks, _ = sig.find_peaks(y, height=1e-10)
+    peaks, _ = sig.find_peaks(y, height=peak_height)
 
     peaks = x[peaks]
-    pneg, _ = sig.find_peaks(-y,height=1e-10)
+    pneg, _ = sig.find_peaks(-y,height=peak_height)
     pneg = x[pneg]
 
     required = {x[0], x[-1]}
@@ -39,7 +39,7 @@ def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass,
         peaks = [x[np.argmax(timeseries.values)]]
         pneg = []
         # this is never used....above is required_slope (singular and not plural...)
-        # threw off reduction for T31 and T34 (C-14 for sure) if required slope is cleared though...
+        # threw off reduction for T31 and T34 (C-14 for sure) if required_slope (singular) is cleared though...
         required_slopes = []
 
 
@@ -93,13 +93,13 @@ def rebalance(reduction_result):
             reduced_mass=reduced_mass)
 
 
-def reduce_flux(flux, threshold_area, threshold_peak, solve_type,
+def reduce_flux(flux, threshold_area, threshold_peak, peak_height, solve_type,
         simple_peaks):
     mass = tsmath.integrate(flux)
     # note: don't think that mass is ever used in the called function reduce_timeseries ....
     reduced_flux, reduced_mass = reduce_timeseries(
             flux, threshold_area, threshold_peak,
-            mass, solve_type, simple_peaks)
+            mass, peak_height, solve_type, simple_peaks)
     
     result = ReductionResult(
             flux=flux,
