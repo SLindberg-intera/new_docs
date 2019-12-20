@@ -38,7 +38,7 @@ MIN_ITERATIONS_KEY = "Minimum Iterations"
 MAX_ITERATIONS_KEY = "Maximum Iterations"
 
 MAX_ERR_ITERATIONS_KEY = "Maximum Error Iterations"
-
+PEAK_HEIGHT_KEY = "Peak Height"
 #DELTA_SLOPE_TOL_KEY = "Delta Slope Tolerance"
 FLUX_FLOOR_KEY = "Flux Floor"
 SOLVE_TYPE_KEY = "Solve Type"
