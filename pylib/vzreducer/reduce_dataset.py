@@ -51,7 +51,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
 
     """
     #grab user-defined constant values from input JSON file
-    flux_floor = float(input_data[c.FLUX_FLOOR_KEY])  # 1e-15
+    #flux_floor = float(input_data[c.FLUX_FLOOR_KEY])  # 1e-15 #deleting flux_floor 12.20.2019--N/A in code
     peak_height = float(input_data[c.PEAK_HEIGHT_KEY]) #1e-10 (for 08.20.2019 reduction for review)
 
     copc = timeseries.copc
@@ -63,94 +63,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     else:
         years = timeseries.times
         values = timeseries.values
-############FLUX FLOOR TO ZERO--not used for the 08.20.2019 reduction provided for review###############################
-        #  anything less than Flux floor is considered to be zero
-        #  we are removing anything under flux floor to help remove jidder
 
-        #non_zero_ind = np.where(values > flux_floor)[0]
-        # add last zero before flux increases above zero   isn't this the first zero after the last flux>0
-        #if non_zero_ind[-1] + 1 < values.size - 1 and non_zero_ind[-1] + 1 not in non_zero_ind:
-        #    ind = non_zero_ind[-1] + 1
-        #    non_zero_ind = np.append(non_zero_ind, [ind])
-        #    low_val = values[ind]
-            # if low_val is not 0 then find then next zero
-    #SLL: this is  needed because if there are values less than the flux floor they not zero but also NOT in non_zero_ind
-        #    if low_val != 0:
-                #for i in range(ind, values.size):
-        #        for i, flux in enumerate(values[ind:]):
-                    #if values[i] == 0:
-        #            if flux ==0:
-        #                ind = i
-        #                break
-                    #elif values[i] < low_val:
-        #            elif flux < low_val:
-                        #low_val = values[i]
-        #                low_val = flux
-        #                ind = i
-        #        if ind not in non_zero_ind:
-        #            non_zero_ind = np.append(non_zero_ind, [ind])
-
-        # add last zero before flux increases above zero
-        #if non_zero_ind[0] - 1 > 0 and non_zero_ind[0] - 1 not in non_zero_ind:
-        #    ind = non_zero_ind[0] - 1
-        #    non_zero_ind = np.append(non_zero_ind, [ind])
-        #    low_val = values[ind]
-            # if low_val is not 0 then find the previous zero
-        #    if low_val != 0:
-        #        for i in range(ind, 0, -1):
-        #            if values[i] == 0:
-        #                ind = i
-        #                break
-        #            elif values[i] < low_val:
-        #                low_val = values[i]
-        #                ind = i
-        #        if ind not in non_zero_ind:
-        #            non_zero_ind = np.append(non_zero_ind, [ind])
-        #if non_zero_ind[0] - 1 > 0:
-        #    non_zero_ind = np.append(non_zero_ind, non_zero_ind[0] - 1)
-
-        # add first zero after data decreases to zero
-        #if non_zero_ind[-1] + 1 < values.size - 1:
-        #    non_zero_ind = np.append(non_zero_ind, non_zero_ind[-1] + 1)
-
-        #add 0 index to the nonzero index array if not already there...
-        #if 0 not in non_zero_ind:  #insert at beginning? non_zero_ind = np.insert(non_zero_ind,0,0) ?
-        #    non_zero_ind = np.append(non_zero_ind, [0])
-
-        #add last index of values to array if not already there....
-        #if (values.size - 1) not in non_zero_ind:
-        #    non_zero_ind = np.append(non_zero_ind, [(values.size - 1)])
-        #    zero = np.where(values > 0)[0][0]-1
-        #    if zero > 0 and zero not in non_zero_ind:
-        #        non_zero_ind = np.append(non_zero_ind,[zero])
-        #    zero = np.where(values > 0)[0][0]+1
-        #    if zero > 0 and not zero in non_zero_ind:
-        #        non_zero_ind = np.append(non_zero_ind,[zero])
-        #    floor = np.where(values > flux_floor)[0][0]-1
-        #    if floor < years.size-1 and floor not in non_zero_ind:
-        #        non_zero_ind = np.append(non_zero_ind,[floor])
-        #    floor = np.where(values > flux_floor)[0][0]+1
-        #    if floor < years.size-1 and floor not in non_zero_ind:
-        #        non_zero_ind = np.append(non_zero_ind,[floor])
-
-        #non_zero_ind = np.sort(non_zero_ind)
-        #years_mod = years[non_zero_ind]
-        #values_mod = values[non_zero_ind]
-        #if years_mod.size < 3:
-        #    years_mod = years
-        #    values_mod = values
-        #    values_mod = 0
-        #    elif years_mod.size < 200:
-        #        o_ts = TimeSeries(years,values,None,None)
-        #        r_ts = TimeSeries(years_mod,values_mod,None,None)
-        #        rr = ReductionResult(
-        #                flux=o_ts,
-        #                mass=o_ts.integrate(),
-        #                reduced_flux=r_ts,
-        #                reduced_mass=r_ts.integrate())
-        #        peaks, _ = sig.find_peaks(rr.reduced_flux.values,width=3,rel_height=1)
-        #        return rr.reduced_flux.times, rr.reduced_flux.values,-rr.total_mass_error,peaks.size
-############END OF COMMENTED OUT FLUX FLOOR to Zero CODE################################################################
 
         #commenting out this code for now--will go ahead and process all sites [looks like they are all over 1 Ci anyway
         #elif (TimeSeries(years, values, None, None).integrate().values[-1]) < 1:  # equivalent of 1 ci
