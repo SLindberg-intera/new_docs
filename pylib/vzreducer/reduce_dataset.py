@@ -51,7 +51,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
 
     """
     #grab user-defined constant values from input JSON file
-    #flux_floor = float(input_data[c.FLUX_FLOOR_KEY])  # 1e-15 #deleting flux_floor 12.20.2019--N/A in code
+    flux_floor = float(input_data[c.FLUX_FLOOR_KEY])  # 1e-15
     peak_height = float(input_data[c.PEAK_HEIGHT_KEY]) #1e-10 (for 08.20.2019 reduction for review)
 
     copc = timeseries.copc
@@ -61,49 +61,32 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
             copc, site))
         return False
     else:
-        years = timeseries.times
-        values = timeseries.values
-
-
-        #commenting out this code for now--will go ahead and process all sites [looks like they are all over 1 Ci anyway
-        #elif (TimeSeries(years, values, None, None).integrate().values[-1]) < 1:  # equivalent of 1 ci
-        #    years_mod = years
-        #    values_mod = values
-
-        # normalize Values--commented out for now [08.16.2019]
-        # consider converting to pCi [multiply by 1e-12] prior to normalizing to eliminate floating point errors?
-        #maxval = np.max(values_mod)
-        #values_mod = values_mod / maxval
-        #o_timeseries = TimeSeries(years, values / maxval, None, None)
-        #o_mass = o_timeseries.integrate()
-
-        o_timeseries = TimeSeries(years, values, copc, site)
+        #set o_timeseries = unreduced (original) timeseries--not normalized
+        o_timeseries = timeseries
         o_mass = o_timeseries.integrate()
 
-        #timeseries = TimeSeries(years_mod, values_mod, None, None)
-        timeseries = TimeSeries(years, values, copc, site)
 
-    #normalize fluxes
-    #    max_val = np.max(timeseries.values)
-    #    timeseries.values = timeseries.values/max_val
+
 
     #find timestep of max flux
     mx = np.argmax(timeseries.values)
 
-    # unused variable...SLL
-    points = [0, mx, len(timeseries)]
+    # unused variable...commented out--SLL
+    # points = list of indexes for the first timestep, max timestep, last timestep
+    #points = [0, mx, len(timeseries)]
+
     x = timeseries.times
 
-    # unused variable...SLL
-    mass = timeseries.integrate()
+    # unused variable?...SLL
+    #mass = timeseries.integrate()
 
     area = 100*np.std(timeseries.values)*(x[-1]-x[0])
     # unused variable (already commented out)...SLL
     #mass.values[-1]
     ythresh = 100*np.std(timeseries.values)
     out_error = 1
-    # tracked but unused variable?...SLL
-    out_error_last = out_error
+    # tracked but unused variable?...commented out--SLL
+    #out_error_last = out_error
 
     # SLL--constants to move to vz-reducer-input.json file--original assigned values in comments
     OUT_ERROR_THRESHOLD = float(input_data[c.OUT_ERROR_THRESHOLD_KEY]) #1e-2
@@ -116,7 +99,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     # SLL--constant to move to JSON input file--original assigned values in comments
     #the maximum number of reduction iterations
     MAX_ITERATIONS = int(input_data[c.MAX_ITERATIONS_KEY])  #80
-    #the maximum number of error redistribution iterations
+    #the maximum number of iterations for mass error redistribution
     MAX_ERR_ITERATIONS = int(input_data[c.MAX_ERR_ITERATIONS_KEY])
 
     solve_type = input_data[c.SOLVE_TYPE_KEY]   #SMOOTH
@@ -143,7 +126,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
 
 
     if ix>=MAX_ITERATIONS - 1:
-        logging.info("MAX ITERATIONS")
+        logging.info("MAX ITERATIONS exceeded")
 
 #this is the original code--commented out to incorporate the GW reducer's functionality to distribute error to valleys
     delta_mass = last_result.total_mass_error
@@ -152,8 +135,8 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     #plot_file = summary_plot(last_result, output_folder)
     #last_result.to_csv(output_folder)
     used_ythresh = ythresh
-    used_area = area
-    n_iterations = ix
+    #used_area = area
+    #n_iterations = ix
     #summary_info(last_result, summary_file,
     #        delta_mass, used_ythresh, used_area, n_iterations, out_error_last)
     #log_info(last_result)
