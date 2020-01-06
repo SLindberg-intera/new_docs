@@ -16,20 +16,21 @@ def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass, peak_hei
     x = timeseries.times
     y = timeseries.values
 
-    #peak height is hardcoded at this point...eventually move to the input config file?
+    #peak height moved to the input config file 12.20.2016
     peaks, _ = sig.find_peaks(y, height=peak_height)
 
     peaks = x[peaks]
     pneg, _ = sig.find_peaks(-y,height=peak_height)
     pneg = x[pneg]
 
+    #first and last timesteps are required in reduced dataset
     required = {x[0], x[-1]}
-
+    #reduced dataset includes significant slope deltas (where the (y2-y1)/y2 is at least 0.2) and y > 0.05*max y
     required_slope = x[np.divide(np.abs(np.diff(y,prepend=0)),y,
             where=(y>0.05*np.max(y)))>0.2]
 
 
-
+    #grab timesteps on either side of "required slope" timestep
     required_slope_lower = [i-1 for i in required_slope if i != x[0]]
     required_slope_upper = [i+1 for i in required_slope if i != x[-1]]
     required_slope = sorted([*{*[*required_slope, *required_slope_upper, *required_slope_lower]}])

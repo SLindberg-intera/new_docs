@@ -60,35 +60,18 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         logging.info("Skipped {} {} - all zero".format(
             copc, site))
         return False
-    else:
-        #set o_timeseries = unreduced (original) timeseries--not normalized
-        o_timeseries = timeseries
-        o_mass = o_timeseries.integrate()
-
-
-
+    #save unreduced timeseries to o_timeseries (original)
+    o_timeseries = timeseries
 
     #find timestep of max flux
     mx = np.argmax(timeseries.values)
-
-    # unused variable...commented out--SLL
-    # points = list of indexes for the first timestep, max timestep, last timestep
-    #points = [0, mx, len(timeseries)]
-
+    #x = timeseries year
     x = timeseries.times
-
-    # unused variable?...SLL
-    #mass = timeseries.integrate()
-
     area = 100*np.std(timeseries.values)*(x[-1]-x[0])
-    # unused variable (already commented out)...SLL
-    #mass.values[-1]
     ythresh = 100*np.std(timeseries.values)
-    out_error = 1
-    # tracked but unused variable?...commented out--SLL
-    #out_error_last = out_error
 
-    # SLL--constants to move to vz-reducer-input.json file--original assigned values in comments
+
+    # SLL--constants to move to vz-reducer-input.json file--originally assigned values in comments
     OUT_ERROR_THRESHOLD = float(input_data[c.OUT_ERROR_THRESHOLD_KEY]) #1e-2
     UPPER_N =  int(input_data[c.UPPER_N_KEY]) #50
     LOWER_N = int(input_data[c.LOWER_N_KEY]) #15

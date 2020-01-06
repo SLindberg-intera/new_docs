@@ -11,10 +11,7 @@ def make_line(signal):
     line_x = [x[0], x[-1]]
     line_y = [y[0], y[-1]]
     try:
-        #print(line_x)
-        #print(line_y)
         line = interp.interp1d(line_x, line_y)
-        #print(line)
         return x, line(x)
 
     except Exception as e:
