@@ -28,6 +28,7 @@ def summarize_version(work_product, version):
         children = backbone.WorkProductVersion(path).children
         return "\n".join(map(lambda x: x.get_summary(), children))
 
+    
     raise ValueError("Could not find Work Product '{} {}'".format(
         work_product, version))
         

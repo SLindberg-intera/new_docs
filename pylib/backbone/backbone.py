@@ -102,12 +102,18 @@ class Block:
         """
         filepath = check_against_prod_path(filepath)
 
+#        try:
+#            f = open(filepath, 'r')
+#        except:
+#            print("Could not find inheritance work product in path {}'".format(filepath))
+#            return cls(os.path.abspath(filepath), "No Hash", "", "")            
+           
         with open(filepath, 'r') as f:
             d = json.load(f)
             p = []
             rootpath = os.path.dirname(filepath)
-
-
+        
+        
             for path in d[INHERITANCE]:
 
                 path = check_against_prod_path(
@@ -118,7 +124,7 @@ class Block:
             return cls(os.path.abspath(filepath), d[HASH].strip(), p,
                     timestamp
                     )
-
+        
     def __itr_nodes(self,):
         """returns an iterator over nodes
         
