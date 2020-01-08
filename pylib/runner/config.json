@@ -7,7 +7,7 @@
 	"Output Log Template":"Output is being logged to {Logfile} ",
 	"Approved Tools":[
 		{
-		"name":"my name", "command":"myscript.py", "description":"this is a description"
+		"name":"Tool Runner", "command":"runner.py", "description":"qualified on 01.08.2020; tool used to invoke CA-CIE tools and verify QA status"
 		},
 		{
 		"name":"my name", "command":"reducer.py", "description":"this is a description"
