@@ -25,7 +25,7 @@ def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass, peak_hei
 
     #first and last timesteps are required in reduced dataset
     required = {x[0], x[-1]}
-    #reduced dataset includes significant slope deltas (where the (y2-y1)/y2 is at least 0.2) and y > 0.05*max y
+    #reduced dataset includes significant slope deltas (where the (y2-y1)/y2 > 0.2) and y > 0.05*max y
     required_slope = x[np.divide(np.abs(np.diff(y,prepend=0)),y,
             where=(y>0.05*np.max(y)))>0.2]
 
@@ -56,12 +56,12 @@ def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass, peak_hei
     )
 
     flat_reduced_x = set(redcon.flatten_reduced(r))
-    #required = {x[0],x[-1]}
 
-
+    #original code:
     #xout = sorted(list(flat_reduced_x.union(required)\
     #        .union(peaks).union(pneg).union(required_slope)
     #       ))
+
     #this is the same result for the above line of code but it is easier for me to read...
     xout = sorted(set([*flat_reduced_x, *required, *peaks, *pneg, *required_slope]))
 

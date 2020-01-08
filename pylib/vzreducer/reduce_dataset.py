@@ -60,12 +60,12 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         logging.info("Skipped {} {} - all zero".format(
             copc, site))
         return False
-    #save unreduced timeseries to o_timeseries (original)
+    #for site/copc with nonzero fluxes, save unreduced timeseries to o_timeseries (original)
     o_timeseries = timeseries
 
     #find timestep of max flux
     mx = np.argmax(timeseries.values)
-    #x = timeseries year
+
     x = timeseries.times
     area = 100*np.std(timeseries.values)*(x[-1]-x[0])
     ythresh = 100*np.std(timeseries.values)
@@ -98,8 +98,8 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         if out_error < OUT_ERROR_THRESHOLD and len(res.reduced_flux)>=LOWER_N:
             last_result = res
             out_error_last = out_error
-
             break
+
         if len(res.reduced_flux) > 2*UPPER_N:
             simple_peaks = True
             solve_type = RAW
@@ -126,7 +126,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
 
 
 #Add the point prior to first (flux > 0), add point after last of (flux >0)
-    last_result = add_zero_markers(o_timeseries,last_result.reduced_flux,flux_floor)
+    last_result = add_zero_markers(o_timeseries, last_result.reduced_flux, flux_floor)
 
 
     rr = last_result
