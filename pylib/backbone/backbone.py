@@ -102,10 +102,12 @@ class Block:
         """
         filepath = check_against_prod_path(filepath)
 
-#        try:
-#            f = open(filepath, 'r')
-#        except:
-#            print("Could not find inheritance work product in path {}'".format(filepath))
+        try:
+            f = open(filepath, 'r')
+        except:
+#            sys.exit("Data Integrity Warning! - Could not find inheritance work product in path {}'".format(filepath))
+            print("Data Integrity Warning! - Could not find inheritance work product in path {}'".format(filepath))
+            sys.exit(1)
 #            return cls(os.path.abspath(filepath), "No Hash", "", "")            
            
         with open(filepath, 'r') as f:
@@ -116,7 +118,7 @@ class Block:
         
             for path in d[INHERITANCE]:
 
-                path = check_against_prod_path(
+                path = check_against_test_path(
                     os.path.join(rootpath, path))
                 p.append(cls.from_path(path))
             timestamp = d.get(TIMESTAMP, None)    
@@ -365,6 +367,7 @@ class WorkProductVersion:
     @property
     def children(self):
         return [WorkProductVersion(i) for i in self._get_children_paths()]
+
 
     @property
     def parents(self):
