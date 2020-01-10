@@ -1,6 +1,6 @@
 """
     build_surface_flux.py
-	version 1.1:  Fixed issues with grid axis having multiple lines 
+	version 1.1:  Fixed issues with grid axis having multiple lines
 				  in the get_variables function, Neil Powers, 20190610
 -----------------------
 Description:
@@ -50,18 +50,19 @@ comment += '#--  Script version:\n'
 comment += '#--       1.0\n'
 #-------------------------------------------------------------------------------
 # validate contaminates
-def validate_contaminates(contaminates):
-    legal_names = ['U-232','U-233','U-234','U-235','U-236','U-238',
-                          'Th-230','Ra-226','C-14','Cl-36','H-3','I-129',
-                          'Np-237','Re-187','Sr-90','Tc-99']
-    bad_names = []
-    for name in contaminates:
-        if name not in legal_names:
-            bad_names.append(name)
-    if len(bad_names) > 0:
-        logger.info('ERROR: Invalid contaminate names:  {0}'.format(bad_names))
-        return False
-    return True
+# 22 Nov 2019, EOP, removed as obsolete do to requirement changed
+#def validate_contaminates(contaminates):
+#    legal_names = ['U-232','U-233','U-234','U-235','U-236','U-238',
+#                          'Th-230','Ra-226','C-14','Cl-36','H-3','I-129',
+#                          'Np-237','Re-187','Sr-90','Tc-99']
+#    bad_names = []
+#    for name in contaminates:
+#        if name not in legal_names:
+#            bad_names.append(name)
+#    if len(bad_names) > 0:
+#        logger.info('ERROR: Invalid contaminate names:  {0}'.format(bad_names))
+#        return False
+#    return True
 
 
 #-------------------------------------------------------------------------------
@@ -157,7 +158,7 @@ def build_shp_grid(shpfile,ind_x,ind_y,num_x,num_y):
     shapes = sf.shapes()
     shapeRecs = sf.shapeRecords()
     fields = sf.fields[1:]
-    logger.info([field[0] for field in fields])
+    logging.info([field[0] for field in fields])
     i = 0
     nodes = []
     x_start = float(ind_x[0])
@@ -175,7 +176,7 @@ def build_shp_grid(shpfile,ind_x,ind_y,num_x,num_y):
                     nodes.append({'x':float(bbox[0]), 'y':float(bbox[1]),'x_end':float(bbox[2]),'y_end':float(bbox[3]),
                               'node':shaperec.record[5],'row':shaperec.record[0],'column':shaperec.record[1],'delx':shaperec.record[2],'dely':shaperec.record[3]})
     if len(nodes) < 1:
-        logger.critical('ERROR: could not find grids between(x:{0},y:{1} and x:{2},y:{3}): {0}'.format(x_start,y_start,x_end, y_end))
+        logging.critical('ERROR: could not find grids between(x:{0},y:{1} and x:{2},y:{3}): {0}'.format(x_start,y_start,x_end, y_end))
         raise
     return sorted(nodes, key=itemgetter('y','x'))
 #-------------------------------------------------------------------------------
@@ -193,13 +194,13 @@ def write_outputs(template):
             values = (yield)
             os.makedirs(os.path.dirname(values['csv_outfile'] ), exist_ok=True)
             filename = str(values['csv_outfile']).rstrip()# + 'input.txt'
-            logger.info('writing csv grid conversion: {0}'.format(filename))
+            logging.info('writing csv grid conversion: {0}'.format(filename))
             with open(filename, "w") as out:
                 out.write(values['csv'])
             #output = o.format(**values)
             os.makedirs(os.path.dirname(values['outfile'] ), exist_ok=True)
             filename = values['outfile'].rstrip()# + 'input.txt'
-            logger.info('writing file: {0}'.format(filename))
+            logging.info('writing file: {0}'.format(filename))
             with open(str(filename), "w") as out:
                 out.write(values['surface_flux'])
 
@@ -207,18 +208,11 @@ def write_outputs(template):
 
     except GeneratorExit:
         None
-        logger.info('Finished building input files')
+        logging.info('Finished building input files')
 #-------------------------------------------------------------------------------
 # main function
 #-------------------------------------------------------------------------------
 def main():
-    # define a Handler which writes INFO messages or higher to the sys.stderr
-    console = logging.StreamHandler()
-    console.setLevel(lvl)
-    # tell the handler to use specified format
-    console.setFormatter(formatter)
-    # add the handler to the root logger
-    logging.getLogger('logger').addHandler(console)
     ####
     # Setup Arguments
     parser = argparse.ArgumentParser()
@@ -232,8 +226,23 @@ def main():
     parser.add_argument("-csv","--csvfile", type=str, help="location to create csv file to check shapefile grid to stomp grid conversion. default: csv/{model}/{date}/{model}_grid_conversion.csv")
     parser.add_argument("-b","--boundaries",type=str, help="turn on boundaries for solute flux and Aqueous Volumetric. exampe: BNS will turn on bottom, North, and South. example 2(default): B will turn on bottom only. ", default="B")
     args = parser.parse_args()
+
+    if not os.path.isdir('log'):
+        os.mkdir('log')
+    log = "error_modify_cards_log_"+cur_date.strftime("%Y%m%d")+".txt"
+
+    lvl = logging.INFO
+    logger = setup_logger('logger', 'log/'+log, lvl)
+    # define a Handler which writes INFO messages or higher to the sys.stderr
+    console = logging.StreamHandler()
+    console.setLevel(lvl)
+    # tell the handler to use specified format
+    console.setFormatter(formatter)
+    # add the handler to the root logger
+    logging.getLogger('logger').addHandler(console)
+
     text_dic = {}
-    contaminates = ['Tc99','I129','Sr90','U233','U235','U238']
+    contaminates = []
     sim = 0;
 
     try:
@@ -293,6 +302,7 @@ def main():
                 logger.critical('Invalid inputs: {0} '.format(shpfile))
                 logger.critical('                File not found, exiting script.')
                 return ValueError('Invalid file')
+#        22 Nov 2019 removed due to requirement change
 #        if args.valcontam:
 #            if not validate_contaminates(contaminates):
 #                logger.critical('                invalid contaminates, exiting script.')
@@ -405,8 +415,7 @@ def main():
             count += temp_count
         #******
         #** find all of the y indexes that fall in each shapefile grid
-        y_nodes = []
-        x_nodes = []
+
         text_dic['csv'] = 'shape node, x_start, x_end, y_start, y_end, i_start, i_end, j_start, j_end,\n'
         for rec in nodes:
             x = 1
@@ -489,11 +498,6 @@ if __name__ == "__main__":
     # build globals
     cur_date  = datetime.date.today()
     time = datetime.datetime.utcnow()
-    if not os.path.isdir('log'):
-        os.mkdir('log')
-    log = "error_modify_cards_log_"+cur_date.strftime("%Y%m%d")+".txt"
     formatter = logging.Formatter('%(asctime)-9s: %(levelname)-8s: %(message)s','%H:%M:%S')
-    lvl = logging.INFO
-    logger = setup_logger('logger', 'log/'+log, lvl)
     #logger.info('\n{0}'.format(comment))
     testout = main()
