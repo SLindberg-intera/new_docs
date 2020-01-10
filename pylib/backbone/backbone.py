@@ -27,6 +27,17 @@ ICF_PROD_DIR = os.path.join("ICF", "PROD")
 TEST = 'TEST'
 PROD = 'PROD'
 
+def get_fingerprint(filepath, sep="\t"):
+    """
+        read the fingerprint from a valid fingerprint file
+
+    """
+    with open(filepath, 'r') as f:
+        lines = f.readlines()
+    fingerline = lines[1]
+    if "Total" not in fingerline:
+        raise ValueError("Invalid fingerprint file")
+    return fingerline.split(sep)[1].strip()    
 
 def version_path_to_blockfile(version_path):
     """ given a path to a work product version directory, return
@@ -92,6 +103,11 @@ class Block:
         self.inheritance = inheritance 
         self.timestamp = timestamp
 
+    def get_fingerprint(self):
+        source = os.path.split(self.path)[0]
+        ffile = os.path.join(source, FINGER_FILENAME)
+        return get_fingerprint(ffile)
+
     @classmethod
     def from_path(cls, filepath, rootpath=""):
         """ read a block from the blockchain
@@ -154,17 +170,6 @@ class Block:
         return "[{}]".format(self.path)    
 
 
-def get_fingerprint(filepath, sep="\t"):
-    """
-        read the fingerprint from a valid fingerprint file
-
-    """
-    with open(filepath, 'r') as f:
-        lines = f.readlines()
-    fingerline = lines[1]
-    if "Total" not in fingerline:
-        raise ValueError("Invalid fingerprint file")
-    return fingerline.split(sep)[1].strip()    
 
 def get_version(meta_folder_path):
     """ given a path to a meta folder, get the version number """
@@ -315,6 +320,8 @@ class WorkProductVersion:
     def get_summary(self, sep=" "):
         block = self.block
         s = []
+        """
+
         for node in block.nodes:
             parent = WorkProductVersion.from_block(Block.from_path(node))
             s.append(sep.join([
@@ -322,7 +329,14 @@ class WorkProductVersion:
                 parent.qa_status
                 ]
             ))
+
         return "\n".join(s)
+        """
+        parents = self.parents
+        out_str = "\n".join([" ".join([parent.work_product_name, 
+                    parent.version_str,
+                    parent.path]) for parent in parents])
+        return out_str
 
     @classmethod
     def explain_version(cls, path):
