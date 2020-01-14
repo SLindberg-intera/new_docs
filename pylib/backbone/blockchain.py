@@ -5,7 +5,11 @@ import hashlib
 try:
     from backbone import backbone
 except ImportError:
-    import backbone
+    try:
+        import backbone
+    except ImportError:
+        import pylib.backbone as backbone
+
 
 def compute_hash(instr):
     f = hashlib.sha256()
