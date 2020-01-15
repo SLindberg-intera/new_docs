@@ -341,10 +341,20 @@ class WorkProductVersion:
         return "\n".join(s)
         """
         parents = self.parents
-        out_str = "\n".join([" ".join([parent.work_product_name, 
-                    parent.version_str,
-                    parent.path]) for parent in parents])
+        out_str = "\n".join([parent.specific_version_summary() for parent in parents])
         return out_str
+
+    def specific_version_summary(self):
+        out_msg = " ".join([self.work_product_name, self.version_str, self.path])
+        if not self.is_most_recent_version():
+            out_msg += " ** A newer version exists -> {}".format(self.most_recent_version().version_str)
+        return out_msg
+
+    def most_recent_version(self):
+        return WorkProduct.from_work_product_version(self).most_recent_version
+        
+    def is_most_recent_version(self):
+        return self.version_str == self.most_recent_version().version_str
 
     @classmethod
     def explain_version(cls, path):
@@ -378,6 +388,8 @@ class WorkProductVersion:
             not in i]
                 )))
         return x
+    
+
     @property
     def children(self):
         return [WorkProductVersion(i) for i in self._get_children_paths()]
@@ -424,7 +436,11 @@ class WorkProduct:
         vlist = [(v.version_number, v) for v in self.versions]
         out = sorted(vlist, key=lambda x: x[0])
         try:
-            return out[0][1]
+            return out[-1][1]
         except IndexError:
             return None
-
+            
+    @classmethod
+    def from_work_product_version(cls, wpv):
+        path,_ = os.path.split(wpv.path)
+        return cls(path)
