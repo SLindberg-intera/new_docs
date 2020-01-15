@@ -10,11 +10,9 @@
 		"name":"Tool Runner", "command":"runner.py", "description":"qualified on 01.08.2020; tool used to invoke CA-CIE tools and verify QA status"
 		},
 		{
-		"name":"my name", "command":"reducer.py", "description":"this is a description"
+		"name":"Fingerprinter", "command":"fingerprint.py", "description":"qualifed on 01.15.2020; tool used to generate hash tag ids of files/directories"
 		},{
-		"name":"my name", "command":"myscript.py", "description":"this is a description"
-		},{
-		"name":"my name", "command":"myscript.py", "description":"this is a description"
+		"name":"Handprinter", "command":"handprint.py", "description":"qualified on 01.15.2020; tool used to batch process the generation of fingerprints"
 		}
 	],
 	"LOGGER":{
