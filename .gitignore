@@ -84,8 +84,7 @@ inc/
 # Model files
 *.dat
 *.INP
-#commented out .pl to add perl scripts to repository SLL 11.15.2019
-#*.pl
+*.pl
 *.srf
 *.x
 *.stomp
