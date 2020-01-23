@@ -3,28 +3,28 @@
 ignore/**
 
 # compiled source and cached
-*.exe
-*.out
-*.app
-*.class
-*.dll
-*.o
-*.obj
-*.slo
-*.so
+#*.exe
+#*.out
+#*.app
+#*.class
+#*.dll
+#*.o
+#*.obj
+#*.slo
+#*.so
 __pycache__/
 *.py[cod]
 *.$py.class
 *.gch
 *.pch
 
-*.dylib
-*.mod
-*.smod
-*.lai
-*.la
-*.a
-*.lib
+#*.dylib
+#*.mod
+#*.smod
+#*.lai
+#*.la
+#*.a
+#*.lib
 !Build/
 .last_cover_stats
 /META.yml
@@ -61,14 +61,14 @@ inc/
 **/*.sw[abcdefghijklmop]
 
 # packages
-*.7z
-*.dmg
-*.gz
-*.iso
-*.jar
-*.rar
-*.tar
-*.zip
+#*.7z
+#*.dmg
+#*.gz
+#*.iso
+#*.jar
+#*.rar
+#*.tar
+#*.zip
 
 # Images
 *.png
@@ -78,22 +78,21 @@ inc/
 
 
 # Logs and databases
-*.log
-*.sqlite
+#*.log
+#*.sqlite
 
 # Model files
-*.dat
-*.INP
-*.pl
-*.srf
-*.x
-*.stomp
-*.2194
-*.top
-*.sij
-*.ucn
-*.hds
-*.ctl
-*.prof
-*.ref
+#*.dat
+#*.INP
+#*.srf
+#*.x
+#*.stomp
+#*.2194
+#*.top
+#*.sij
+#*.ucn
+#*.hds
+#*.ctl
+#*.prof
+#*.ref
 
