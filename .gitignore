@@ -84,7 +84,6 @@ inc/
 # Model files
 *.dat
 *.INP
-*.pl
 *.srf
 *.x
 *.stomp
