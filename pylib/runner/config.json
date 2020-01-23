@@ -11,8 +11,12 @@
 		},
 		{
 		"name":"Fingerprinter", "command":"fingerprint.py", "description":"qualifed on 01.15.2020; tool used to generate hash tag ids of files/directories"
-		},{
+		},
+		{
 		"name":"Handprinter", "command":"handprint.py", "description":"qualified on 01.15.2020; tool used to batch process the generation of fingerprints"
+		},
+		{
+		"name":"RET-2-STOMP", "command":"CA_RET2STOMP.py", "description":"qualified on 01.23.2020; tool used to generate the meteoric recharge boundary condition cards for the STOMP model input file using RET output."
 		}
 	],
 	"LOGGER":{
