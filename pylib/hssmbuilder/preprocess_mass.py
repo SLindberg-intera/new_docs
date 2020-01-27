@@ -126,7 +126,7 @@ class mass_obj:
                     elif "modflow_" in col:
                         temp = col.replace("modflow_","")
                         self.logger.info("     -renaming column {0} to {1}".format(col,temp))
-                        df.rename(index=str,columns={col:temp})
+                        df.rename(index=str,columns={col:temp},inplace=True)
                         self.build_cell_map(filename,col,df[temp].sum())
                     elif "-" in col:
                         self.build_cell_map(filename,col,df[col].sum())
@@ -256,4 +256,7 @@ class mass_obj:
             if intrmdt_flag:
                 self.cells.to_csv(os.path.join(self.misc_path,r'dry_cell_flux_shift_itteration_{0}.csv'.format(iteration)),header = True)
             self.cells = self.cells.groupby(lambda x:x, axis=1).sum()
+        #order index and columns of move_log
+        move_log.sort_index(axis=0,inplace=True)
+        move_log.sort_index(axis=1,inplace=True)
         move_log.to_csv(os.path.join(self.misc_path,r'flux_mass_shift_mapping.csv'.format(iteration)),header = True)
