@@ -512,10 +512,12 @@ class hssm_obj:
             if len(data) > 2:
                 o_ts = TimeSeries(self.cells['days'].values,self.cells[data[4]].values,None,None)
                 r_ts = data[6]
+                interp = np.array(tsmath.interpolated(r_ts,o_ts).values,dtype='float64')
+
                 if summed_cells.size == 0:
-                    summed_cells =  tsmath.interpolate(r_ts).values
+                    summed_cells =  np.array(interp,dtype='float64')
                 else:
-                    summed_cells = np.sum(summed_cells,tsmath.interpolate(r_ts).values)
+                    summed_cells = np.sum([summed_cells,interp],axis=0)
                 r_t_mass = data[6].integrate()
                 t_mass = o_ts.integrate()
                 d_mass_ts = tsmath.delta(t_mass,r_t_mass)

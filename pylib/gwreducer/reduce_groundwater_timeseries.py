@@ -98,6 +98,23 @@ def reduct_iter(timeseries,flux_floor,ythresh,out_error,out_error_last,OUT_ERROR
     return last_result,ix
 #-------------------------------------------------------------------------------
 #
+def remove_begin_end_zero_flux(days,vals,flux_floor,min_reduction_steps):
+    non_zero_ind = np.where(vals > 0)[0]
+    pre_data = 0
+    post_data = 0
+    if (non_zero_ind[-1] - non_zero_ind[0]) > min_reduction_steps:
+        non_zero_ind = np.where(vals > flux_floor)[0]
+    if non_zero_ind[0] > 0:
+        pre_data = non_zero_ind[0] - 1
+    if non_zero_ind[-1] < len(days)-1:
+        post_data = non_zero_ind[-1] + 1
+    non_zero_ind = np.array([days[0],pre_data,days[non_zero_ind[0]],days[non_zero_ind[-1]],post_data,days[0]])
+    return non_zero_ind
+def set_flux_below_floor(vals,flux_floor):
+    vals[vals < flux_floor] = 0
+    return vals
+#-------------------------------------------------------------------------------
+#
 def remove_zero_flux(days,vals,flux_floor,min_reduction_steps):
     last_ind = vals.size-1
     #check if allowing any steps greater than 0 is still below min_reduction_steps
@@ -212,9 +229,16 @@ def reduce_dataset(years, values,flux_floor=0,max_tm_error=0):
     #if (values.size -1) not in non_zero_ind:
     #    non_zero_ind = np.append(non_zero_ind,[(values.size -1)])
     #non_zero_ind = np.sort(non_zero_ind)
-    non_zero_ind = remove_zero_flux(years,values,flux_floor,500)
+
+    #test
+    #non_zero_ind = remove_zero_flux(years,values,flux_floor,500)
+    remove_begin_end_zero_flux(days,vals,flux_floor,min_reduction_steps)
+    #end test
     years_mod = years[non_zero_ind]
     values_mod = values[non_zero_ind]
+    #test
+    values_mod = set_flux_below_floor(values_mod,flux_floor)
+    #end_test
     if years_mod.size <3:
         years_mod = years
         values_mod = values
