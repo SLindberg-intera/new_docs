@@ -56,6 +56,13 @@ def get_version(path):
     key = res.split("commit")[1].split()[0]
     return key
 
+def get_tool_hash(path, toolpath):
+    """ get the hash of the tool specified in toolpath"""
+    cmd = "hash-object {}".format(toolpath)
+    cmd = make_cmd(path, cmd)
+    hashkey = run_command(cmd)
+    return hashkey
+
 def is_clean_master_branch(path):
     """ True if we are on the last commit of the master branch
     with nothing changed """

@@ -3,7 +3,7 @@ import sys, os
 from config import config, parse_args
 import logging
 from pylib.info.info import Info
-from pylib.pygit.git import get_version, is_clean_master_branch, get_remote_master_version , get_tag
+from pylib.pygit.git import get_version, is_clean_master_branch, get_remote_master_version , get_tag, get_tool_hash
 from pathlib import Path
 
 import subprocess
@@ -153,11 +153,13 @@ def make_version(tool, path):
         if release == 'show':
             release = 'not a QA_QUALIFIED version'
     else:
-        version =   'Not a git repository'
+        version = 'Not a valid tool path'
         release = ''
+    tool_hash = get_tool_hash(path, tool)
     
-    
-    return config[c.VERSION_TEMPLATE_KEY].format(version='{} {}: {}'.format(version, release,tool))
+    return config[c.VERSION_TEMPLATE_KEY].format(
+                    version='{} {}: {}<--{}'.format(version, release,tool, tool_hash)
+                    )
 
 
 def log_tooluse_header(args, tg_dict):
@@ -171,7 +173,8 @@ def log_header(args,tg_dict):
     notify_user(make_user_message(args), shell=True)
     #check versioning (first for loop) and QA status (second for loop) of both the runner and the tool(s) being invoked....
     for tool, gitpath in tg_dict.items():
-        notify_user(make_version(tool,gitpath))
+        notify_user(make_version(tool, gitpath))
+
     if args.manual is None:
         notify_user(make_tool_use_message(args))
 
