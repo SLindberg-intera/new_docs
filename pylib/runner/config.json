@@ -6,6 +6,7 @@
 	"Tool Notification Template":"Invoking: \tCommand:\"{Name}\"\tArguments:\"{Arguments}\"",
 	"Output Log Template":"Output is being logged to {Logfile} ",
     "Manual Mode Template":"Manual Mode: {manual}",
+    "Virtual Summary Template":"Virtual Mode: Command '{tool}' not executed",
 	"Approved Tools":[
 		{
 		"name":"Tool Runner", "command":"runner.py", "description":"qualified on 01.08.2020; tool used to invoke CA-CIE tools and verify QA status"
@@ -48,7 +49,12 @@
 			},
             {
               "ARG":"--manual",
-              "help":"Manual mode; logs description and quits"    
+              "help":"Manual mode. Used to record a human action in the log. No 'Name' or 'Arguments' required. Takes one argument, a description (enclose in quotes); logs that and quits."    
+            },
+            {
+              "ARG":"--virtual",
+              "help":"Log run but does not execute; helpful for testing",
+              "action":"store_true"
             },
 			{
 			  "ARG":"--logfile",
@@ -63,9 +69,7 @@
 			{
 			  "ARG":"--gitpath",
 			  "help":"path to .git directory"
-			  
 			}
-			
 		]
 	}	
 }
