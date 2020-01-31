@@ -177,6 +177,11 @@ def log_header(args,tg_dict):
 
     notify_user(make_user_summary())
 
+def make_virtual_summary(args):
+    return config[c.VIRTUAL_SUMMARY_TEMPLATE_KEY].format(tool=args.Name)
+
+def log_virtual_run(args):
+    notify_user(make_virtual_summary(args))    
 
 def execute_program(args):
     runargs = args.Arguments.split(" ")
@@ -200,4 +205,7 @@ if __name__ == "__main__":
     if args.manual is not None:
         notify_manual_mode(args)    
     else:        
-        execute_program(args)
+        if args.virtual is False:    
+            execute_program(args)
+        else:
+            log_virtual_run(args)    
