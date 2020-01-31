@@ -21,6 +21,9 @@ TOOL_NAME_KEY = "Name"
 the runner
 """
 
+MANUAL_MODE_TEMPLATE_KEY = "Manual Mode Template"
+""" key setting the template of what info is displayed to the user in manual mode"""
+
 APPROVED_TOOL_KEY = "Approved Tools"
 
 TOOL_NOTIFICATION_TEMPLATE_KEY= "Tool Notification Template"
