@@ -3,7 +3,7 @@
 	"Version Template":"Code Version: {version}",
 	"QA Status Template":"QA Status: {status}",
 	"User Notification Template":"Starting {Name}\tLogging to \"{logfile}\"",
-	"Tool Notification Template":"Invoking: \tCommand:\"{Name}\"\tArguments:\"{Arguments}\"",
+	"Tool Notification Template":"Invoking Command:\"{Name}\"\twith Arguments:\"{Arguments}\"",
 	"Output Log Template":"Output is being logged to {Logfile} ",
     "Manual Mode Template":"Manual Mode: {manual}",
     "Virtual Summary Template":"Virtual Mode: Command '{tool}' not executed",
