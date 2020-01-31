@@ -5,6 +5,7 @@
 	"User Notification Template":"Starting {Name}\tLogging to \"{logfile}\"",
 	"Tool Notification Template":"Invoking: \tCommand:\"{Name}\"\tArguments:\"{Arguments}\"",
 	"Output Log Template":"Output is being logged to {Logfile} ",
+    "Manual Mode Template":"Manual Mode: {manual}",
 	"Approved Tools":[
 		{
 		"name":"Tool Runner", "command":"runner.py", "description":"qualified on 01.08.2020; tool used to invoke CA-CIE tools and verify QA status"
@@ -29,11 +30,15 @@
 		"ARGUMENTS":[
 			{
 			  "ARG":"Name",
-			  "help":"The name of the tool to invoke; enclose in quotes"
+			  "help":"The name of the tool to invoke; enclose in quotes",
+              "default":"",
+              "nargs":"?"
 			},
 			{
 			  "ARG":"Arguments",
-			  "help":"Arguments passed to tool; enclose in quotes"
+			  "help":"Arguments passed to tool; enclose in quotes",
+              "default":"",
+              "nargs":"?"
 			},
 			{
 			  "ARG":"--loglevel",
@@ -41,6 +46,10 @@
 			  "default":"I",
 			  "choices":["I","D"]
 			},
+            {
+              "ARG":"--manual",
+              "help":"Manual mode; logs description and quits"    
+            },
 			{
 			  "ARG":"--logfile",
 			  "help":"Path to a log file (default is stdout)"

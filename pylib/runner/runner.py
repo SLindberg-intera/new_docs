@@ -30,6 +30,9 @@ def get_invoked_tool_name(args):
     """ return the tool name that was invoked at the command line"""
     return args.Name
 
+def notify_manual_mode(args):
+    logging.info(
+         config[c.MANUAL_MODE_TEMPLATE_KEY].format(manual=args.manual))
 
 def get_invoked_tool_arguments(args):
     """ return the arguments were invoked at the command line
@@ -157,20 +160,23 @@ def make_version(tool, path):
     return config[c.VERSION_TEMPLATE_KEY].format(version='{} {}: {}'.format(version, release,tool))
 
 
-def log_header(args,tg_dict):
-    notify_user(make_user_message(args), shell=True)
-    notify_user(make_tool_use_message(args))
-
-    
-    #check versioning (first for loop) and QA status (second for loop) of both the runner and the tool(s) being invoked....
-    for tool, gitpath in tg_dict.items():
-        notify_user(make_version(tool,gitpath))
+def log_tooluse_header(args, tg_dict):
 
     for tool, gitpath in tg_dict.items():
         #note: args is a artifact--not currently used in the code for checking qa status
         notify_user(make_qa_status(args, tool, gitpath))
 
+
+def log_header(args,tg_dict):
+    notify_user(make_user_message(args), shell=True)
+    #check versioning (first for loop) and QA status (second for loop) of both the runner and the tool(s) being invoked....
+    for tool, gitpath in tg_dict.items():
+        notify_user(make_version(tool,gitpath))
+    if args.manual is None:
+        notify_user(make_tool_use_message(args))
+
     notify_user(make_user_summary())
+
 
 def execute_program(args):
     runargs = args.Arguments.split(" ")
@@ -184,8 +190,6 @@ if __name__ == "__main__":
 
      
     args = parse_args()
-
-
     #get the tool(s) being invoked by runner and add to tool/gitpath dictionary--CAST references a library and jar file in repository--not handled at this time
     tool_list = get_pathtools(args)
     for path_tool in tool_list:
@@ -193,4 +197,7 @@ if __name__ == "__main__":
 
     configure_logger(args)
     log_header(args, toolgitdict)
-    execute_program(args)
+    if args.manual is not None:
+        notify_manual_mode(args)    
+    else:        
+        execute_program(args)
