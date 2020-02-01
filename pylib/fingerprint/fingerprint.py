@@ -46,6 +46,14 @@ def is_dir(target):
     return os.path.isdir(target)
 
 def extract_fingerprints(target):
+    """
+        generates a report of fingerprints
+
+        target can be a file or a directory
+        if it's a directory, fingerprint recursively
+        else, just fingerpint the file
+
+    """
     count = 0
     if is_file(target):
         yield [target, fingerprint_file(target)]
@@ -64,9 +72,9 @@ def extract_fingerprints(target):
     yield ["Total for {} files".format(count), hasher.hexdigest()]
 
 SEP = "\t"
-def to_file(filename, extract_fingerprints_itr):
+def to_file(filename, extract_fingerprints_itr, filemode='w'):
     all_items = list(extract_fingerprints_itr)
-    with open(filename, 'w') as f:
+    with open(filename, filemode) as f:
         f.write("Fingerprint generated at {}\n".format(
             datetime.datetime.now()))
         f.write(SEP.join(all_items[-1]))
@@ -86,8 +94,68 @@ def setupArgParse():
             help="The name of the output fingerprint file.  The default is 'fingerprint.txt'",
             default="fingerprint.txt"
             )
+    pa.add_argument("--outputmode",
+            type=str,
+            choices={"w","a"},
+            default="w",
+            help=(
+            "The file mode of the output; w==(over)write a==append."
+            )
+            )
+            
+    pa.add_argument("--lineranges",
+            help=(
+            "Fingerprint sections of the target file. "
+            "LINERANGES must be A nested list of form "
+            "[sectionA, sectionB, ...] "
+            "where each section is a list of line numbers defining "
+            "the range of that section. The end line is NOT read. "
+            "For example: --linerange=[[0,1],[2,3]] fingerprints the first "
+            "and third lines of the file (if --lineindexing=0). "
+            "Likewise, --linerange=[[0,9]] "
+            "fingerprints the first eight lines only. "
+            "If this argument is present, target must be a file. "
+            "Do not put spaces in this argument."
+                )
+            ,
+            )
+    pa.add_argument("--lineindexing",
+            type=int,
+            choices=[0,1],
+            default=0,
+            help=(
+                "Determines if the first line of the file is given "
+                "a value of '0' or '1'. Defaults to 0."
+                )
+            )
 
     return pa
+
+
+def extract_sections(args):
+    """ extract sections of the target file and build a report
+    
+    args is assumed to a namespace from setupArgParse()
+    """
+    start = args.target
+    if not is_file(start):
+        raise IOError((
+           "fingerprint target must be a file when lines are "
+           "specified"))
+    out = []
+    linerange = eval(args.lineranges)
+    for startline, endline in linerange:    
+        startline = int(startline) + args.lineindexing
+        endline = int(endline) + args.lineindexing
+        filename = args.target 
+        msg = "line section [{},{}); {}-indexed".format(
+                startline, endline,
+                args.lineindexing)
+        res = [msg, fingerprint_lines(filename, startline, endline)]
+        out.append(res)
+    out.append(*extract_fingerprints(start))
+    return out
+
 
 if __name__=="__main__":
     pa = setupArgParse()
@@ -95,7 +163,11 @@ if __name__=="__main__":
     start = args.target
     outfile = args.output
 
-    s = extract_fingerprints(start)
-    to_file(outfile, s)
-    
-
+    if args.lineranges is not None:
+        """ extract sections from a target file """
+        s = extract_sections(args)
+    else:
+        """ fingerprint whole file or directory """
+        s = extract_fingerprints(start)
+        
+    to_file(outfile, s, filemode=args.outputmode)
