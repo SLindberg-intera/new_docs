@@ -24,6 +24,21 @@ def fingerprint_file(filename):
             hasher.update(data)
         return hasher.hexdigest()    
 
+def fingerprint_lines(filename, start_line, end_line=None):
+    """ gets hash for section start_line to (not including) end_line
+    
+        if end_line is None, just reutrns the hash of start_line
+    """
+    if end_line is None:
+        end_line = start_line+1
+
+    with open(filename, 'rb') as f:
+        lines = f.readlines()
+    data = b''.join(lines[start_line: end_line]) 
+    hasher = get_hasher()
+    hasher.update(data)
+    return hasher.hexdigest()
+
 def is_file(target):
     return os.path.isfile(target)
 
