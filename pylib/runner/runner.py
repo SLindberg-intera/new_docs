@@ -174,8 +174,10 @@ def log_header(args,tg_dict):
     #check versioning (first for loop) and QA status (second for loop) of both the runner and the tool(s) being invoked....
     for tool, gitpath in tg_dict.items():
         notify_user(make_version(tool, gitpath))
-
+    
     if args.manual is None:
+        for tool, gitpath in tg_dict.items():
+            notify_user(make_qa_status(args, tool, gitpath))
         notify_user(make_tool_use_message(args))
 
     notify_user(make_user_summary())
