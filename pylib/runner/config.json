@@ -17,6 +17,9 @@
 		},
 		{
 		"name":"RET-2-STOMP", "command":"CA_RET2STOMP.py", "description":"qualified on 01.23.2020; tool used to generate the meteoric recharge boundary condition cards for the STOMP model input file using RET output."
+		},
+		{
+		"name":"Inactive Nodes", "command":"inactive_nodes_linux-intel-64.exe", "description":"qualified on 02.04.2020; tool used to determine the number of active and inactive nodes in the uppermost five model layers."
 		}
 	],
 	"LOGGER":{
