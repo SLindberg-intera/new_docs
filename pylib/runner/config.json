@@ -20,6 +20,12 @@
 		},
 		{
 		"name":"Inactive Nodes", "command":"inactive_nodes_linux-intel-64.exe", "description":"qualified on 02.04.2020; tool used to determine the number of active and inactive nodes in the uppermost five model layers."
+		},
+
+		{
+
+		"name":"Patchbowl", "command":"ca-patchbowl.pl", "description":"qualified on 02.04.2020; tool used to modify STOMP soil zonation files to patch holes in the silt layers of the perching silt layer in the 200 E Area."
+
 		}
 	],
 	"LOGGER":{
