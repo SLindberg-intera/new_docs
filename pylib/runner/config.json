@@ -26,6 +26,12 @@
 
 		"name":"Patchbowl", "command":"ca-patchbowl.pl", "description":"qualified on 02.04.2020; tool used to modify STOMP soil zonation files to patch holes in the silt layers of the perching silt layer in the 200 E Area."
 
+		},
+
+		{
+
+		"name":"SS STOMP Input File Generator", "command":"SS_input_gen_linux-intel-64.exe", "description":"qualified on 02.05.2020; tool used to generate the STOMP Input file input_SS for the steady-state simulation."
+
 		}
 	],
 	"LOGGER":{
