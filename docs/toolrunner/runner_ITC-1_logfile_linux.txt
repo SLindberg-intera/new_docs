@@ -1,0 +1,7 @@
+INFO--02/05/2020 02:36:26 PM--Starting CA-CIE Tool Runner.	Logging to "../runner_ITC-1_logfile.txt"
+INFO--02/05/2020 02:36:26 PM--Invoking: 	Command:"python"	Arguments:"../../tools/ca-surf/ca_build_surface_flux.py -c C-14 Cl-36 H-3 I-129 Np-237 Re-187 Sr-90 Tc-99 -shp ../../modflowgrid/data/grid_274_geo.shp -i ../ss/input -s mpond -n Tester -o ./rad1_surface_flux.txt"
+INFO--02/05/2020 02:36:26 PM--Code Version: Not a git repository : ../../tools/pylib/runner/runner.py
+INFO--02/05/2020 02:36:26 PM--Code Version: Not a git repository : ../../tools/ca-surf/ca_build_surface_flux.py
+INFO--02/05/2020 02:36:26 PM--QA Status: TEST : ../../tools/pylib/runner/runner.py
+INFO--02/05/2020 02:36:26 PM--QA Status: TEST : ../../tools/ca-surf/ca_build_surface_flux.py
+INFO--02/05/2020 02:36:26 PM--Username:chall	Computer:olive	Platform:Linux 4.4.0-38-generic #57~14.04.1-Ubuntu SMP Tue Sep 6 17:20:43 UTC 2016
