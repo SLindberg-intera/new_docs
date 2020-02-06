@@ -56,6 +56,12 @@
 
 		"name":"CAST Supporting Libraries", "command":"lib", "description":"qualified on 02.06.2020; libraries supporting CAST."
 
+		},
+
+		{
+
+		"name":"Kingdom to ArcGIS Grid Tool", "command":"kingdom2arcgrid.py", "description":"qualified on 02.06.2020; converts Kingdom point files (x, y, z) of surfaces (topographic surface or geologic structure tops) to ASCII raster files (asc)."
+
 		}
 	],
 	"LOGGER":{
