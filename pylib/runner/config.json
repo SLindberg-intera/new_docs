@@ -38,6 +38,12 @@
 
 		"name":"Kingdom2STOMP", "command":"K2S_ROCSAN.exe", "description":"qualified on 02.05.2020; tool used to generate a CSV file representing each node and its corresponding geologic formation in a model domain."
 
+		},
+
+		{
+
+		"name":"Steady State Output Card Generator Tool ", "command":"OC_SS_gen_linux-intel-64.exe", "description":"qualified on 02.06.2020; tool used to generate an Output Control card for the steady-state simulation."
+
 		}
 	],
 	"LOGGER":{
