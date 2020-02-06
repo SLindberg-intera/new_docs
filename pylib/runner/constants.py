@@ -20,6 +20,10 @@ TOOL_NAME_KEY = "Name"
 """ key setting the name of *this* tool; I.E. the runner (not the tool invoked) by 
 the runner
 """
+VIRTUAL_SUMMARY_TEMPLATE_KEY = "Virtual Summary Template"
+
+MANUAL_MODE_TEMPLATE_KEY = "Manual Mode Template"
+""" key setting the template of what info is displayed to the user in manual mode"""
 
 APPROVED_TOOL_KEY = "Approved Tools"
 

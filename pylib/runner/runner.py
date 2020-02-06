@@ -3,7 +3,7 @@ import sys, os
 from config import config, parse_args
 import logging
 from pylib.info.info import Info
-from pylib.pygit.git import get_version, is_clean_master_branch, get_remote_master_version , get_tag
+from pylib.pygit.git import get_version, is_clean_master_branch, get_remote_master_version , get_tag, get_tool_hash
 from pathlib import Path
 
 import subprocess
@@ -30,6 +30,9 @@ def get_invoked_tool_name(args):
     """ return the tool name that was invoked at the command line"""
     return args.Name
 
+def notify_manual_mode(args):
+    logging.info(
+         config[c.MANUAL_MODE_TEMPLATE_KEY].format(manual=args.manual))
 
 def get_invoked_tool_arguments(args):
     """ return the arguments were invoked at the command line
@@ -150,27 +153,40 @@ def make_version(tool, path):
         if release == 'show':
             release = 'not a QA_QUALIFIED version'
     else:
-        version =   'Not a git repository'
+        version = 'Not a valid tool path'
         release = ''
+    tool_hash = get_tool_hash(path, tool)
     
-    
-    return config[c.VERSION_TEMPLATE_KEY].format(version='{} {}: {}'.format(version, release,tool))
+    return config[c.VERSION_TEMPLATE_KEY].format(
+                    version='{} {}: {}<--{}'.format(version, release,tool, tool_hash)
+                    )
 
 
-def log_header(args,tg_dict):
-    notify_user(make_user_message(args), shell=True)
-    notify_user(make_tool_use_message(args))
-
-    
-    #check versioning (first for loop) and QA status (second for loop) of both the runner and the tool(s) being invoked....
-    for tool, gitpath in tg_dict.items():
-        notify_user(make_version(tool,gitpath))
+def log_tooluse_header(args, tg_dict):
 
     for tool, gitpath in tg_dict.items():
         #note: args is a artifact--not currently used in the code for checking qa status
         notify_user(make_qa_status(args, tool, gitpath))
 
+
+def log_header(args,tg_dict):
+    notify_user(make_user_message(args), shell=True)
+    #check versioning (first for loop) and QA status (second for loop) of both the runner and the tool(s) being invoked....
+    for tool, gitpath in tg_dict.items():
+        notify_user(make_version(tool, gitpath))
+    
+    if args.manual is None:
+        for tool, gitpath in tg_dict.items():
+            notify_user(make_qa_status(args, tool, gitpath))
+        notify_user(make_tool_use_message(args))
+
     notify_user(make_user_summary())
+
+def make_virtual_summary(args):
+    return config[c.VIRTUAL_SUMMARY_TEMPLATE_KEY].format(tool=args.Name)
+
+def log_virtual_run(args):
+    notify_user(make_virtual_summary(args))    
 
 def execute_program(args):
     runargs = args.Arguments.split(" ")
@@ -184,8 +200,6 @@ if __name__ == "__main__":
 
      
     args = parse_args()
-
-
     #get the tool(s) being invoked by runner and add to tool/gitpath dictionary--CAST references a library and jar file in repository--not handled at this time
     tool_list = get_pathtools(args)
     for path_tool in tool_list:
@@ -193,4 +207,10 @@ if __name__ == "__main__":
 
     configure_logger(args)
     log_header(args, toolgitdict)
-    execute_program(args)
+    if args.manual is not None:
+        notify_manual_mode(args)    
+    else:        
+        if args.virtual is False:    
+            execute_program(args)
+        else:
+            log_virtual_run(args)    
