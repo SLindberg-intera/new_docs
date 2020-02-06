@@ -32,6 +32,12 @@
 
 		"name":"SS STOMP Input File Generator", "command":"SS_input_gen_linux-intel-64.exe", "description":"qualified on 02.05.2020; tool used to generate the STOMP Input file input_SS for the steady-state simulation."
 
+		},
+
+		{
+
+		"name":"Kingdom2STOMP", "command":"K2S_ROCSAN.exe", "description":"qualified on 02.05.2020; tool used to generate a CSV file representing each node and its corresponding geologic formation in a model domain."
+
 		}
 	],
 	"LOGGER":{
