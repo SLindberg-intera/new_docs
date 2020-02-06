@@ -42,7 +42,19 @@
 
 		{
 
-		"name":"Steady State Output Card Generator Tool ", "command":"OC_SS_gen_linux-intel-64.exe", "description":"qualified on 02.06.2020; tool used to generate an Output Control card for the steady-state simulation."
+		"name":"Steady State Output Card Generator Tool", "command":"OC_SS_gen_linux-intel-64.exe", "description":"qualified on 02.06.2020; tool used to generate an Output Control card for the steady-state simulation."
+
+		},
+
+		{
+
+		"name":"CAST", "command":"ModelSetupFY18.jar", "description":"qualified on 02.06.2020; tool used to generate initial input cards for ESTOMP."
+
+		},
+
+		{
+
+		"name":"CAST Supporting Libraries", "command":"lib", "description":"qualified on 02.06.2020; libraries supporting CAST."
 
 		}
 	],
