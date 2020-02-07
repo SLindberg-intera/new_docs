@@ -3,8 +3,10 @@
 	"Version Template":"Code Version: {version}",
 	"QA Status Template":"QA Status: {status}",
 	"User Notification Template":"Starting {Name}\tLogging to \"{logfile}\"",
-	"Tool Notification Template":"Invoking: \tCommand:\"{Name}\"\tArguments:\"{Arguments}\"",
+	"Tool Notification Template":"Invoking Command:\"{Name}\"\twith Arguments:\"{Arguments}\"",
 	"Output Log Template":"Output is being logged to {Logfile} ",
+    "Manual Mode Template":"Manual Mode: {manual}",
+    "Virtual Summary Template":"Virtual Mode: Command '{tool}' not executed",
 	"Approved Tools":[
 		{
 		"name":"Tool Runner", "command":"runner.py", "description":"qualified on 01.08.2020; tool used to invoke CA-CIE tools and verify QA status"
@@ -80,11 +82,15 @@
 		"ARGUMENTS":[
 			{
 			  "ARG":"Name",
-			  "help":"The name of the tool to invoke; enclose in quotes"
+			  "help":"The name of the tool to invoke; enclose in quotes",
+              "default":"",
+              "nargs":"?"
 			},
 			{
 			  "ARG":"Arguments",
-			  "help":"Arguments passed to tool; enclose in quotes"
+			  "help":"Arguments passed to tool; enclose in quotes",
+              "default":"",
+              "nargs":"?"
 			},
 			{
 			  "ARG":"--loglevel",
@@ -92,6 +98,15 @@
 			  "default":"I",
 			  "choices":["I","D"]
 			},
+            {
+              "ARG":"--manual",
+              "help":"Manual mode. Used to record a human action in the log. No 'Name' or 'Arguments' required. Takes one argument, a description (enclose in quotes); logs that and quits."    
+            },
+            {
+              "ARG":"--virtual",
+              "help":"Log run but does not execute; helpful for testing",
+              "action":"store_true"
+            },
 			{
 			  "ARG":"--logfile",
 			  "help":"Path to a log file (default is stdout)"
@@ -105,9 +120,7 @@
 			{
 			  "ARG":"--gitpath",
 			  "help":"path to .git directory"
-			  
 			}
-			
 		]
 	}	
 }
