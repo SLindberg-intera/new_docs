@@ -68,7 +68,7 @@
 
 		{
 
-		"name":"Split Kindgom Layer", "command":"splitKindgdomLayer.pl", "description":"qualified on 02.06.2020; used to split one geology surface layer file into two sub-unit surface layer files."
+		"name":"Split Kindgom Layer", "command":"splitKingdomLayer.pl", "description":"qualified on 02.06.2020; used to split one geology surface layer file into two sub-unit surface layer files."
 
 		}
 	],
