@@ -17,6 +17,7 @@ from pylib.hssmbuilder.build_saturation import sat_obj
 from pylib.hssmbuilder.preprocess_mass import mass_obj
 import argparse
 import datetime as dt
+import numpy as np
 import pandas as pd
 import os.path
 import logging
@@ -180,6 +181,9 @@ def main():
         hssm = hssm_obj(sat.year_sat,mass.cells,params,'hssm_obj',log_dir,misc_dir)
     else:
         hssm = hssm_obj(sat.sat_obj,mass.cells,params,'hssm_obj',log_dir,misc_dir)
+    #clean memory space up a bit.
+    sat = None
+    mass = None
     #Create HSSM packages
     hssm.write_data()
     logger.info("\n\n Application Completed Normally.")

@@ -32,6 +32,7 @@ class mass_obj:
         start_year = int(self.cells.index[self.cells.index.size - 1]) + 1
         for year in range(start_year, stop_year,1):
             self.cells = self.cells.append(pd.Series(name=year))
+        print(self.cells.index)
         self.cells = self.cells.sort_index()
     #---------------------------------------------------------------------------
     # Convert all values to unit/day, and add days column 0 to last year by
@@ -214,6 +215,7 @@ class mass_obj:
                     t_rows = self.cells.loc[:,'days'] > time_step
                     if t_rows[t_rows].index.size > 0:
                         first_dry_ind = min(t_rows[t_rows].index)
+
                         self.logger.info ("      index of first dry time step: {0}, {1}".format(first_dry_ind,self.cells.loc[first_dry_ind,"days"]))
                         #make copy of the rows to be distributed
                         cell_loss = self.cells.loc[first_dry_ind:,i_j].copy()

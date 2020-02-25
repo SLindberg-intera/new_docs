@@ -19,8 +19,18 @@ import scipy.signal as sig
 def reduct_iter(timeseries,flux_floor,ythresh,out_error,out_error_last,OUT_ERROR_THRESHOLD,UPPER_N,LOWER_N,last_result,MAX_ITERATIONS, algo="iter"):
     out_error_last = out_error
     prev_point_count = 0
-    good_result=last_result
+
     mass = timeseries.integrate()
+    good_result=ReductionResult(
+                flux=timeseries,
+                mass=mass,
+                reduced_flux=timeseries,
+                reduced_mass=mass)
+    last_result = ReductionResult(
+                flux=timeseries,
+                mass=mass,
+                reduced_flux=timeseries,
+                reduced_mass=mass)
     epsilon = ythresh
     mult_by = .5
     #upper_epsilon = ythresh
@@ -100,16 +110,63 @@ def reduct_iter(timeseries,flux_floor,ythresh,out_error,out_error_last,OUT_ERROR
 #
 def remove_begin_end_zero_flux(days,vals,flux_floor,min_reduction_steps):
     non_zero_ind = np.where(vals > 0)[0]
-    pre_data = 0
-    post_data = 0
-    if (non_zero_ind[-1] - non_zero_ind[0]) > min_reduction_steps:
-        non_zero_ind = np.where(vals > flux_floor)[0]
-    if non_zero_ind[0] > 0:
-        pre_data = non_zero_ind[0] - 1
-    if non_zero_ind[-1] < len(days)-1:
-        post_data = non_zero_ind[-1] + 1
-    non_zero_ind = np.array([days[0],pre_data,days[non_zero_ind[0]],days[non_zero_ind[-1]],post_data,days[0]])
-    return non_zero_ind
+    old_non_zero_ind = np.array([])
+    temp = np.array([])
+    pre_data = days[1]
+    post_data = days[-2]
+    if (non_zero_ind.size) > min_reduction_steps:
+        old_non_zero_ind = non_zero_ind
+        temp = np.where(vals > flux_floor)[0]
+    if temp.size > 0:
+        non_zero_ind = temp
+    if non_zero_ind[0] > 1:
+        pre_data = days[non_zero_ind[0] - 1]
+    if non_zero_ind[-1] < len(days)-2:
+        post_data = days[non_zero_ind[-1] + 1]
+    #get add first year, year of last 0 before mass, first 0 after flux, last year
+    zero_ind = np.concatenate((np.array([0]),np.where(np.logical_or(days ==pre_data, days==post_data))[0],np.array([days.size -1])))
+    if old_non_zero_ind.size > 0:
+        pre = old_non_zero_ind[0] if old_non_zero_ind[0] > 1 else 1
+        post = old_non_zero_ind[-1] if old_non_zero_ind[0] < len(days)-2 else len(days)-2
+        zero_ind = np.concatenate((zero_ind,np.array([pre,post])))
+        zero_ind = np.unique(zero_ind)
+        zero_ind.sort()
+    #get add first year, year of last 0 before mass,all years with mas, first 0 after flux, last year
+    non_zero_ind = np.concatenate((np.array([0]),np.where(np.logical_and(days >=pre_data, days<=post_data))[0],np.array([days.size -1])))
+
+    return non_zero_ind,zero_ind
+#-------------------------------------------------------------------------------
+# take an array of indexes from unreduced data and add them back into the reduced data set.
+# array should contain first and last indexes, other points are point before mass,
+# before flux floor mass, after mass, after flux floor
+def retain_min_years(r_ts,o_ts,o_mass,min_years_ind):
+
+    years = o_ts.times[min_years_ind]
+    if r_ts.times[0] != years[0]:
+        r_ts.times = np.insert(r_ts.times,0,years[0])
+        r_ts.values = np.insert(r_ts.values,0,o_ts.values[min_years_ind[0]])
+    if len(years) > 2:
+        for ind in range(1,len(years-2)):
+            if not np.any(r_ts.times == years[ind]):
+                pos = np.where(r_ts.times > years[ind])[0][0]
+                if pos < 0:
+                    pos = np.where(r_ts.times < years[ind])[0][-1]
+                r_ts.times = np.insert(r_ts.times,pos,years[ind])
+                r_ts.values = np.insert(r_ts.values,pos,o_ts.values[min_years_ind[ind]])
+
+    if r_ts.times[-1] != years[-1]:
+        ind = r_ts.times.size-1
+        r_ts.times = np.insert(r_ts.times,ind,years[-1])
+        r_ts.values = np.insert(r_ts.values,ind,o_ts.values[min_years_ind[-1]])
+    reduced_mass = tsmath.integrate(r_ts)
+    return ReductionResult(
+            flux=o_ts,
+            mass=o_mass,
+            reduced_flux=r_ts,
+            reduced_mass=reduced_mass)
+#-------------------------------------------------------------------------------
+# if flux is below flux floor then it is considered noise and effectively 0 so
+#  set it to 0.  this fixes some issues with extremely small numbers.
 def set_flux_below_floor(vals,flux_floor):
     vals[vals < flux_floor] = 0
     return vals
@@ -162,7 +219,7 @@ def remove_zero_flux(days,vals,flux_floor,min_reduction_steps):
         non_zero_ind = np.append(non_zero_ind,[(vals.size -1)])
     non_zero_ind = np.sort(non_zero_ind)
     return non_zero_ind
-def reduce_dataset(years, values,flux_floor=0,max_tm_error=0):
+def reduce_dataset(years, values,flux_floor=0,max_tm_error=0,min_reduction_steps=200):
     """ takes  times and values and then reduces it
 
     returns reduced_times and reduced_values
@@ -173,91 +230,38 @@ def reduce_dataset(years, values,flux_floor=0,max_tm_error=0):
     max_tm_error > total mass error
     """
 
-    #  anything less than Flux floor is considered to be zero
-    #  we are removing anything under flux floor to help remove jidder
-    #non_zero_ind = np.where(values > flux_floor)[0]
-    #non_zero_start_ind = non_zero_ind[0]
-    #non_zero_end_ind = non_zero_ind[-1]
-    #non_zero_start_day = years[non_zero_start_ind]
-    #non_zero_end_day = years[non_zero_end_ind]
-    #add last zero before flux increases above zero
-    #if non_zero_end_ind+1 < values.size-1 and non_zero_end_ind+1 not in non_zero_ind:
-    #    ind = non_zero_ind[-1]+1
-    #    non_zero_ind = np.append(non_zero_ind,[ind])
-    #    low_val = values[ind]
-    #    #if low_val is not 0 then find then next zero
-    #    if low_val != 0:
-    #        for i in range(ind,values.size):
-    #            if values[i] == 0:
-    #                ind = i
-    #                break
-    #            elif values[i] < low_val:
-    #                low_val = values[i]
-    #                ind = i
-    #        if ind not in non_zero_ind:
-    #            non_zero_ind = np.append(non_zero_ind,[ind])
-    #    non_zero_ind = np.sort(non_zero_ind)
-    #add last zero before flux increases above zero
-    #if non_zero_start_ind-1 > 0 and non_zero_start_ind-1 not in non_zero_ind:
-    #    ind = non_zero_start_ind-1
-    #    non_zero_ind = np.append(non_zero_ind,[ind])
-    #    low_val = values[ind]
-    #    #if low_val is not 0 then find the previous zero
-    #    if low_val >= flux_floor:
-    #        for i in range(ind, 0,-1):
-    #            if values[i] == 0:
-    #                ind = i
-    #                break
-    #            elif values[i] < low_val:
-    #                low_val = values[i]
-    #                ind = i
-    #        if ind not in non_zero_ind:
-    #            non_zero_ind = np.append(non_zero_ind,[ind])
-    #    non_zero_ind = np.sort(non_zero_ind)
-    #if non_zero_start_ind-1 > 0:
-    #    non_zero_ind = np.append(non_zero_ind,non_zero_start_ind-1)
-    #    non_zero_ind = np.sort(non_zero_ind)
-
-    #add first zero after data decreases to zero
-    #if non_zero_end_ind+1 < values.size-1:
-    #    non_zero_ind = np.append(non_zero_ind,non_zero_end_ind+1)
-    #    non_zero_ind = np.sort(non_zero_ind)
-    #non_zero_ind = np.sort(non_zero_ind)
-    #if 0 not in non_zero_ind:
-    #    non_zero_ind = np.append(non_zero_ind,[0])
-    #    non_zero_ind = np.sort(non_zero_ind)
-    #if (values.size -1) not in non_zero_ind:
-    #    non_zero_ind = np.append(non_zero_ind,[(values.size -1)])
-    #non_zero_ind = np.sort(non_zero_ind)
-
     #test
+    #val_temp = set_flux_below_floor(values_mod,flux_floor)
     #non_zero_ind = remove_zero_flux(years,values,flux_floor,500)
-    remove_begin_end_zero_flux(days,vals,flux_floor,min_reduction_steps)
+    non_zero_ind, min_retained_zero_years = remove_begin_end_zero_flux(years,values,flux_floor,min_reduction_steps)
     #end test
+
     years_mod = years[non_zero_ind]
     values_mod = values[non_zero_ind]
-    #test
-    values_mod = set_flux_below_floor(values_mod,flux_floor)
-    #end_test
+
     if years_mod.size <3:
         years_mod = years
         values_mod = values
         values_mod = 0
-#    elif years_mod.size < 200:
-#        o_ts = TimeSeries(years,values,None,None)
-#        r_ts = TimeSeries(years_mod,values_mod,None,None)
-#        rr = ReductionResult(
-#                flux=o_ts,
-#                mass=o_ts.integrate(),
-#                reduced_flux=r_ts,
-#                reduced_mass=r_ts.integrate())
-#        peaks, _ = sig.find_peaks(rr.reduced_flux.values,width=3,rel_height=1)
-#        return rr.reduced_flux.times, rr.reduced_flux.values,-rr.total_mass_error,peaks.size
+    else:
+        #makes ure you have not removed more than 1% of the mass when removing 0 or flux floor rates
+        o_mass = TimeSeries(years,values,None,None).integrate().values[-1]
+        r_mass = TimeSeries(years_mod, values_mod, None, None).integrate().values[-1]
+        if abs((o_mass-r_mass)/o_mass)*100 > 1:
+            years_mod = years
+            values_mod = values
+            timeseries = TimeSeries(years_mod, values_mod, None, None)
+            mass = timeseries.integrate()
     #if total mass is less than the max to mass error then use all data
-    elif (TimeSeries(years,values,None,None).integrate().values[-1]) < max_tm_error:#1e12:#equivalent of 1 ci
-        years_mod = years
-        values_mod = values
-
+    #elif (TimeSeries(years,values,None,None).integrate().values[-1]) < max_tm_error:#1e12:#equivalent of 1 ci
+    #    years_mod = years
+    #    values_mod = values
+    #if values.sum() > 1:
+    #    values_mod = set_flux_below_floor(values_mod,flux_floor)
+    #    timeseries = TimeSeries(years_mod, values_mod, None, None)
+    #    if timeseries.are_all_zero():
+            #logging.info("Skipped - all zero")
+    #        return years, values,0,0,0
 
     #normalize Values
     maxval = np.max(values_mod)
@@ -265,16 +269,15 @@ def reduce_dataset(years, values,flux_floor=0,max_tm_error=0):
     o_timeseries = TimeSeries(years,values/maxval,None,None)
     o_mass = o_timeseries.integrate()
     timeseries = TimeSeries(years_mod, values_mod, None, None)
+    mass = timeseries.integrate()
+
     #Commented out 20190619, logging not defined when called directly
-    if timeseries.are_all_zero():
-    #    logging.info("Skipped - all zero")
-        return years, values,0,0
 
     mx = np.argmax(timeseries.values)
     points = [0, mx, len(timeseries)]
     x = timeseries.times
 
-    mass = timeseries.integrate()
+
     #area = 100*np.mean(timeseries.values)*(x[-1]-x[0])
     ythresh = 100*np.mean(timeseries.values)
     out_error = 1
@@ -289,8 +292,9 @@ def reduce_dataset(years, values,flux_floor=0,max_tm_error=0):
     solve_type = SMOOTH
     simple_peaks = False
     last_result,ix = reduct_iter(timeseries,flux_floor,ythresh,out_error,out_error_last,OUT_ERROR_THRESHOLD,UPPER_N,LOWER_N,last_result,MAX_ITERATIONS)
+    last_result = retain_min_years(last_result.reduced_flux,o_timeseries,o_mass,min_retained_zero_years)
     #Add the point prior to first (flux > 0), add point after last of (flux >0)
-    last_result = add_zero_markers(o_timeseries,last_result.reduced_flux,flux_floor)
+    #last_result = add_zero_markers(o_timeseries,last_result.reduced_flux,flux_floor)
 
     #for ix in range(MAX_ITERATIONS):
         #res = red_flux.reduce_flux(timeseries, area, ythresh,
@@ -331,10 +335,17 @@ def reduce_dataset(years, values,flux_floor=0,max_tm_error=0):
     #Commented out 20190619, logging not defined when called directly
     #    logging.info("MAX ITERATIONS")
 
-
-
+    #if the total number of reduced points is < min reduction steps
+    #  then add the points back in until you have less than
+    #  .01% total relative error
+    play_points = min_reduction_steps - last_result.num_reduced_points
+    bef = last_result.reduced_flux.times.size
+    if play_points > 0:
+        last_result = red_flux.rebalance_extra_points(last_result,play_points)
 
     rr = last_result
+
+
     #find peaks for data rebalance and reporting
     peaks, _ = sig.find_peaks(rr.reduced_flux.values,width=3,rel_height=1)
     if peaks.size == 0 :
@@ -358,11 +369,13 @@ def reduce_dataset(years, values,flux_floor=0,max_tm_error=0):
     peaks = peaks[0]
     pneg = pneg[0]
     iter = 0
-    while abs(last_result.total_mass_error*maxval) > flux_floor*365.25 and iter < 100:
+    while iter < 100 and (abs(last_result.total_mass_error*maxval) > max_tm_error or abs(last_result.total_mass_error/last_result.mass.values[-1])*100 > .01) :
         rr = red_flux.rebalance_valleys(rr,peaks,pneg)
         #keep the lowest total_mass_error
         if abs(rr.total_mass_error) < abs(last_result.total_mass_error):
             last_result = rr
+        else:
+            break
         iter += 1
 
     out_times = last_result.reduced_flux.times

@@ -2,8 +2,8 @@ import sys, os
 sys.path.append(
         os.path.join(os.path.dirname(__file__), '..','..'))
 import logging
-import pandas as pd
 import numpy as np
+import pandas as pd
 import os.path
 #from pylib.hssmbuilder.time_series_reduction import data_reduction
 
@@ -14,6 +14,7 @@ import datetime as dt
 import pylib.gwreducer.reduce_groundwater_timeseries as rgt
 from pylib.timeseries.timeseries import TimeSeries
 import pylib.timeseries.timeseries_math as tsmath
+from pylib.datareduction.reduction_result import ReductionResult
 import pylib.hssmbuilder.plots as plt
 import scipy.signal as sig
 #---------------------------------------------------------------------------
@@ -47,8 +48,8 @@ def build_pkg(file):
             time = dt.datetime.utcnow()
             lvl = logging.INFO
             formatter = logging.Formatter('%(asctime)-9s: %(levelname)-8s: %(message)s','%H:%M:%S')
-            log_file = os.path.join(file.log_path,"build_i{0}-j{1}_log_{2}.txt".format(file.iSource,file.jSource,cur_date.strftime("%Y%m%d")))
-            cell_logger = setup_logger(file.col,log_file,formatter,lvl)
+            log_file = os.path.join(file.log_path,"build_i{0}-j{1}-k{3}_log_{2}.txt".format(file.iSource,file.jSource,cur_date.strftime("%Y%m%d"),file.kSource))
+            cell_logger = setup_logger(log_file,log_file,formatter,lvl)
 
             file.set_logger(cell_logger)
             file.check_has_data()
@@ -69,13 +70,18 @@ def build_pkg(file):
             else:
                 #check if allowing any steps greater than flux_floor yearly is below min_reduction_steps
                 #non_zero_ind = file.remove_zero_flux()
-                non_zero_ind = rgt.remove_zero_flux(file.days,file.vals,file.flux_floor,file.min_reduction_steps)
+                #non_zero_ind = rgt.remove_zero_flux(file.days,file.vals,file.flux_floor,file.min_reduction_steps)
+                non_zero_ind, min_zero_years = rgt.remove_begin_end_zero_flux(file.days,file.vals,file.flux_floor,file.min_reduction_steps)
+
                 ix = 0
-                r_mass = TimeSeries(file.days[non_zero_ind],file.vals[non_zero_ind],None,None).integrate().values[-1]
+                r_ts = TimeSeries(file.days[non_zero_ind],file.vals[non_zero_ind],None,None)
+                r_mass = r_ts.integrate().values[-1]
                 #check if allowing only steps greater than flux floor (converted to year vs dayly) reduces steps to below min_reduction_steps
-                if abs(o_mass - r_mass) < (file.flux_floor*365.25) and non_zero_ind.size < file.min_reduction_steps and file.reduce_data:
+
+                if abs(o_mass - r_mass) < (file.flux_floor) and non_zero_ind.size < file.min_reduction_steps and non_zero_ind.size > 1 and file.reduce_data:
                     days = file.days[non_zero_ind]
                     vals = file.vals[non_zero_ind]
+
     #                    segs, error = file.build_hssm_data(days,vals)
     #                    num_peaks, _ = sig.find_peaks(vals,width=3,rel_height=1)
     #                    if num_peaks.size == 0:
@@ -93,7 +99,10 @@ def build_pkg(file):
                 #    print(msg_str)
                 #    return ["i{}j{}k{}".format(file.iSource,file.jSource,file.kSource),o_ts]
                 elif len(file.data) > file.min_reduction_steps and file.reduce_data:
-                    days, vals,error,num_peaks,ix = rgt.reduce_dataset(file.days, file.vals, file.flux_floor, file.max_tm_error)
+                    days, vals,error,num_peaks,ix = rgt.reduce_dataset(file.days, file.vals, file.flux_floor, file.max_tm_error, file.min_reduction_steps)
+                    #if file.days[min_zero_years[0]] not in days or file.days[min_zero_years[1]] not in days or file.days[min_zero_years[2]] not in days or file.days[min_zero_years[3]] not in days:
+                        #print(file.HSSFileName)
+                        #print(file.days[min_zero_years])
                     #segs, _ = file.build_hssm_data(days,vals)
                     #r_ts = TimeSeries(days,vals,None,None)
     #                else:
@@ -108,7 +117,6 @@ def build_pkg(file):
                             num_peaks, _ = sig.find_peaks(vals,width=1,rel_height=1)
                     num_peaks = num_peaks.size
 
-
                 r_ts = TimeSeries(days,vals,None,None)
                 file.logger.info("final data reduction produced {0} steps".format(len(segs)))
 
@@ -121,7 +129,7 @@ def build_pkg(file):
 
                 i = 0
                 dat_output = ""
-                cell_logger.info("Building dat file: {0}".format(file.HSSFileName))
+                cell_logger.info("Building dat file: {0}".format(file.outputFileName))
 
                 count = 0
 
@@ -132,8 +140,10 @@ def build_pkg(file):
                 c_count = 0
                 first = True
                 prev_data = []
+                cell_logger.info("timeseries:")
                 for rec in segs:
                     count += 1
+                    cell_logger.info("{0} 0 {1}".format(rec[0],rec[1]))
                     dat_output += "{0} 0 {1}\n".format(hssm_obj.format_e(rec[0]),hssm_obj.format_e(rec[1]))
 
 
@@ -189,7 +199,7 @@ class hss_file():#data_reduction):
         self.day_unit = day_unit
     def set_logger(self,log):
         self.logger = log
-        self.logger.info("Initiated Data reduction for cell {0}-{1}")
+        self.logger.info("Initiated Data reduction for cell {0}-{1}".format(self.iSource,self.jSource))
 
     #---------------------------------------------------------------------------
     # build timeseries format for HSSM package .dat file and create summaryplot
@@ -262,17 +272,38 @@ class hss_file():#data_reduction):
 
     #    self.data = []
     #    self.data = new_data
+
     #---------------------------------------------------------------------------
     # check the cell has mass, and total mass is above flux floor
     def check_has_data(self):
         d_len = len(self.data)
         new_data = []
         self.has_data = False
+        #check if has any flux
         if np.any(self.vals > 0):#self.flux_floor):
+            #check if the total mass gets above the yearly flux floor.
+            #  --current flux floor is figured in days so you multiply it
+            #    by 365.25 to get the yearly flux floor.
             o_ts = TimeSeries(self.days,self.vals,None,None)
             o_mass = o_ts.integrate().values[-1]
             if o_mass > self.flux_floor * 365.25:
                 self.has_data = True
+    #-------------------------------------------------------------------------------
+    #
+    #def remove_begin_end_zero_flux(days,vals,flux_floor,min_reduction_steps):
+    #    non_zero_ind = np.where(vals > 0)[0]
+    #    pre_data = 0
+    #    post_data = 0
+    #    if (non_zero_ind[-1] - non_zero_ind[0]) > min_reduction_steps:
+    #        non_zero_ind = np.where(vals > flux_floor)[0]
+    #    if non_zero_ind.size == 0:
+    #        return np.where(vals <= flux_floor)[0]
+    #    if non_zero_ind[0] > 0:
+    #        pre_data = non_zero_ind[0] - 1
+    #    if non_zero_ind[-1] < len(days)-1:
+    #        post_data = non_zero_ind[-1] + 1
+    #    non_zero_ind = cp.concatenate((np.array([0,pre_data]),non_zero_ind,np.array([post_data,days.size -1])))
+    #    return non_zero_ind
     #---------------------------------------------------------------------------
     # remove all points below flux_floor (data that is below the flux floor
     # causes issues in data reduction as its so small typicall)
@@ -354,19 +385,7 @@ class hssm_obj:
             self.HSSpath = params["HSSpath"]
         else:
             self.HSSpath = "./hss/"
-    #---------------------------------------------------------------------------
-    #Does a given time series (days/values) have any flux if it does is the total
-    # mass > flux_floor
-    def check_has_data(self,days,vals,i,j,k):
-        if np.any(vals > 0):#self.flux_floor):
-            o_ts = TimeSeries(days,vals,None,None)
-            o_mass = o_ts.integrate().values[-1]
-            if o_mass > self.flux_floor * 365.25:
-                return True
-        msg_str = ("Cell i{0}-j{1}; k{2} not processed.  mass never exceeds noise: total mass={5}({4}); flux never exceeds {3} ({4}/day)".format(i,j,k,self.flux_floor, self.units,vals.sum()*365.25))
-        self.logger.info(msg_str)
-        print(msg_str)
-        return False
+
     #---------------------------------------------------------------------------
     #break a dataframe of cells down into individual cell objects (this is used to
     # multiprocess)
@@ -400,37 +419,31 @@ class hssm_obj:
                 #self.logger.critical("Invalid header format {0}".format(self.head[i]))
                 raise
             if k_df.size > 0:
-
+                k_used = []
                 for ind in range(k_df.size):
                     k = int(k_df.iloc[ind]['k'])
-                    start_day = k_df.index.values[ind]
-                    end_day = days[-1]+1
+                    if not k in k_used:
+                        k_used.append(k)
+                        lay_days, lay_vals = self.build_time_val_series(k,k_df,self.head[i])
+                        #start_day = k_df.index.values[ind]
+                        #end_day = days[-1]+1
 
-                    #size gives size ind is zero based. so to determine if there
-                    # is another record after the current ind add 2 and compare to
-                    # size
-                    if ind+2 <= k_df.size:
-                        end_day = k_df.index.values[ind+1]
 
-                    lay_days = days[np.where((days >= start_day)&(days < end_day))]
-                    lay_vals = self.cells.loc[self.cells['days'].isin(lay_days),self.head[i]]
-                    #if self.check_has_data(lay_days,lay_vals,i_ind,j_ind,k):
-                    out_fileName = "{0}i{1}j{2}k{3}_hss.dat".format(self.path,i_ind,j_ind,k)
-                    HSSFileName = "{0}i{1}j{2}k{3}_hss.dat".format(self.HSSpath,i_ind,j_ind,k)
-                    rec = hss_file(out_fileName,HSSFileName,k,i_ind,j_ind,1,self.head[i],
-                                    self.tolerance,self.start_year,self.log_path,
-                                    self.min_reduction_steps,self.flux_floor,
-                                    self.max_tm_error,self.units,self.graph_name,self.copc,self.data_reduction)
+                        out_fileName = "{0}i{1}j{2}k{3}_hss.dat".format(self.path,i_ind,j_ind,k)
+                        HSSFileName = "{0}i{1}j{2}k{3}_hss.dat".format(self.HSSpath,i_ind,j_ind,k)
+                        rec = hss_file(out_fileName,HSSFileName,k,i_ind,j_ind,1,self.head[i],
+                                        self.tolerance,self.start_year,self.log_path,
+                                        self.min_reduction_steps,self.flux_floor,
+                                        self.max_tm_error,self.units,self.graph_name,self.copc,self.data_reduction)
 
-                    self.logger.info("seperating layers i{0}-j{1}-k{2}: start day: {3}, end day: {4}".format(i_ind,j_ind,k,start_day,end_day-1))
-                    rec.build_array_fill_empty(days[0],days[-1],lay_days.tolist(), lay_vals.tolist())
-                    data.append(rec)
+
+                        rec.build_array_fill_empty(days[0],days[-1],lay_days.tolist(), lay_vals.tolist())
+                        data.append(rec)
 
             else:
                 out_fileName = "{0}i{1}j{2}k{3}_hss.dat".format(self.path,i_ind,j_ind,k)
                 HSSFileName = "{0}i{1}j{2}k{3}_hss.dat".format(self.HSSpath,i_ind,j_ind,k)
                 values = self.cells.loc[:,self.head[i]].values
-                #if self.check_has_data(days,values,i_ind,j_ind,k):
                 rec = hss_file(out_fileName,HSSFileName,k,i_ind,j_ind,1,self.head[i],
                                 self.tolerance,self.start_year,self.log_path,
                                 self.min_reduction_steps,self.flux_floor,
@@ -440,20 +453,45 @@ class hssm_obj:
                 data.append(rec)
 
         return data
+    #---------------------------------------------------------------------------
+    #
+    def build_time_val_series(self, k, k_df,head):
+        lay_days = self.cells['days'].values
+        lay_vals = np.zeros(lay_days.size)
 
+        for ind in range(k_df.size):
+            k2 = int(k_df.iloc[ind]['k'])
+            if k2 == k:
+                start_day = k_df.index.values[ind]
+                end_day = lay_days[-1]+1
+
+                #size gives size ind is zero based. so to determine if there
+                # is another record after the current ind add 2 and compare to
+                # size
+                if ind+2 <= k_df.size:
+                    end_day = k_df.index.values[ind+1]
+
+                temp_days = np.where((lay_days >= start_day)&(lay_days < end_day))
+                lay_vals[temp_days] = self.cells.iloc[temp_days][head]
+                self.logger.info("seperating layers {0}-k{1}: start day: {2}, end day: {3}".format(head,k,start_day,end_day-1))
+
+        return lay_days, lay_vals
     #-------------------------------------------------------------------------------
     # method can be called without instantiating an object.
     # format a float as scientific string representation
     @staticmethod
     def format_e(n):
-        if n == 0.0:
-            a = n
+        if n == 0.0 or n == 0 or n == '--':
+            a = 0.0
         else:
             try:
                 a = '%.10E' % n
+                #print(a)
+                #print(a.split('E')[0].rstrip('0').rstrip('.'))
+                #print(a.split('E')[1])
                 a = a.split('E')[0].rstrip('0').rstrip('.') + 'E' + a.split('E')[1]
             except:
-                print (n)
+                print ("invalidfloat: {}".format(n))
                 raise
         return a #a.split('E')[0].rstrip('0').rstrip('.') + 'E' + a.split('E')[1]
 
@@ -497,7 +535,7 @@ class hssm_obj:
         self.misc_file_generation()
         self.misc_files(self.reduced_data_c,'cell_error.csv')
 
-        self.error_check()
+        #self.error_check() broken
     #---------------------------------------------------------------------------
     # Build a csv file showing the mass error by year per cell/layer when the total
     # mass error was > .1
@@ -510,8 +548,9 @@ class hssm_obj:
         check_cells = pd.DataFrame()
         for data in self.reduced_data_c:
             if len(data) > 2:
-                o_ts = TimeSeries(self.cells['days'].values,self.cells[data[4]].values,None,None)
+                o_ts = TimeSeries(self.cells['days'].values ,self.cells[data[4]].values ,None,None)
                 r_ts = data[6]
+
                 interp = np.array(tsmath.interpolated(r_ts,o_ts).values,dtype='float64')
 
                 if summed_cells.size == 0:
@@ -589,19 +628,40 @@ class hssm_obj:
         cells = pd.DataFrame(columns=cols)
         cells = cells.set_index('cell')
         days = self.cells.loc[:,'days'].values
-
+        cells_interp = pd.DataFrame(days,columns=['days'])
+        cells_interp = cells_interp.set_index('days')
         for x in data:
             if len(x) > 2:
 
                 values = self.cells.loc[:,x[4]].values
                 ts = TimeSeries(days,values,None,None)
-                total_mass = ts.integrate().values[-1]
+                #total_mass = ts.integrate().values[-1]
                 r_ts = x[6]
 
-                r_tmass = r_ts.integrate().values[-1]
-                t_mass_diff = total_mass-r_tmass
+                #r_tmass = r_ts.integrate().values[-1]
+                result = ReductionResult(
+                                flux=ts,
+                                mass=ts.integrate(),
+                                reduced_flux=r_ts,
+                                reduced_mass=r_ts.integrate())
+
+
+                total_mass = result.mass.values[-1]
+                r_tmass = result.reduced_mass.values[-1]
+                t_mass_diff = result.total_mass_error
                 p_error = ((t_mass_diff)/total_mass)*100
                 v_minus_ff = (values[values < self.flux_floor].sum())*365.25
+                t_dict = {'days':ts.times,'{}_orig'.format(x[4]):ts.values,'cumulative':result.mass.values}
+                t_data = pd.DataFrame(t_dict)
+                t_data = t_data.set_index('days')
+                cells_interp = pd.concat([cells_interp,t_data],axis=1,sort=False)
+                i_ts = tsmath.interpolated(r_ts,ts)
+                t_dict = None
+                t_dict = {'days':i_ts.times,'{}_interp'.format(x[0][x[0].index('/i')+1:]):i_ts.values,'cumulative':i_ts.integrate().values}
+                t_data = pd.DataFrame(t_dict)
+                t_dict = None
+                t_data = t_data.set_index('days')
+                cells_interp = pd.concat([cells_interp,t_data],axis=1,sort=False)
 
                 #if data has mulitple layers per cell create a summed record for
                 # each cell
@@ -634,24 +694,27 @@ class hssm_obj:
                 temp = pd.DataFrame(np.array([['{} Skipped'.format(x[0]),'--',total_mass,'--','--','--','--',total_mass,'This cell was skipped as the flux never rises above minimum flux({})'.format(self.flux_floor)]]),columns=cols)
                 temp = temp.set_index('cell')
                 cells = cells.append(temp)
+
         cells.sort_index(axis=0,inplace=True)
         #show what the mass difference is if you remove everything below the flux floor
-        t_vals = self.cells.loc[:,self.cells.columns != 'days'].astype('float64')
-        values = t_vals.sum(axis=1).values
-        ts = TimeSeries(days,values,None,None)
-        total_mass = ts.integrate().values[-1]
-        t_vals[t_vals < self.flux_floor] =  0
-        values = t_vals.sum(axis=1).values
-        nz_ts = TimeSeries(days,values,None,None)
-        nz_total_mass = nz_ts.integrate().values[-1]
-        t_mass_diff = total_mass-nz_total_mass
-        p_error = ((t_mass_diff)/nz_total_mass)*100
-        temp = pd.DataFrame(np.array([['Approximate mass removed as Noise (flux < {} {}/day)'.format(self.flux_floor,self.units),'--',total_mass,nz_total_mass,t_mass_diff,p_error,'--',t_mass_diff,'This is the removal of any fluxes considered to be noise (flux < {} {}/day) calculated before any data reduction'.format(self.flux_floor,self.units)]]),columns=cols)
-        temp = temp.set_index('cell')
-        cells = cells.append(temp)
+        #t_vals = self.cells.loc[:,self.cells.columns != 'days'].astype('float64')
+        #values = t_vals.sum(axis=1).values
+        #ts = TimeSeries(days,values,None,None)
+        #total_mass = ts.integrate().values[-1]
+        #t_vals[t_vals < self.flux_floor] =  0
+        #values = t_vals.sum(axis=1).values
+        #nz_ts = TimeSeries(days,values,None,None)
+        #nz_total_mass = nz_ts.integrate().values[-1]
+        #t_mass_diff = total_mass-nz_total_mass
+        #p_error = ((t_mass_diff)/nz_total_mass)*100
+        #temp = pd.DataFrame(np.array([['Approximate mass removed as Noise (flux < {} {}/day)'.format(self.flux_floor,self.units),'--',total_mass,nz_total_mass,t_mass_diff,p_error,'--',t_mass_diff,'This is the removal of any fluxes considered to be noise (flux < {} {}/day) calculated before any data reduction'.format(self.flux_floor,self.units)]]),columns=cols)
+        #temp = temp.set_index('cell')
+        #cells = cells.append(temp)
 
-        fileName = os.path.join(self.misc_path,fileName)#'cell_error_by_layer.csv')
-        cells.to_csv(fileName, header=True)
+        pathfile = os.path.join(self.misc_path,fileName)#'cell_error_by_layer.csv')
+        cells.to_csv(pathfile, header=True)
+        pathfile = os.path.join(self.misc_path,'interpolated_results_{}'.format(fileName.replace('_error','')))#'cell_error_by_layer.csv')
+        cells_interp.to_csv(pathfile, header=True)
     #---------------------------------------------------------------------------
     #takes the reduced data which is seperated by cells and layers and consolidates
     # all of the layers for each cell so there is a single entry per cell
@@ -679,12 +742,38 @@ class hssm_obj:
 
                     o_ts = TimeSeries(self.cells['days'].values,self.cells[ij].values,None,None)
                     #loop through to find all layers for ij
+                    cell = pd.DataFrame([[o_ts.times]],columns=['days'])
+                    cell = cell.set_index('days')
+                    pre_data = o_ts.times[1]
+                    post_data = o_ts.times[-2]
                     for y in self.reduced_data:
                         if len(y) > 2:
                             #check if the same cell
                             if y[4] == ij:
+                                #days = np.array(y[1]).astype(float)[:,0]
+                                #vals = np.array(y[1]).astype(float)[:,1]
+                                #cum = np.array(yrec).astype(float)[:,2]
+                                #non_zero_ind = np.where(vals > 0)[0]
+                                #print(cell)
 
+                                #find the last day where flux is 0 before mass starts
+                                #if pre_data > days[non_zero_ind[0]-1] > o_ts.times[0]:
+                                #    pre_data = days[non_zero_ind[0] - 1]
+                                #find the first day where flux is 0 after mass ends
+                                #if post_data < days[non_zero_ind[-1]+1] < o_ts.times[-1]:
+                                #    post_data = days[non_zero_ind[-1] + 1]
+                                #non_zero_ind = np.concatenate((np.where(np.logical_and(days >=pre_data+1, days<=post_data-1))[0]))
+                                #temp = pd.DataFrame([days[non_zero_ind],vals[non_zero_ind],cum[non_zero_ind]],columns=['days','vals','cum'])
+                                #days_tmp = np.array(days[non_zero_ind])
+                                #vals_tmp = np.array(vals[non_zero_ind])
+                                #temp = pd.DataFrame([[days_tmp,vals_tmp]],columns=['days','vals'])
+                                #temp = temp.set_index('days')
+
+                                #cell = pd.concat([cell,temp],axis=1,sort=False)
+
+                                #original
                                 for yrec in y[1]:
+
                                     found = False
 
                                     for xrec in segs:
@@ -707,6 +796,8 @@ class hssm_obj:
                                                 segs.append(yrec)
                                         else:
                                             segs.append(yrec)
+                                    #end of original
+
                                     #if r_ts.times.size ==0:
                                     #    r_ts = y[6]
                                     #else:
@@ -715,12 +806,30 @@ class hssm_obj:
                     segs.sort(key = sort_first_field)
                     ###u, c =
                     days = [float(i[0]) for i in segs]
+                    days = np.array(segs).astype(float)[:,0]
                     vals = [float(i[1]) for i in segs]
+                    vals = np.array(segs).astype(float)[:,1]
+
+                    #pre_ind = np.where(o_ts.times == pre_data)
+                    #post_ind = np.where(o_ts.times == post_data)
+                    #days_tmp = np.array([o_ts.times[0],o_ts.times[pre_ind],o_ts.times[post_ind],o_ts.times[-1]])
+                    #vals_tmp = np.array([0,0,0,0])
+                    #temp = pd.DataFrame([[days_tmp,vals_tmp]],columns=['days','vals'])
+                    #temp = temp.set_index('days')
+                    #cell = cell.combine_first(temp).reset_index().fillna(0)
+                    #print(cell)
+                    #cell = pd.concat([cell,temp],axis=1,sort=False)
+                    #cell = cell.groupby(lambda x:x, axis=1).sum()
+                    #print(cell)
+                    #days = cell.index.values
+                    #vals = cell[:,0].values
                     try:
                         r_ts = TimeSeries(np.array(days),np.array(vals),None,None)
                         r_ts = tsmath.interpolated(r_ts,o_ts)
                     except:
-                        print('{} failed.  start: {}; end: {};'.foramt(ij,r_ts.times[0],r_ts.times[-1]))
+                        #print('{} failed.  start: {}; end: {};'.format(ij,r_ts.times[0],r_ts.times[-1]))
+                        #print('{} failed.  start: {}; end: {};'.format(ij,o_ts.times[0],o_ts.times[-1]))
+                        raise
                     cur_rec[1] = segs
                     cur_rec[6] = r_ts
                     cur_rec[7] = o_ts

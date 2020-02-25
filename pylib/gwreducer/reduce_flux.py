@@ -251,6 +251,7 @@ def build_segments(rr,peaks,pneg,inflection_area):
         #timeseries = TimeSeries(r_x[r_start:r_end],r_y[r_start:r_end],None,None)
         segments.append(timeseries)
     return segments, segs_total_mass
+
 #-------------------------------------------------------------------------------
 # rebalance reduced time series by adjusting valleys to be deeper/shallower without
 # affecting the peaks
@@ -334,3 +335,92 @@ def insert_point(times, values,time,value):
     values2 = np.insert(values,ind,value)
 
     return times, values2
+#-------------------------------------------------------------------------------
+# add extra points in areas of greatest error until you run out of points or
+#  you reach less than .01% relative error.
+def rebalance_extra_points(reduction_result,num_points=10):
+    #----------------------
+    #
+    def find_mean_dif_day():
+        diff = rr.diff_mass
+        #m_diff = max(abs(diff.values))
+        m_diff = np.mean(abs(diff.values))
+        if m_diff > 0:
+            #ind = np.flatnonzero(abs(diff.values) == m_diff)[0]
+            ind = np.flatnonzero(abs(diff.values) >= m_diff)[0]
+            return diff.times[ind]
+        return -1
+    #--------------------
+    #
+    def check_zero_fluxes():
+        points = num_points
+        times = rr.reduced_flux.times
+        vals = rr.reduced_flux.values
+        zero_inds = np.flatnonzero(rr.flux.values == 0)
+        series = []
+        result = [series]
+        expect = None
+        step = 1
+        #loop through indexes and find consecutive zeros
+        for v in zero_inds:
+            if (v == expect) or (expect is None):
+                series.append(v)
+            else:
+                run = [v]
+                result.append(series)
+            expect = v + step
+        #
+
+        for r in result:
+            #leave a few points for adding in strategice points.
+            if points <= 10:
+                break
+            if len(r) > 5:
+                times,vals = insert_point(times, vals,rr.flux.times[r[0]],rr.flux.values[r[0]])
+                times,vals = insert_point(times, vals,rr.flux.times[r[-1]],rr.flux.values[r[-1]])
+                points -= 2
+        return points,times,vals
+
+    rr = reduction_result
+    points,times,vals = check_zero_fluxes()
+    adjusted = TimeSeries(times,vals,None,None)
+    reduced_mass = tsmath.integrate(adjusted)
+    rr = ReductionResult(
+        flux=rr.flux,
+        mass=rr.mass,
+        reduced_flux=adjusted,
+        reduced_mass=reduced_mass)
+    #loop through and add mid points at strategic places.
+    for x in range(points):
+        diff_day = find_mean_dif_day()
+        #if diff_day == -1, then max_diff was 0, which means there is nothing to
+        # correct.
+        if diff_day == -1:
+            return rr
+        times = rr.reduced_flux.times
+        vals = rr.reduced_flux.values
+        start_ind = np.flatnonzero(times < diff_day)[-1]
+        end_ind = np.flatnonzero(times >= diff_day)[0]
+        mid_day = 0
+        #zero_inds = np.flatnonzero(vals[start_ind:end_ind] == 0)
+        #if zero_inds.size > 0:
+        #    mid_point = zero_inds[-1]
+        #    mid_day = times[mid_point]
+        #else:
+        start_day = times[start_ind]
+        end_day = times[end_ind]
+        mid_day = ((end_day-start_day )/2)+start_day
+        mid_point =  np.flatnonzero(rr.flux.times >= mid_day)[0]
+        if not mid_day in times:
+            times,vals = insert_point(times, vals,rr.flux.times[mid_point],rr.flux.values[mid_point])
+        adjusted = TimeSeries(times,vals,None,None)
+        reduced_mass = tsmath.integrate(adjusted)
+        rr = ReductionResult(
+            flux=rr.flux,
+            mass=rr.mass,
+            reduced_flux=adjusted,
+            reduced_mass=reduced_mass)
+
+        if abs(rr.total_mass_error/rr.mass.values[-1])*100 < .001:
+            break
+    return rr
