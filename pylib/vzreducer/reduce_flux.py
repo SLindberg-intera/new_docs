@@ -12,7 +12,7 @@ import math
 #SMOOTH = "SMOOTH"
 #RAW = "RAW"
 
-def reduce_timeseries(timeseries, epsilon, close_gaps, gap_delta):
+def reduce_timeseries(timeseries, epsilon, close_gaps, gap_delta, gap_steps):
     x = timeseries.times
     y = timeseries.values
 
@@ -45,7 +45,7 @@ def reduce_timeseries(timeseries, epsilon, close_gaps, gap_delta):
            for index in (np.where(np.diff(rdp_x) > gap_delta))[0]:
                 #check to see if slope between timesteps > 0 and if so fill in gaps with timesteps
                 if abs(np.diff(rdp_y)[index])>0:
-                    x_gaps += [timestep for timestep in range(rdp_x[index], rdp_x[index+1], int((np.diff(rdp_x)[index])/3))]
+                    x_gaps += [timestep for timestep in range(rdp_x[index], rdp_x[index+1], int((np.diff(rdp_x)[index])/[(gap_steps+1)]))]
 
     xout = sorted(set([*required_slope, *rdp_x, *x_gaps]))
 
@@ -55,9 +55,9 @@ def reduce_timeseries(timeseries, epsilon, close_gaps, gap_delta):
     return reduced_flux, reduced_mass
 
 
-def reduce_flux(flux, epsilon, close_gaps, gap_delta):
+def reduce_flux(flux, epsilon, close_gaps, gap_delta, gap_steps):
     mass = tsmath.integrate(flux)
-    reduced_flux, reduced_mass = reduce_timeseries(flux, epsilon, close_gaps, gap_delta)
+    reduced_flux, reduced_mass = reduce_timeseries(flux, epsilon, close_gaps, gap_delta, gap_steps)
 
     result = ReductionResult(
             flux=flux,

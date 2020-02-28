@@ -59,8 +59,17 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     o_timeseries = timeseries
 
     # grab user-defined constant values from input JSON file
-    close_gaps = input_data[c.GAP_CLOSED]
-    gap_delta = int(input_data[c.GAP_DELTA])
+    close_gaps = input_data[c.GAP_CLOSED].lower()
+    if input_data[c.GAP_DELTA]:
+        gap_delta = int(input_data[c.GAP_DELTA])
+    else:
+        gap_delta = 0
+    if input_data[c.GAP_STEPS]:
+        gap_steps = int(input_data[c.GAP_STEPS])
+    else:
+        gap_steps = 0
+
+    diff_mass = input_data[c.DIFF_MASS].lower()
 
     #if input_data[c.FLUX_FLOOR_KEY] is not "":
     #    flux_floor = float(input_data[c.FLUX_FLOOR_KEY])
@@ -79,7 +88,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
 
     epsilon = float(input_data[c.EPSILON])
 
-    res = red_flux.reduce_flux(timeseries, epsilon, close_gaps, gap_delta)
+    res = red_flux.reduce_flux(timeseries, epsilon, close_gaps, gap_delta, gap_steps)
     out_error = abs(res.relative_total_mass_error)
     #last_result = res
     out_error_last = out_error
@@ -123,41 +132,42 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
             out_error_last = out_error
             used_epsilon = epsilon
 
-        res = red_flux.reduce_flux(timeseries, epsilon, close_gaps, gap_delta)
+        res = red_flux.reduce_flux(timeseries, epsilon, close_gaps, gap_delta, gap_steps)
 
     if ix>= max_iters - 1:
         logging.info("MAX ITERATIONS exceeded")
 
     n_iterations = ix+1
 
-    #check error in cummulative mass differences of reduced and original dataset after reduction
-    mass = last_result.mass
-    r_mass = last_result.reduced_mass
-    dmass = mass - r_mass
+    if diff_mass == "true":
+        #check error in cummulative mass differences of reduced and original dataset after reduction
+        mass = last_result.mass
+        r_mass = last_result.reduced_mass
+        dmass = mass - r_mass
 
-    corrected = False
-    while abs(max(dmass.values))/mass.values[-1] > out_error_threshold:# or abs(min(dmass.values))/mass.values[-1] > out_error_threshold:
-        year_err = dmass.times[np.where(dmass.values == max(dmass.values))].tolist()[0]
-        year2 = r_mass.times[np.where(r_mass.times > year_err)][0]
-        year1 = r_mass.times[np.where(r_mass.times < year_err)][-1]
-        interval  = int((year2-year1)/2)
+        corrected = False
+        while abs(max(dmass.values))/mass.values[-1] > out_error_threshold:# or abs(min(dmass.values))/mass.values[-1] > out_error_threshold:
+            year_err = dmass.times[np.where(dmass.values == max(dmass.values))].tolist()[0]
+            year2 = r_mass.times[np.where(r_mass.times > year_err)][0]
+            year1 = r_mass.times[np.where(r_mass.times < year_err)][-1]
+            interval  = int((year2-year1)/2)
 
-        if interval >= 2:
-            years = [year+interval for year in range(year1, year2, interval)][0:-1]
-            revised_years = sorted(set([*r_mass.times.tolist(), *years]))
-            r_flux = timeseries.subset(revised_years)
-            r_mass = tsmath.integrate(r_flux)
-            dmass=mass-r_mass
-            corrected = True
-        else:
-            break
+            if interval >= 2:
+                years = [year+interval for year in range(year1, year2, interval)][0:-1]
+                revised_years = sorted(set([*r_mass.times.tolist(), *years]))
+                r_flux = timeseries.subset(revised_years)
+                r_mass = tsmath.integrate(r_flux)
+                dmass=mass-r_mass
+                corrected = True
+            else:
+                break
 
-    if corrected:
-        last_result = ReductionResult(
-        flux=last_result.flux,
-        mass=last_result.mass,
-        reduced_flux=r_flux,
-        reduced_mass=r_mass)
+        if corrected:
+            last_result = ReductionResult(
+            flux=last_result.flux,
+            mass=last_result.mass,
+            reduced_flux=r_flux,
+            reduced_mass=r_mass)
 
     out_error_last = abs(last_result.relative_total_mass_error)
     delta_mass = last_result.total_mass_error

@@ -53,6 +53,10 @@ FLUX_FLOOR_KEY = "Flux Floor"
 EPSILON = "Epsilon"
 GAP_CLOSED = "Close Gaps"
 GAP_DELTA = "Gap Delta"
+GAP_STEPS = "Gap Steps"
+
+DIFF_MASS  = "Diff Mass Correction"
+
 """ End of keys used in the input JSON file """
 
 

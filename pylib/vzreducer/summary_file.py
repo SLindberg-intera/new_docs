@@ -13,13 +13,19 @@ def summary_header(summary_file,hdr):
     with open(summary_file, APPEND_MODE) as f:
         f.write(hdr)
 
-def reset_summary_file(output_folder, summary_filename,header,mode):
+def get_summary_file(output_folder, summary_filename,header,mode):
     summary_file = os.path.join(output_folder, summary_filename)
-    if mode == 'w':
-        with open(summary_file, WRITE_MODE) as f:
-            f.write(NOTHING)
-        summary_header(summary_file,header)
+    if mode == 'w' or not os.path.isfile(summary_file):
+        reset_summary_file(summary_file,header)
+
     return summary_file
+
+def reset_summary_file(summary_file,header):
+    with open(summary_file, WRITE_MODE) as f:
+        f.write(NOTHING)
+    summary_header(summary_file, header)
+
+
 
 def summary_info(reduction_result,
     filename,
@@ -34,7 +40,7 @@ def summary_info(reduction_result,
         reduction_result is an instance of ReductionResult
     """
     rr = reduction_result
-    #"{copc},{site},{N},{ix},{used_eps:.2g},{orig_total_mass:.7g}, {reduced_total_mass:.7g},{unbal_mass_err:.2g}, {unbal_rel_err:.2g}, {bal_mass_err:.2g}, {bal_rel_err:.2g}\n"
+    #"{copc},{site},{N},{ix},{used_eps:.2g},{orig_total_mass:.7g}, {reduced_total_mass:.7g},{unbal_mass_err:.2g},{unbal_rel_err:.2g},{bal_mass_err:.2g},{bal_rel_err:.2g}\n"
 
     outline = summary_template.format(
         copc=rr.mass.copc,

@@ -8,7 +8,7 @@ import pylib.vzreducer.constants as c
 from pylib.vzreducer.parse_input_file import parse_input_file
 from pylib.vzreducer.read_solid_waste_release import SolidWasteReleaseData
 from pylib.vzreducer.reduce_dataset import reduce_dataset
-from pylib.vzreducer.summary_file import reset_summary_file 
+from pylib.vzreducer.summary_file import get_summary_file
 
 def configure_logger(args):
     """
@@ -114,8 +114,8 @@ def main():
 
     summary_filename = input_data['SUMMARY_FILE_NAME']
     summary_header = ','.join(input_data['SUMMARY_HEADER']) +'\n'
-    if input_data["SUMMARY_MODE"] == 'w':
-        summary_file = reset_summary_file(output_folder, summary_filename,summary_header)
+
+    summary_file = get_summary_file(output_folder, summary_filename,summary_header,input_data["SUMMARY_MODE"] )
 
     for filekey in input_data[c.SOURCE_FILES_KEY]:
         reduce_input_data(filekey, input_data, summary_file,
