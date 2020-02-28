@@ -24,6 +24,7 @@ ZERO_BELOW_KEY = "Zero Below"
 
 SUMMARY_TEMPLATE_KEY = "SUMMARY_TEMPLATE"
 SUMMARY_FILE_NAME = "SUMMARY_FILE_NAME"
+SUMMARY_MODE = "SUMMARY_MODE"
 COPCS_KEY = "COPCs"
 WASTE_SITES_KEY = 'Waste Sites'
 #end of original constants/input file values

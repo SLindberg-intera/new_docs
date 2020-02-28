@@ -114,7 +114,8 @@ def main():
 
     summary_filename = input_data['SUMMARY_FILE_NAME']
     summary_header = ','.join(input_data['SUMMARY_HEADER']) +'\n'
-    summary_file = reset_summary_file(output_folder, summary_filename,summary_header)
+    if input_data["SUMMARY_MODE"] == 'w':
+        summary_file = reset_summary_file(output_folder, summary_filename,summary_header)
 
     for filekey in input_data[c.SOURCE_FILES_KEY]:
         reduce_input_data(filekey, input_data, summary_file,

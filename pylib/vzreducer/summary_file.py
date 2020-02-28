@@ -13,12 +13,13 @@ def summary_header(summary_file,hdr):
     with open(summary_file, APPEND_MODE) as f:
         f.write(hdr)
 
-def reset_summary_file(output_folder, summary_filename,header):
+def reset_summary_file(output_folder, summary_filename,header,mode):
     summary_file = os.path.join(output_folder, summary_filename)
-    with open(summary_file, WRITE_MODE) as f:
-        f.write(NOTHING)
-    summary_header(summary_file,header)
-    return summary_file    
+    if mode == 'w':
+        with open(summary_file, WRITE_MODE) as f:
+            f.write(NOTHING)
+        summary_header(summary_file,header)
+    return summary_file
 
 def summary_info(reduction_result,
     filename,
