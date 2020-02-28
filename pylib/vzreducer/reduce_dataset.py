@@ -8,6 +8,7 @@ import pylib.vzreducer.plots as p
 from pylib.vzreducer.summary_file import summary_info
 #neils code imports...
 from pylib.timeseries.timeseries import TimeSeries
+import pylib.timeseries.timeseries_math as tsmath
 from pylib.datareduction.reduction_result import ReductionResult
 import scipy.signal as sig
 import datetime
@@ -15,11 +16,8 @@ import datetime
 from pylib.pygit.git import get_version
 
 #check other branch for code change here....
-SMOOTH = "SMOOTH"  #MOVED TO INPUT file 08.09.2019
-RAW = "RAW"        #MOVED TO INPUT file 08.09.2019
-
-
-
+#SMOOTH = "SMOOTH"  #MOVED TO INPUT file 08.09.2019
+#RAW = "RAW"        #MOVED TO INPUT file 08.09.2019
 
 
 def log_info(reduction_result):
@@ -35,12 +33,12 @@ def log_info(reduction_result):
 
 
 def summary_plot(reduction_result, output_folder):
-    """ make a plot of hte reduction result and place it in output_folder"""
+    """ make a plot of the reduction result and place it in output_folder"""
     copc = reduction_result.mass.copc
     site = reduction_result.mass.site
     f, ax1, ax2 = p.reduced_timeseries_plot(reduction_result)
-    plt.savefig(os.path.join(output_folder, 
-            "{}-{}.png".format(copc, site)))
+    plt.savefig(os.path.join(output_folder,
+            "{}-{}.png".format(copc, site)),bbox_inches = 'tight', dpi = 1200)
     plt.close(f)
 
 
@@ -50,141 +48,161 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
     write a summary into summary_folder
 
     """
-    #grab user-defined constant values from input JSON file
-    flux_floor = float(input_data[c.FLUX_FLOOR_KEY])  # 1e-15
-    peak_height = float(input_data[c.PEAK_HEIGHT_KEY]) #1e-10 (for 08.20.2019 reduction for review)
-
     copc = timeseries.copc
     site = timeseries.site
     if timeseries.are_all_zero():
         logging.info("Skipped {} {} - all zero".format(
             copc, site))
         return False
-    #for site/copc with nonzero fluxes, save unreduced timeseries to o_timeseries (original)
+
+    #for site/copc with nonzero fluxes, save unreduced timeseries to o_timeseries (original) for error correction (below)
     o_timeseries = timeseries
 
-    #find timestep of max flux
-    mx = np.argmax(timeseries.values)
+    # grab user-defined constant values from input JSON file
+    close_gaps = input_data[c.GAP_CLOSED]
+    gap_delta = int(input_data[c.GAP_DELTA])
 
-    x = timeseries.times
-    area = 100*np.std(timeseries.values)*(x[-1]-x[0])
-    ythresh = 100*np.std(timeseries.values)
+    #if input_data[c.FLUX_FLOOR_KEY] is not "":
+    #    flux_floor = float(input_data[c.FLUX_FLOOR_KEY])
 
+    #else:
+    #    flux_floor = ""
+    #    logging.info("no flux floor value is being applied")
+    upper_n = int(input_data[c.UPPER_N_KEY])
+    lower_n = int(input_data[c.LOWER_N_KEY])
 
-    # SLL--constants to move to vz-reducer-input.json file--originally assigned values in comments
-    OUT_ERROR_THRESHOLD = float(input_data[c.OUT_ERROR_THRESHOLD_KEY]) #1e-2
-    UPPER_N =  int(input_data[c.UPPER_N_KEY]) #50
-    LOWER_N = int(input_data[c.LOWER_N_KEY]) #15
-
-
-    last_result = None
-
-    # SLL--constant to move to JSON input file--original assigned values in comments
     #the maximum number of reduction iterations
-    MAX_ITERATIONS = int(input_data[c.MAX_ITERATIONS_KEY])  #80
+    max_iters = int(input_data[c.MAX_ITERATIONS_KEY])
+
     #the maximum number of iterations for mass error redistribution
-    MAX_ERR_ITERATIONS = int(input_data[c.MAX_ERR_ITERATIONS_KEY])
+    max_err_iters = int(input_data[c.MAX_ERR_ITERATIONS_KEY])
 
-    solve_type = input_data[c.SOLVE_TYPE_KEY]   #SMOOTH
-    simple_peaks = False
+    epsilon = float(input_data[c.EPSILON])
 
-    for ix in range(MAX_ITERATIONS):
+    res = red_flux.reduce_flux(timeseries, epsilon, close_gaps, gap_delta)
+    out_error = abs(res.relative_total_mass_error)
+    #last_result = res
+    out_error_last = out_error
+    last_timesteps = 0
 
-        res = red_flux.reduce_flux(timeseries, area, ythresh, peak_height,
-                solve_type=solve_type,
-                simple_peaks=simple_peaks
-                )
+    if res.mass.values[-1] > float(input_data[c.MASS_THRESHOLD]):
+        out_error_threshold = float(input_data[c.LOWER_OUT_ERROR_THRESHOLD_KEY])
+    else:
+        out_error_threshold = float(input_data[c.UPPER_OUT_ERROR_THRESHOLD_KEY])
+
+    for ix in range(max_iters):
+        timesteps = len(res.reduced_flux)
         out_error = abs(res.relative_total_mass_error)
-        if out_error < OUT_ERROR_THRESHOLD and len(res.reduced_flux)>=LOWER_N:
+
+        #if the timesteps are within the acceptable range and error < error threshold --> done
+        if timesteps <= upper_n and timesteps >= lower_n and out_error <= out_error_threshold:
             last_result = res
-            out_error_last = out_error
+            used_epsilon = epsilon
             break
 
-        if len(res.reduced_flux) > 2*UPPER_N:
-            simple_peaks = True
-            solve_type = RAW
+        elif timesteps < lower_n:
+            epsilon = epsilon / 2
 
-        ythresh = 0.5*ythresh
-        area = 0.5*area
+        elif timesteps <= upper_n and timesteps >= lower_n and out_error > out_error_threshold and out_error < out_error_last:
+            epsilon = epsilon / 2
 
+        elif timesteps <= upper_n and timesteps >= lower_n and out_error > out_error_threshold and last_timesteps <= timesteps:
+            epsilon = epsilon / 2
 
-    if ix>=MAX_ITERATIONS - 1:
+        #after exceeding max points then iterate between upper_n and last epsilon where timesteps < upper_n
+        elif timesteps > upper_n and last_timesteps < timesteps:
+            epsilon = epsilon * 1.75
+
+        elif timesteps <= last_timesteps:
+            epsilon = epsilon / 1.5
+
+        #keep the result as the last result only if timesteps are < max and if error is lower than previous result
+        if timesteps <= upper_n and out_error <= out_error_last:
+            last_result = res
+            last_timesteps = timesteps
+            out_error_last = out_error
+            used_epsilon = epsilon
+
+        res = red_flux.reduce_flux(timeseries, epsilon, close_gaps, gap_delta)
+
+    if ix>= max_iters - 1:
         logging.info("MAX ITERATIONS exceeded")
 
-#this is the original code--commented out to incorporate the GW reducer's functionality to distribute error to valleys
+    n_iterations = ix+1
+
+    #check error in cummulative mass differences of reduced and original dataset after reduction
+    mass = last_result.mass
+    r_mass = last_result.reduced_mass
+    dmass = mass - r_mass
+
+    corrected = False
+    while abs(max(dmass.values))/mass.values[-1] > out_error_threshold:# or abs(min(dmass.values))/mass.values[-1] > out_error_threshold:
+        year_err = dmass.times[np.where(dmass.values == max(dmass.values))].tolist()[0]
+        year2 = r_mass.times[np.where(r_mass.times > year_err)][0]
+        year1 = r_mass.times[np.where(r_mass.times < year_err)][-1]
+        interval  = int((year2-year1)/2)
+
+        if interval >= 2:
+            years = [year+interval for year in range(year1, year2, interval)][0:-1]
+            revised_years = sorted(set([*r_mass.times.tolist(), *years]))
+            r_flux = timeseries.subset(revised_years)
+            r_mass = tsmath.integrate(r_flux)
+            dmass=mass-r_mass
+            corrected = True
+        else:
+            break
+
+    if corrected:
+        last_result = ReductionResult(
+        flux=last_result.flux,
+        mass=last_result.mass,
+        reduced_flux=r_flux,
+        reduced_mass=r_mass)
+
+    out_error_last = abs(last_result.relative_total_mass_error)
     delta_mass = last_result.total_mass_error
 
-    #last_result = red_flux.rebalance(last_result)
-    #plot_file = summary_plot(last_result, output_folder)
-    #last_result.to_csv(output_folder)
-    used_ythresh = ythresh
-    #used_area = area
-    #n_iterations = ix
-    #summary_info(last_result, summary_file,
-    #        delta_mass, used_ythresh, used_area, n_iterations, out_error_last)
-    #log_info(last_result)
-
-
-#Add the point prior to first (flux > 0), add point after last of (flux >0)
-    last_result = add_zero_markers(o_timeseries, last_result.reduced_flux, flux_floor)
-
-
-    rr = last_result
-    #find peaks for data rebalance and reporting
-    peaks, _ = sig.find_peaks(rr.reduced_flux.values)
-#SSL commenting out the following; going with just the peaks and not depending on the peak width for now....
-    #peaks, _ = sig.find_peaks(rr.reduced_flux.values,width=3,rel_height=1)
-    #if peaks.size == 0 :
-    #    peaks, _ = sig.find_peaks(rr.reduced_flux.values,width=2,rel_height=1)
-    #    if peaks.size == 0:
-    #        peaks, _ = sig.find_peaks(rr.reduced_flux.values,width=1,rel_height=1)
-    pneg, _ = sig.find_peaks((-rr.reduced_flux.values))
-# SSL commenting out the following; going with just the peaks and not depending on the peak width for now....
-    #pneg, _ = sig.find_peaks(-rr.reduced_flux.values,width=3,rel_height=1)
-    #if pneg.size == 0:
-    #    pneg, _ = sig.find_peaks(-rr.reduced_flux.values,width=2,rel_height=1)
-    #    if pneg.size == 0:
-    #        pneg, _ = sig.find_peaks(-rr.reduced_flux.values,width=1,rel_height=1)
-
-    peaks = rr.reduced_flux.times[peaks]
-    pneg = rr.reduced_flux.times[pneg]
-
-    peaks = np.isin(o_timeseries.times,peaks)
-    pneg = np.isin(o_timeseries.times,pneg)
-    peaks = np.where(peaks)
-#made the following change [peaks --> pneg] to code and commented out the old stuff....check with Neil on this change...
-    #pneg = np.where(peaks)
-    pneg = np.where(pneg)
-
-    peaks = peaks[0]
-    pneg = pneg[0]
-    iter = 0
-
-    # for tracking reduction of error through the iterations....
+     # for tracking reduction of error through the iterations....
     max_err = last_result.total_mass_error
     min_err = last_result.total_mass_error
-    # got rid of multiplying mass error by maxval (currently not normalizing fluxes-08.2019)
-    # while abs(last_result.total_mass_error * maxval) != 0 and iter < 100:
-    while abs(last_result.total_mass_error) != 0 and iter < MAX_ERR_ITERATIONS: #100:
+    iter = 0
+    rr = last_result
+
+    if abs(last_result.relative_total_mass_error)>out_error_threshold:
+    #find peaks for data rebalance and reporting
+        #Note: departure from HSS algorithm--no peak width consideration for solid waste result reduction
+        peaks, _ = sig.find_peaks(rr.reduced_flux.values)
+        pneg, _ = sig.find_peaks((-rr.reduced_flux.values))
+
+        peaks = rr.reduced_flux.times[peaks]
+        pneg = rr.reduced_flux.times[pneg]
+
+        peaks = np.isin(o_timeseries.times,peaks)
+        pneg = np.isin(o_timeseries.times,pneg)
+        peaks = np.where(peaks)
+        pneg = np.where(pneg)
+
+        peaks = peaks[0]
+        pneg = pneg[0]
+
+
+
+
+    while abs(last_result.relative_total_mass_error) > out_error_threshold and iter < max_err_iters:
         rr = red_flux.rebalance_valleys(rr,peaks,pneg)
         #keep the lowest total_mass_error
         if abs(rr.total_mass_error) < abs(last_result.total_mass_error):
             last_result = rr
             min_err = rr.total_mass_error
-
         else:
-
             max_err = rr.total_mass_error
-
         iter += 1
-    logging.info("min error: {}; max error: {}--after rebalance iterations {}".format(min_err,max_err,iter))
-    last_result.flux.values = last_result.flux.values
-    last_result.reduced_flux.values = last_result.reduced_flux.values
 
-    #out_times = last_result.reduced_flux.times
-    #out_values = last_result.reduced_flux.values
-    #return the reduced data, undo normalize of the values (*maxval)
-    #return out_times, out_values*maxval,-(last_result.total_mass_error * maxval),peaks.size
+    logging.info("min error: {}; max error: {}--after rebalance iterations {}".format(min_err,max_err,iter))
+    #last_result.flux.values = last_result.flux.values
+    #last_result.reduced_flux.values = last_result.reduced_flux.values
+
+
 #end of Neil's code...
     #delta_mass = last_result.total_mass_error
     #last_result. = red_flux.rebalance(last_result)
@@ -199,13 +217,12 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         old = f.read()
         f.seek(0)
         f.write(header_info +old)
-    #used_ythresh = ythresh
-    used_area = area
-    n_iterations = ix
+
+
 
     summary_template = input_data["SUMMARY_TEMPLATE"] + '\n'
     summary_info(last_result, filename, summary_file, summary_template,
-            delta_mass, used_ythresh, used_area, n_iterations, out_error_last)
+            delta_mass, used_epsilon, n_iterations, out_error_last)
     log_info(last_result)
 #-------------------------------------------------------------------------------
 #

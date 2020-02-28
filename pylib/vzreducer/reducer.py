@@ -1,7 +1,6 @@
 import logging
 import os
 try:
-#this config file is not in sync with the code--the config.py file located in runner\ is the one with the config and
     from pylib.config import config, parse_args
 except ModuleNotFoundError:
     from config import config, parse_args
@@ -86,14 +85,12 @@ def reduce_input_data(filekey, input_data, summary_file, output_folder):
     for copc in copc_list:
         for site in site_list:
             try:
-                #SLL--inserted input_data as an argument for reduction constants moved to input file
                 worked = reduce_for_copc_site(
                         solid_waste_release, copc, site,
                         summary_file, output_folder, input_data)
                 if not worked:
                     continue
             except TypeError as e:
-#SLL: switched the order of the following two lines so that the error will be logged if an exception is thrown...
                 logging.error("failed at {} {}".format(copc, site))
                 raise Exception(e)
 
@@ -114,14 +111,12 @@ def main():
     input_data = parse_input_file(input_file)
     logging.info(input_data)
     output_folder = get_output_folder(args)
-    #move summary file name to constants????
-    summary_filename = "summary.csv"
+
+    summary_filename = input_data['SUMMARY_FILE_NAME']
     summary_header = ','.join(input_data['SUMMARY_HEADER']) +'\n'
     summary_file = reset_summary_file(output_folder, summary_filename,summary_header)
 
-    #replaced the area keys with source files key in case the areas change?
-    #for filekey in [c._200E_KEY, c._200W_KEY]:
-    for filekey in  input_data[c.SOURCE_FILES_KEY]:
+    for filekey in input_data[c.SOURCE_FILES_KEY]:
         reduce_input_data(filekey, input_data, summary_file,
                 output_folder)
 
@@ -130,4 +125,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

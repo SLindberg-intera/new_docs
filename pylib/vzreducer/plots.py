@@ -22,11 +22,12 @@ def get_symbol(source_key):
     return color+symbol
 
 
-#FORMATTER = EngFormatter(places=0, sep="\N{THIN SPACE}")
+FORMATTER = EngFormatter(places=0, sep="\N{THIN SPACE}")
 
 def reduced_timeseries_plot(reduction_result):
     """  makes a pretty plot of the reduction result """
     f, (ax1, ax2) = plt.subplots(2,1, sharex=True)
+    f.figsize = [8,4.8]
     flux = reduction_result.flux
     mass = reduction_result.mass
 
@@ -40,12 +41,14 @@ def reduced_timeseries_plot(reduction_result):
     dmass = mass - r_mass
 
     y_formatter = tkr.ScalarFormatter()
-    #y_formatter.set_scientific(True)
-    ax1.yaxis.set_major_formatter(y_formatter)
-    ax2.yaxis.set_major_formatter(y_formatter)
+    y_formatter.set_scientific(True)
+    #ax1.ticklabel_format(axis = 'y', style='sci', scilimits=(0,0))
+    #ax1.yaxis.set_major_formatter(y_formatter)
+    ax1.yaxis.set_major_formatter(tkr.FormatStrFormatter('%.2e'))
+    ax2.yaxis.set_major_formatter(tkr.FormatStrFormatter('%.2e'))
 
     ax1.plot(flux.times[:], flux.values[:], 'b', label="input")
-    ax1.plot(r_flux.times[:], r_flux.values[:], 'r.', label="reduced {}".format(len(r_flux.values)))
+    ax1.plot(r_flux.times[:], r_flux.values[:], 'r.', label="reduced ({} data pairs)".format(len(r_flux.values)))
     ax2.plot(mass.times[:], mass.values[:], 'b')
     ax2.plot(r_mass.times[:], r_mass.values[:], 'r.')
 
@@ -69,7 +72,9 @@ def reduced_timeseries_plot(reduction_result):
             flux.site, flux.copc)
             )
     ax1.set_ylabel("Flux (Ci/yr)")
+    #ax1.set_xlabel("Time (years)")
     ax2.set_ylabel("Mass (Ci)")
+    ax2.set_xlabel("Time (years)")
 
     return  f, ax1, ax2
 

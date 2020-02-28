@@ -3,110 +3,68 @@ import scipy.signal as sig
 import pylib.timeseries.timeseries_math as tsmath
 import pylib.datareduction.recursive_contour as redcon  
 from pylib.datareduction.reduction_result import ReductionResult
+from rdp import rdp
 
 from pylib.timeseries.timeseries import TimeSeries
 
 import math
 
-SMOOTH = "SMOOTH"
-RAW = "RAW"
+#SMOOTH = "SMOOTH"
+#RAW = "RAW"
 
-def reduce_timeseries(timeseries, threshold_area, threshold_peak, mass, peak_height,
-        solve_type=RAW, simple_peaks=False):
+def reduce_timeseries(timeseries, epsilon, close_gaps, gap_delta):
     x = timeseries.times
     y = timeseries.values
 
-    #peak height moved to the input config file 12.20.2016
-    peaks, _ = sig.find_peaks(y, height=peak_height)
-
-    peaks = x[peaks]
-    pneg, _ = sig.find_peaks(-y,height=peak_height)
-    pneg = x[pneg]
-
-    #first and last timesteps are required in reduced dataset
-    required = {x[0], x[-1]}
     #reduced dataset includes significant slope deltas (where the (y2-y1)/y2 > 0.2) and y > 0.05*max y
     required_slope = x[np.divide(np.abs(np.diff(y,prepend=0)),y,
-            where=(y>0.05*np.max(y)))>0.2]
+        where=(y>0.05*np.max(y)))>0.2]
 
 
-    #grab timesteps on either side of "required slope" timestep
+    #grab timesteps on either side of "required slope" timestep and add to the required slope list
     required_slope_lower = [i-1 for i in required_slope if i != x[0]]
     required_slope_upper = [i+1 for i in required_slope if i != x[-1]]
     required_slope = sorted([*{*[*required_slope, *required_slope_upper, *required_slope_lower]}])
 
-
-    if simple_peaks:
-        peaks = [x[np.argmax(timeseries.values)]]
-        pneg = []
-        # this is never used....above is required_slope (singular and not plural...)
-        # threw off reduction for T31 and T34 (C-14 for sure) if required_slope (singular) is cleared though...
-        required_slopes = []
+    #normalize the fluxes for the RDP reduction algorithm
+    y_normalized = y/np.max(y)
+    list_xy = list(zip(x,y_normalized))
 
 
-    if solve_type == SMOOTH:
-        ts_smooth = tsmath.smooth(timeseries)
-        y = ts_smooth.values
+    rdp_list = rdp(list_xy, epsilon)
+    #parse the returned reduced dataset into timesteps and normalized fluxes (normalized fluxes don't need to be converted back
+    #because not used for reduced fluxes [handled by timeseries.subset()]
+    rdp_x = [int(pair[0]) for pair in rdp_list]
+    rdp_y = [pair[1] for pair in rdp_list]
 
+    x_gaps=[]
+    #for some datasets which large gaps between timesteps, reduction error is improved by adding add'l timesteps
+    #user-defined in JSON config file whether applied or not
+    if close_gaps.lower() == "true":
+        if np.where(np.diff(rdp_x) > gap_delta):
+           for index in (np.where(np.diff(rdp_x) > gap_delta))[0]:
+                #check to see if slope between timesteps > 0 and if so fill in gaps with timesteps
+                if abs(np.diff(rdp_y)[index])>0:
+                    x_gaps += [timestep for timestep in range(rdp_x[index], rdp_x[index+1], int((np.diff(rdp_x)[index])/3))]
 
-
-    r = redcon.reducer((x,y), 
-            threshold_area=threshold_area,
-            threshold_peak=threshold_peak,
-    )
-
-    flat_reduced_x = set(redcon.flatten_reduced(r))
-
-    #original code:
-    #xout = sorted(list(flat_reduced_x.union(required)\
-    #        .union(peaks).union(pneg).union(required_slope)
-    #       ))
-
-    #this is the same result for the above line of code but it is easier for me to read...
-    xout = sorted(set([*flat_reduced_x, *required, *peaks, *pneg, *required_slope]))
-
+    xout = sorted(set([*required_slope, *rdp_x, *x_gaps]))
 
     reduced_flux = timeseries.subset(xout)
     reduced_mass = tsmath.integrate(reduced_flux)
 
     return reduced_flux, reduced_mass
 
-def rebalance(reduction_result):
-    """
-        return a new ReductionResult 
-        flux, mass such that the total mass difference is 0
-    """
-    rr = reduction_result
-    deltaM = rr.total_mass_error
-    vals = rr.reduced_flux.values
-    times = rr.reduced_flux.times
-    # equal application
-    dt = times[-1]-times[0]
-    vals += deltaM/dt 
 
-    adjusted = rr.reduced_flux.from_values(
-            values =vals)
-    reduced_mass = tsmath.integrate(adjusted)
-    return ReductionResult(
-            flux=rr.flux,
-            mass=rr.mass,
-            reduced_flux=adjusted,
-            reduced_mass=reduced_mass)
-
-
-def reduce_flux(flux, threshold_area, threshold_peak, peak_height, solve_type,
-        simple_peaks):
+def reduce_flux(flux, epsilon, close_gaps, gap_delta):
     mass = tsmath.integrate(flux)
-    # note: don't think that mass is ever used in the called function reduce_timeseries ....
-    reduced_flux, reduced_mass = reduce_timeseries(
-            flux, threshold_area, threshold_peak,
-            mass, peak_height, solve_type, simple_peaks)
-    
+    reduced_flux, reduced_mass = reduce_timeseries(flux, epsilon, close_gaps, gap_delta)
+
     result = ReductionResult(
             flux=flux,
             mass=mass,
             reduced_flux=reduced_flux,
             reduced_mass=reduced_mass)
+
     return result
     
 #-------------------------------------------------------------------------------
@@ -187,10 +145,7 @@ def get_inflection_points(flux,peaks,pneg,p_area):
             e_ind = peaks[index]
             if e_ind > s_ind and (e_ind - s_ind) > 0 and e_ind <= last_val: #skip time step 0 as that will always be a starting point
                 #find the deepest part of the valley
-                #changed the following line of code...
-                #v_ind = np.where((pneg>s_ind) & (pneg< e_ind))
                 v_ind = np.where((pneg > s_ind) & (pneg < e_ind))
-                #v_ind = v_ind[0]
                 v_ind = pneg[v_ind]
                 if v_ind.size == 1:
                     v_ind = v_ind[0]
@@ -233,20 +188,15 @@ def adjust_flux(data,error):
             total_mass += temp_series.values[-1]
     adjusted = {}
 
-    #total_error_perc = float(0.0)
-    #mass_used = float(0.0)
-
-    #figure precentage to adjust each point by
-#    flux_diff = (total_mass+error)/total_mass
     for seg in data:
         #if segment has atleast 3 points (mid points are adjusted)
         if seg.times.size > 2:
-            x = seg.times#[1:-1]
-            y = seg.values#[1:-1]
-            #ts = TimeSeries(x,y,None,None)
+            x = seg.times
+            y = seg.values
+
             mass = seg.integrate().values[-1]
             #get Percent mass current segment is of the total mass
-            p_mass =  mass/ total_mass
+            p_mass = mass/total_mass
             #get find equivalent percentage of total_error
             e_mass = error * p_mass
             #divide reduced total error by time (not including begin and end points (they never change))
@@ -272,7 +222,6 @@ def adjust_flux(data,error):
 #
 def build_segments(rr,peaks,pneg,inflection_area):
     inf_pts = get_inflection_points(rr.flux,peaks,pneg,inflection_area)
-    #segments,t_mass = build_segments(inf_pts,rr,peaks,pneg)
 
     x = rr.flux.times
     y = rr.flux.values
@@ -299,9 +248,6 @@ def build_segments(rr,peaks,pneg,inflection_area):
 
             timeseries = TimeSeries(seg_x,seg_y,None,None)
             segs_total_mass += timeseries.integrate().values[-1]
-        #these two lines were initially commented out...I uncommented them to enable the code to run...
-            #timeseries = TimeSeries(r_x[r_seg],r_y[r_seg],None,None)
-            #timeseries = TimeSeries(r_x[r_start:r_end],r_y[r_start:r_end],None,None)
 
             segments.append(timeseries)
     return segments, segs_total_mass
@@ -320,9 +266,7 @@ def rebalance_valleys(reduction_result,peaks,pneg):
     segments,t_mass = build_segments(rr,peaks,pneg,.5)
 
 
-    #if abs(error) > t_mass:
-    #    print("*Warning: total_mass_error ({}) exceeds valley mass ({}) for error adjustment; increasting inflection points from 50% to 75% of valley area".format(error,t_mass))
-    #    segments,t_mass = build_segments(rr,peaks,pneg,.75)
+
     if abs(error) > t_mass:
         print("*Warning: total_mass_error ({}) exceeds valley mass ({}) for error adjustment; unable to correct mass_error".format(error,t_mass))
         return rr
@@ -342,32 +286,6 @@ def rebalance_valleys(reduction_result,peaks,pneg):
         reduced_flux=adjusted,
         reduced_mass=reduced_mass)
     return rr
-#-------------------------------------------------------------------------------
-#deprecated
-#def rebalance(reduction_result):
-    """
-        return a new ReductionResult
-        flux, mass such that the total mass difference is 0
-    """
-#    rr = reduction_result
-#    #minvalue = np.min(rr.reduced_flux.values)*.0001
-#    deltaM = rr.total_mass_error
-#    vals = rr.reduced_flux.values
-#    times = rr.reduced_flux.times3    # equal application
-#    dt = times[-1]-times[0]
-#    vals += deltaM/dt
-#
-#    adjusted = rr.reduced_flux.from_values(
-#            values =vals)
-#    reduced_mass = tsmath.integrate(adjusted)
-#    rr = ReductionResult(
-#        flux=rr.flux,
-#        mass=rr.mass,
-#        reduced_flux=adjusted,
-#        reduced_mass=reduced_mass)
-#    return rr
-
-#-------------------------------------------------------------------------------
 
 def insert_point(times, values,time,value):
     times = np.append(times,time)

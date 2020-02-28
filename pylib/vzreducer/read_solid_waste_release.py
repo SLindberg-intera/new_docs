@@ -30,14 +30,13 @@ class SolidWasteReleaseData:
     """
     def __init__(self, filename, zero_below=''):
         self.df = read_solid_waste_file(filename)
-        self.zero_below = zero_below
+        #if user defined a zero below value, assign value to solidwastereleasedata object
         if zero_below == '':
             self.zero_below = None
             logging.info("NOTE: No flux values are reset to 0")
-        #SLL--converted zero_below from string to a float to avoid type error
         else:
             self.zero_below = float(zero_below)
-            logging.info("NOTE: Fluxes less than the user-defined value of {} are set to 0 [zero]".format(str(self.zero_below)))
+            logging.info("NOTE: Fluxes less than the user-defined value of {} will be set to 0 [zero]".format(str(self.zero_below)))
         logging.info("COPCS in {}: {}".format(filename, str(self.copcs)))
         logging.info("Sites in {}: {}".format(filename, str(self.sites)))
 
@@ -68,8 +67,6 @@ class SolidWasteReleaseData:
             idx = y < self.zero_below
 
         if self.zero_below is not None and any(idx):
-            #idx = y < self.zero_below
-
             msg = "{}--{}: Forcing values less than '{}' to zero; occurs at \ntimesteps: {} \nwith corresponding flux: {} "
             logging.info(msg.format(
                 site, copc, self.zero_below,
