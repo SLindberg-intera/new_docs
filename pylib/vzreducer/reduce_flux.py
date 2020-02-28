@@ -9,8 +9,7 @@ from pylib.timeseries.timeseries import TimeSeries
 
 import math
 
-#SMOOTH = "SMOOTH"
-#RAW = "RAW"
+
 
 def reduce_timeseries(timeseries, epsilon, close_gaps, gap_delta, gap_steps):
     x = timeseries.times

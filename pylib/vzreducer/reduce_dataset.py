@@ -214,8 +214,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
 
 
 #end of Neil's code...
-    #delta_mass = last_result.total_mass_error
-    #last_result. = red_flux.rebalance(last_result)
+
     plot_file = summary_plot(last_result, output_folder)
     filename = last_result.to_csv(output_folder)
 
