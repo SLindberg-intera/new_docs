@@ -212,17 +212,18 @@ def adjust_flux(data,error):
             #get find equivalent percentage of total_error
             e_mass = error * p_mass
             #divide reduced total error by time (not including begin and end points (they never change))
-            flux_diff = e_mass / (x[-1]-x[0]) #mass
+            flux_diff = e_mass / (x[-2]-x[1]) #mass
 
             if flux_diff>0.1:
                 flux_diff=abs(flux_diff)/flux_diff*0.1
+                # if flux_diff >0:
+                #    flux_diff = .1
+                # else:
+                #   flux_diff = -.1
 
             if abs(flux_diff) < 0.001:
                 flux_diff = abs(flux_diff)/flux_diff *0.001
-                #if flux_diff >0:
-                #    flux_diff = .1
-                #else:
-                #   flux_diff = -.1
+
 
             adjusted[x[0]] = y[0]
             max_flux = max(y)
