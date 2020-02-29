@@ -145,8 +145,9 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         r_mass = last_result.reduced_mass
         dmass = mass - r_mass
 
+        diff_iter = 0
         corrected = False
-        while abs(max(dmass.values))/mass.values[-1] > out_error_threshold:# or abs(min(dmass.values))/mass.values[-1] > out_error_threshold:
+        while abs(max(dmass.values))/mass.values[-1] > out_error_threshold and diff_iter <max_err_iters: # or abs(min(dmass.values))/mass.values[-1] > out_error_threshold:
             year_err = dmass.times[np.where(dmass.values == max(dmass.values))].tolist()[0]
             year2 = r_mass.times[np.where(r_mass.times > year_err)][0]
             year1 = r_mass.times[np.where(r_mass.times < year_err)][-1]
@@ -161,7 +162,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
                 corrected = True
             else:
                 break
-
+            diff_iter +=1
         if corrected:
             last_result = ReductionResult(
             flux=last_result.flux,
