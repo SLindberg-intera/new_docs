@@ -193,13 +193,18 @@ def adjust_flux(data,error):
             p_mass =  mass/ total_mass
             #get find equivalent percentage of total_error
             e_mass = error * p_mass
-            #divide reduced total error by time (not including begin and end points (they never change))
+            #divide reduced total error by total mass of segment
             flux_diff = e_mass / mass
+            # if dif is greater than 10% reduce it to 10%
             if abs(flux_diff) > .1:
-                if flux_diff >0:
-                    flux_diff = .1
-                else:
-                    flux_diff = -.1
+                flux_diff=abs(flux_diff)/flux_diff*0.1
+            #    if flux_diff >0:
+            #        flux_diff = .1
+            #    else:
+            #        flux_diff = -.1
+
+            if abs(flux_diff) < 0.001:
+                flux_diff = abs(flux_diff)/flux_diff *0.001
 
             adjusted[x[0]] = y[0]
             max_flux = max(y)
@@ -249,7 +254,7 @@ def build_segments(rr,peaks,pneg,inflection_area):
             segs_total_mass += timeseries.integrate().values[-1]
         #timeseries = TimeSeries(r_x[r_seg],r_y[r_seg],None,None)
         #timeseries = TimeSeries(r_x[r_start:r_end],r_y[r_start:r_end],None,None)
-        segments.append(timeseries)
+            segments.append(timeseries)
     return segments, segs_total_mass
 
 #-------------------------------------------------------------------------------
