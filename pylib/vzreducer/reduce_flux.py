@@ -273,7 +273,7 @@ def build_segments(rr,peaks,pneg,inflection_area):
 
         #timeseries = TimeSeries(r_x[r_seg],r_y[r_seg],None,None)
         #timeseries = TimeSeries(r_x[r_start:r_end],r_y[r_start:r_end],None,None)
-        segments.append(timeseries)
+            segments.append(timeseries)
 
     return segments, segs_total_mass
 #-------------------------------------------------------------------------------
