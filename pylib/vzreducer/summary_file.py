@@ -15,7 +15,7 @@ def summary_header(summary_file,hdr):
 
 def get_summary_file(output_folder, summary_filename,header,mode):
     summary_file = os.path.join(output_folder, summary_filename)
-    if mode == 'w' or not os.path.isfile(summary_file):
+    if mode == WRITE_MODE or not os.path.isfile(summary_file):
         reset_summary_file(summary_file,header)
 
     return summary_file

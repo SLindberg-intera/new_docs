@@ -1,14 +1,11 @@
 import numpy as np
-import scipy.signal as sig
 import pylib.timeseries.timeseries_math as tsmath
-import pylib.datareduction.recursive_contour as redcon  
 from pylib.datareduction.reduction_result import ReductionResult
-from rdp import rdp
+from pylib.datareduction.rdp import rdp
 
 from pylib.timeseries.timeseries import TimeSeries
 
 import math
-
 
 
 def reduce_timeseries(timeseries, epsilon, close_gaps, gap_delta, gap_steps):
@@ -31,14 +28,14 @@ def reduce_timeseries(timeseries, epsilon, close_gaps, gap_delta, gap_steps):
 
 
     rdp_list = rdp(list_xy, epsilon)
-    #parse the returned reduced dataset into timesteps and normalized fluxes (normalized fluxes don't need to be converted back
-    #because not used for reduced fluxes [handled by timeseries.subset()]
+    #parse the returned reduced dataset into timesteps and normalized fluxes (normalized fluxes don't need to be
+    #converted back because not used for reduced fluxes [handled by timeseries.subset()]
     rdp_x = [int(pair[0]) for pair in rdp_list]
     rdp_y = [pair[1] for pair in rdp_list]
 
-    x_gaps=[]
     #for some datasets which large gaps between timesteps, reduction error is improved by adding add'l timesteps
     #user-defined in JSON config file whether applied or not
+    x_gaps = []
     if close_gaps.lower() == "true":
         if np.where(np.diff(rdp_x) > gap_delta):
            for index in (np.where(np.diff(rdp_x) > gap_delta))[0]:
@@ -144,8 +141,11 @@ def get_inflection_points(flux,peaks,pneg,p_area):
             e_ind = peaks[index]
             if e_ind > s_ind and (e_ind - s_ind) > 0 and e_ind <= last_val: #skip time step 0 as that will always be a starting point
                 #find the deepest part of the valley
-                v_ind = np.where((pneg > s_ind) & (pneg < e_ind))
-                v_ind = pneg[v_ind]
+                min_val = min(y[s_ind:e_ind])
+                v_ind = np.where(pneg==min_val)
+                #v_ind = np.where((pneg > s_ind) & (pneg < e_ind))
+                v_ind = v_ind[0]
+
                 if v_ind.size == 1:
                     v_ind = v_ind[0]
                 elif v_ind.size > 1:
@@ -187,40 +187,62 @@ def adjust_flux(data,error):
             total_mass += temp_series.values[-1]
     adjusted = {}
 
+    #total_error_perc = float(0.0)
+
+    #mass_used = float(0.0)
+
+
+
+    #figure precentage to adjust each point by
+
+#    flux_diff = (total_mass+error)/total_mass
+
     for seg in data:
         #if segment has atleast 3 points (mid points are adjusted)
         if seg.times.size > 2:
-            x = seg.times
-            y = seg.values
-
+            years = seg.times#[1:-1]
+            fluxes = seg.values#[1:-1]
+            #ts = TimeSeries(x,y,None,None)
             mass = seg.integrate().values[-1]
             #get Percent mass current segment is of the total mass
             p_mass = mass/total_mass
             #get find equivalent percentage of total_error
             e_mass = error * p_mass
             #divide reduced total error by time (not including begin and end points (they never change))
-            flux_diff = e_mass / mass
-            if abs(flux_diff) > .1:
-                if flux_diff >0:
-                    flux_diff = .1
-                else:
-                    flux_diff = -.1
+            flux_diff = e_mass / (years[-1]-years[0]) #mass
 
-            adjusted[x[0]] = y[0]
+            if abs(flux_diff)>0.1:
+                flux_diff=abs(flux_diff)/flux_diff*0.1
+                 #if flux_diff >0:
+                 #   flux_diff = .1
+                 #else:
+                 #  flux_diff = -.1
+
+            adjusted[years[0]] = fluxes[0]
+            max_flux = max(fluxes)
+
+
             #for each value (except first and last values) adjust value by percent (flux_diff)
-            for i in range(1,x.size-1):
+            for i in range(1,years.size-1):
+                new_val = fluxes[i] + flux_diff #(fluxes[i] * flux_diff)
+                if new_val > max_flux:
+                    new_val = fluxes[i] + ((max_flux - fluxes[i]) * .1)
 
-                new_val = y[i]+(y[i] * flux_diff)
+                #new_val = y[i]+(y[i] * flux_diff)
                 #should not happen but just in case negative numbers not allowed
-                #if new_val < 0:
-                #    new_val = float(0.0)
-                adjusted[x[i]] = new_val
+
+                if new_val < 0:
+                    new_val = float(0.0)
+                adjusted[years[i]] = new_val
 
     return adjusted
 #-------------------------------------------------------------------------------
 #
 def build_segments(rr,peaks,pneg,inflection_area):
     inf_pts = get_inflection_points(rr.flux,peaks,pneg,inflection_area)
+
+    #segments,t_mass = build_segments(inf_pts,rr,peaks,pneg)
+
 
     x = rr.flux.times
     y = rr.flux.values
@@ -248,7 +270,10 @@ def build_segments(rr,peaks,pneg,inflection_area):
             timeseries = TimeSeries(seg_x,seg_y,None,None)
             segs_total_mass += timeseries.integrate().values[-1]
 
+        #timeseries = TimeSeries(r_x[r_seg],r_y[r_seg],None,None)
+        #timeseries = TimeSeries(r_x[r_start:r_end],r_y[r_start:r_end],None,None)
             segments.append(timeseries)
+
     return segments, segs_total_mass
 #-------------------------------------------------------------------------------
 # rebalance reduced time series by adjusting valleys to be deeper/shallower without
@@ -263,7 +288,6 @@ def rebalance_valleys(reduction_result,peaks,pneg):
     r_y = rr.reduced_flux.values
 
     segments,t_mass = build_segments(rr,peaks,pneg,.5)
-
 
 
     if abs(error) > t_mass:
@@ -293,3 +317,131 @@ def insert_point(times, values,time,value):
     values2 = np.insert(values,ind,value)
 
     return times, values2
+
+#-------------------------------------------------------------------------------
+
+# add extra points in areas of greatest error until you run out of points or
+#  you reach less than .01% relative error.
+def rebalance_extra_points(reduction_result,num_points=10):
+
+#----------------------
+
+    #
+
+    def find_mean_dif_day():
+        diff = rr.diff_mass
+        #m_diff = max(abs(diff.values))
+        m_diff = np.mean(abs(diff.values))
+        if m_diff > 0:
+            #ind = np.flatnonzero(abs(diff.values) == m_diff)[0]
+            ind = np.flatnonzero(abs(diff.values) >= m_diff)[0]
+            return diff.times[ind]
+        return -1
+
+    #--------------------
+
+    #
+
+    def check_zero_fluxes():
+
+        points = num_points
+        times = rr.reduced_flux.times
+        vals = rr.reduced_flux.values
+        zero_inds = np.flatnonzero(rr.flux.values == 0)
+        series = []
+        result = [series]
+        expect = None
+        step = 1
+
+        #loop through indexes and find consecutive zeros
+        for v in zero_inds:
+            if (v == expect) or (expect is None):
+                series.append(v)
+            else:
+                run = [v]
+                result.append(series)
+            expect = v + step
+
+        #
+        for r in result:
+            #leave a few points for adding in strategice points.
+            if points <= 10:
+                break
+            if len(r) > 5:
+                times,vals = insert_point(times, vals,rr.flux.times[r[0]],rr.flux.values[r[0]])
+                times,vals = insert_point(times, vals,rr.flux.times[r[-1]],rr.flux.values[r[-1]])
+                points -= 2
+        return points,times,vals
+
+
+
+    rr = reduction_result
+
+    points,times,vals = check_zero_fluxes()
+
+    adjusted = TimeSeries(times,vals,None,None)
+
+    reduced_mass = tsmath.integrate(adjusted)
+
+    rr = ReductionResult(
+
+        flux=rr.flux,
+
+        mass=rr.mass,
+
+        reduced_flux=adjusted,
+
+        reduced_mass=reduced_mass)
+
+    #loop through and add mid points at strategic places.
+
+    for x in range(points):
+
+        diff_day = find_mean_dif_day()
+
+        #if diff_day == -1, then max_diff was 0, which means there is nothing to
+
+        # correct.
+
+        if diff_day == -1:
+
+            return rr
+
+        times = rr.reduced_flux.times
+        vals = rr.reduced_flux.values
+        start_ind = np.flatnonzero(times < diff_day)[-1]
+        end_ind = np.flatnonzero(times >= diff_day)[0]
+        mid_day = 0
+
+        #zero_inds = np.flatnonzero(vals[start_ind:end_ind] == 0)
+        #if zero_inds.size > 0:
+        #    mid_point = zero_inds[-1]
+        #    mid_day = times[mid_point]
+        #else:
+
+        start_day = times[start_ind]
+        end_day = times[end_ind]
+        mid_day = ((end_day-start_day )/2)+start_day
+        mid_point =  np.flatnonzero(rr.flux.times >= mid_day)[0]
+        if not mid_day in times:
+            times,vals = insert_point(times, vals,rr.flux.times[mid_point],rr.flux.values[mid_point])
+        adjusted = TimeSeries(times,vals,None,None)
+        reduced_mass = tsmath.integrate(adjusted)
+
+        rr = ReductionResult(
+
+            flux=rr.flux,
+
+            mass=rr.mass,
+
+            reduced_flux=adjusted,
+
+            reduced_mass=reduced_mass)
+
+
+
+        if abs(rr.total_mass_error/rr.mass.values[-1])*100 < .001:
+
+            break
+
+    return rr

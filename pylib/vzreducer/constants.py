@@ -48,8 +48,8 @@ MAX_ITERATIONS_KEY = "Maximum Iterations"
 #the maximum number of iterations when distributing the difference in mass
 MAX_ERR_ITERATIONS_KEY = "Maximum Error Iterations"
 
-
-FLUX_FLOOR_KEY = "Flux Floor"
+#Placeholder if flux floor is ever needed in the future
+#FLUX_FLOOR_KEY = "Flux Floor"
 EPSILON = "Epsilon"
 GAP_CLOSED = "Close Gaps"
 GAP_DELTA = "Gap Delta"

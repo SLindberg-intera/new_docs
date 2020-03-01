@@ -10,6 +10,7 @@ from pylib.vzreducer.read_solid_waste_release import SolidWasteReleaseData
 from pylib.vzreducer.reduce_dataset import reduce_dataset
 from pylib.vzreducer.summary_file import get_summary_file
 
+
 def configure_logger(args):
     """
         set the logger for this utility

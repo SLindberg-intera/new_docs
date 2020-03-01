@@ -15,9 +15,6 @@ import datetime
 
 from pylib.pygit.git import get_version
 
-#check other branch for code change here....
-#SMOOTH = "SMOOTH"  #MOVED TO INPUT file 08.09.2019
-#RAW = "RAW"        #MOVED TO INPUT file 08.09.2019
 
 
 def log_info(reduction_result):
@@ -71,12 +68,14 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
 
     diff_mass = input_data[c.DIFF_MASS].lower()
 
+#Placeholder code if flux_floor is needed in the future
     #if input_data[c.FLUX_FLOOR_KEY] is not "":
     #    flux_floor = float(input_data[c.FLUX_FLOOR_KEY])
 
     #else:
     #    flux_floor = ""
     #    logging.info("no flux floor value is being applied")
+
     upper_n = int(input_data[c.UPPER_N_KEY])
     lower_n = int(input_data[c.LOWER_N_KEY])
 
@@ -147,12 +146,12 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
 
         diff_iter = 0
         corrected = False
-        while abs(max(dmass.values))/mass.values[-1] > out_error_threshold and diff_iter <max_err_iters: # or abs(min(dmass.values))/mass.values[-1] > out_error_threshold:
+        while abs(max(dmass.values))/mass.values[-1] > out_error_threshold and diff_iter <max_err_iters:# or abs(min(dmass.values))/mass.values[-1] > out_error_threshold:
             year_err = dmass.times[np.where(dmass.values == max(dmass.values))].tolist()[0]
             year2 = r_mass.times[np.where(r_mass.times > year_err)][0]
             year1 = r_mass.times[np.where(r_mass.times < year_err)][-1]
             interval  = int((year2-year1)/2)
-
+            diff_iter+=1
             if interval >= 2:
                 years = [year+interval for year in range(year1, year2, interval)][0:-1]
                 revised_years = sorted(set([*r_mass.times.tolist(), *years]))
