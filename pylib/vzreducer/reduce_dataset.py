@@ -15,9 +15,6 @@ import datetime
 
 from pylib.pygit.git import get_version
 
-#check other branch for code change here....
-#SMOOTH = "SMOOTH"  #MOVED TO INPUT file 08.09.2019
-#RAW = "RAW"        #MOVED TO INPUT file 08.09.2019
 
 
 def log_info(reduction_result):

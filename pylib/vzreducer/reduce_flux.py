@@ -1,9 +1,9 @@
 import numpy as np
-import scipy.signal as sig
+#import scipy.signal as sig
 import pylib.timeseries.timeseries_math as tsmath
-import pylib.datareduction.recursive_contour as redcon  
+#import pylib.datareduction.recursive_contour as redcon
 from pylib.datareduction.reduction_result import ReductionResult
-from rdp import rdp
+from pylib.datareduction.rdp import rdp
 
 from pylib.timeseries.timeseries import TimeSeries
 
