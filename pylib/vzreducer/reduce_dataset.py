@@ -68,12 +68,14 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
 
     diff_mass = input_data[c.DIFF_MASS].lower()
 
+#Placeholder code if flux_floor is needed in the future
     #if input_data[c.FLUX_FLOOR_KEY] is not "":
     #    flux_floor = float(input_data[c.FLUX_FLOOR_KEY])
 
     #else:
     #    flux_floor = ""
     #    logging.info("no flux floor value is being applied")
+
     upper_n = int(input_data[c.UPPER_N_KEY])
     lower_n = int(input_data[c.LOWER_N_KEY])
 
@@ -148,7 +150,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
             year2 = r_mass.times[np.where(r_mass.times > year_err)][0]
             year1 = r_mass.times[np.where(r_mass.times < year_err)][-1]
             interval  = int((year2-year1)/2)
-
+            diff_iter+=1
             if interval >= 2:
                 years = [year+interval for year in range(year1, year2, interval)][0:-1]
                 revised_years = sorted(set([*r_mass.times.tolist(), *years]))

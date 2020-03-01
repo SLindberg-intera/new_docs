@@ -1,14 +1,11 @@
 import numpy as np
-#import scipy.signal as sig
 import pylib.timeseries.timeseries_math as tsmath
-#import pylib.datareduction.recursive_contour as redcon
 from pylib.datareduction.reduction_result import ReductionResult
 from pylib.datareduction.rdp import rdp
 
 from pylib.timeseries.timeseries import TimeSeries
 
 import math
-
 
 
 def reduce_timeseries(timeseries, epsilon, close_gaps, gap_delta, gap_steps):
@@ -31,14 +28,14 @@ def reduce_timeseries(timeseries, epsilon, close_gaps, gap_delta, gap_steps):
 
 
     rdp_list = rdp(list_xy, epsilon)
-    #parse the returned reduced dataset into timesteps and normalized fluxes (normalized fluxes don't need to be converted back
-    #because not used for reduced fluxes [handled by timeseries.subset()]
+    #parse the returned reduced dataset into timesteps and normalized fluxes (normalized fluxes don't need to be
+    #converted back because not used for reduced fluxes [handled by timeseries.subset()]
     rdp_x = [int(pair[0]) for pair in rdp_list]
     rdp_y = [pair[1] for pair in rdp_list]
 
-    x_gaps=[]
     #for some datasets which large gaps between timesteps, reduction error is improved by adding add'l timesteps
     #user-defined in JSON config file whether applied or not
+    x_gaps = []
     if close_gaps.lower() == "true":
         if np.where(np.diff(rdp_x) > gap_delta):
            for index in (np.where(np.diff(rdp_x) > gap_delta))[0]:
@@ -203,44 +200,40 @@ def adjust_flux(data,error):
     for seg in data:
         #if segment has atleast 3 points (mid points are adjusted)
         if seg.times.size > 2:
-            x = seg.times#[1:-1]
-            y = seg.values#[1:-1]
+            years = seg.times#[1:-1]
+            fluxes = seg.values#[1:-1]
             #ts = TimeSeries(x,y,None,None)
             mass = seg.integrate().values[-1]
             #get Percent mass current segment is of the total mass
-            p_mass =  mass/ total_mass
+            p_mass = mass/total_mass
             #get find equivalent percentage of total_error
             e_mass = error * p_mass
             #divide reduced total error by time (not including begin and end points (they never change))
-            flux_diff = e_mass / (x[-2]-x[1]) #mass
+            flux_diff = e_mass / (years[-1]-years[0]) #mass
 
-            if flux_diff>0.1:
+            if abs(flux_diff)>0.1:
                 flux_diff=abs(flux_diff)/flux_diff*0.1
-                # if flux_diff >0:
-                #    flux_diff = .1
-                # else:
-                #   flux_diff = -.1
+                 #if flux_diff >0:
+                 #   flux_diff = .1
+                 #else:
+                 #  flux_diff = -.1
 
-            if abs(flux_diff) < 0.001:
-                flux_diff = abs(flux_diff)/flux_diff *0.001
-
-
-            adjusted[x[0]] = y[0]
-            max_flux = max(y)
+            adjusted[years[0]] = fluxes[0]
+            max_flux = max(fluxes)
 
 
             #for each value (except first and last values) adjust value by percent (flux_diff)
-            for i in range(1,x.size-1):
-                new_val = y[i]+(y[i] * flux_diff)
+            for i in range(1,years.size-1):
+                new_val = fluxes[i] + flux_diff #(fluxes[i] * flux_diff)
                 if new_val > max_flux:
-                    new_val = y[i] + ((max_flux - y[i]) * .1)
+                    new_val = fluxes[i] + ((max_flux - fluxes[i]) * .1)
 
                 #new_val = y[i]+(y[i] * flux_diff)
                 #should not happen but just in case negative numbers not allowed
 
                 if new_val < 0:
                     new_val = float(0.0)
-                adjusted[x[i]] = new_val
+                adjusted[years[i]] = new_val
 
     return adjusted
 #-------------------------------------------------------------------------------
