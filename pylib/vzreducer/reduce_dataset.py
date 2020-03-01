@@ -89,7 +89,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
 
     res = red_flux.reduce_flux(timeseries, epsilon, close_gaps, gap_delta, gap_steps)
     out_error = abs(res.relative_total_mass_error)
-    #last_result = res
+    
     out_error_last = out_error
     last_timesteps = 0
 
@@ -146,12 +146,13 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
 
         diff_iter = 0
         corrected = False
-        while abs(max(dmass.values))/mass.values[-1] > out_error_threshold and diff_iter <max_err_iters:# or abs(min(dmass.values))/mass.values[-1] > out_error_threshold:
+        while max(dmass.values)/mass.values[-1] > out_error_threshold and diff_iter <max_err_iters:# or abs(min(dmass.values))/mass.values[-1] > out_error_threshold:
             year_err = dmass.times[np.where(dmass.values == max(dmass.values))].tolist()[0]
             year2 = r_mass.times[np.where(r_mass.times > year_err)][0]
             year1 = r_mass.times[np.where(r_mass.times < year_err)][-1]
             interval  = int((year2-year1)/2)
             diff_iter+=1
+            #adding those years where the timesteps on either side of max diff spans > 4 years
             if interval >= 2:
                 years = [year+interval for year in range(year1, year2, interval)][0:-1]
                 revised_years = sorted(set([*r_mass.times.tolist(), *years]))
@@ -159,8 +160,7 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
                 r_mass = tsmath.integrate(r_flux)
                 dmass=mass-r_mass
                 corrected = True
-            else:
-                break
+            
             diff_iter +=1
         if corrected:
             last_result = ReductionResult(

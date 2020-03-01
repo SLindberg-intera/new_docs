@@ -63,6 +63,7 @@ class SolidWasteReleaseData:
         sub = self.df[self.df[SITE_COL]==site]
         x = sub[YEAR_COL].values
         y = sub[copc].values
+        #checking if zero below threshold is defined and if so, then find values and force to zero
         if self.zero_below is not None:
             idx = y < self.zero_below
 
