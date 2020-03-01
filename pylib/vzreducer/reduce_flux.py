@@ -290,13 +290,6 @@ def rebalance_valleys(reduction_result,peaks,pneg):
     segments,t_mass = build_segments(rr,peaks,pneg,.5)
 
 
-
-
-
-    #if abs(error) > t_mass:
-    #    print("*Warning: total_mass_error ({}) exceeds valley mass ({}) for error adjustment; increasting inflection points from 50% to 75% of valley area".format(error,t_mass))
-    #    segments,t_mass = build_segments(rr,peaks,pneg,.75)
-
     if abs(error) > t_mass:
         print("*Warning: total_mass_error ({}) exceeds valley mass ({}) for error adjustment; unable to correct mass_error".format(error,t_mass))
         return rr
