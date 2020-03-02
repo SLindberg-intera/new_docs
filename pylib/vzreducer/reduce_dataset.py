@@ -196,8 +196,6 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         pneg = pneg[0]
 
 
-
-
     while abs(last_result.relative_total_mass_error) > out_error_threshold and iter < max_err_iters:
         rr = red_flux.rebalance_valleys(rr,peaks,pneg)
         #keep the lowest total_mass_error
@@ -209,9 +207,6 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
         iter += 1
 
     logging.info("min error: {}; max error: {}--after rebalance iterations {}".format(min_err,max_err,iter))
-    #last_result.flux.values = last_result.flux.values
-    #last_result.reduced_flux.values = last_result.reduced_flux.values
-
 
 #end of Neil's code...
 

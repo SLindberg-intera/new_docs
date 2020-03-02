@@ -187,44 +187,35 @@ def adjust_flux(data,error):
             total_mass += temp_series.values[-1]
     adjusted = {}
 
-    #total_error_perc = float(0.0)
+    #figure the amount of flux to adjust each timestep by
 
-    #mass_used = float(0.0)
-
-
-
-    #figure precentage to adjust each point by
-
-#    flux_diff = (total_mass+error)/total_mass
+#    flux_diff = ((error) * mass/total_mass)/(number of timesteps to distributed over)
 
     for seg in data:
         #if segment has atleast 3 points (mid points are adjusted)
         if seg.times.size > 2:
             years = seg.times#[1:-1]
             fluxes = seg.values#[1:-1]
-            #ts = TimeSeries(x,y,None,None)
+
             mass = seg.integrate().values[-1]
             #get Percent mass current segment is of the total mass
             p_mass = mass/total_mass
             #get find equivalent percentage of total_error
-            e_mass = error * p_mass
-            #divide reduced total error by time (not including begin and end points (they never change))
-            flux_diff = e_mass / (years[-1]-years[0]) #mass
+            p_error = error /total_mass
+
+            #divide reduced total error by mass of segment = error/total mass (not including begin and end points (they never change))
+            flux_diff = p_mass * p_error #e_mass / mass
 
             if abs(flux_diff)>0.1:
                 flux_diff=abs(flux_diff)/flux_diff*0.1
-                 #if flux_diff >0:
-                 #   flux_diff = .1
-                 #else:
-                 #  flux_diff = -.1
 
             adjusted[years[0]] = fluxes[0]
             max_flux = max(fluxes)
 
 
-            #for each value (except first and last values) adjust value by percent (flux_diff)
+            #for each value (except first and last values) adjust value by flux_diff
             for i in range(1,years.size-1):
-                new_val = fluxes[i] + flux_diff #(fluxes[i] * flux_diff)
+                new_val = fluxes[i] + (fluxes[i] * flux_diff)
                 if new_val > max_flux:
                     new_val = fluxes[i] + ((max_flux - fluxes[i]) * .1)
 
