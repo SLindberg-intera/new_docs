@@ -30,10 +30,13 @@ class SolidWasteReleaseData:
     """
     def __init__(self, filename, zero_below=''):
         self.df = read_solid_waste_file(filename)
-        self.zero_below = zero_below
+        #if user defined a zero below value, assign value to solidwastereleasedata object
         if zero_below == '':
             self.zero_below = None
-
+            logging.info("NOTE: No flux values are reset to 0")
+        else:
+            self.zero_below = float(zero_below)
+            logging.info("NOTE: Fluxes less than the user-defined value of {} will be set to 0 [zero]".format(str(self.zero_below)))
         logging.info("COPCS in {}: {}".format(filename, str(self.copcs)))
         logging.info("Sites in {}: {}".format(filename, str(self.sites)))
 
@@ -60,15 +63,17 @@ class SolidWasteReleaseData:
         sub = self.df[self.df[SITE_COL]==site]
         x = sub[YEAR_COL].values
         y = sub[copc].values
-
+        #checking if zero below threshold is defined and if so, then find values and force to zero
         if self.zero_below is not None:
             idx = y < self.zero_below
-            y[idx] = 0.0
-            msg = "Forcing values below '{}' to zero; happens at timesteps: {}"
+
+        if self.zero_below is not None and any(idx):
+            msg = "{}--{}: Forcing values less than '{}' to zero; occurs at \ntimesteps: {} \nwith corresponding flux: {} "
             logging.info(msg.format(
-                self.zero_below,
-                x[idx]
-                )
-            )
+                site, copc, self.zero_below,
+                x[idx], y[idx]
+                                    )
+                       )
+            y[idx] = 0.0
 
         return TimeSeries(x, y, copc, site)

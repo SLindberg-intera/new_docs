@@ -9,26 +9,26 @@ def to_csv(reduction_result, filename):
 
     """
     rr = reduction_result    
-    years = rr.flux.times
-    flux = rr.flux.values
-    total_mass = rr.mass.values
-    mass = np.diff(total_mass, prepend=0)
+    #years = rr.flux.times
+    #flux = rr.flux.values
+    #total_mass = rr.mass.values
+    #mass = np.diff(total_mass, prepend=0)
     reduced_years = rr.reduced_flux.times
     reduced_flux = rr.reduced_flux.values
-    reduced_total_mass = rr.reduced_mass.values
-    reduced_mass = np.diff(reduced_total_mass, prepend=0)
+    #reduced_total_mass = rr.reduced_mass.values
+    #reduced_mass = np.diff(reduced_total_mass, prepend=0)
     data = {
-        "Year":pd.Series(years),
-        "Activity Release Rate (Ci/year)":pd.Series(flux),
-        "Mass (Ci)":pd.Series(mass),
-        "Total Mass (Ci)":pd.Series(total_mass),
+        #"Year":pd.Series(years),
+        #"Activity Release Rate (Ci/year)":pd.Series(flux),
+        #"Mass (Ci)":pd.Series(mass),
+        #"Total Mass (Ci)":pd.Series(total_mass),
         "Reduced Year":pd.Series(reduced_years),
         "Reduced Activity Release Rate (Ci/year)":pd.Series(reduced_flux),
-        "Reduced Mass (Ci)":pd.Series(reduced_mass),
-        "Reduced Total Mass (Ci)":pd.Series(reduced_total_mass)
+        #"Reduced Mass (Ci)":pd.Series(reduced_mass),
+        #"Reduced Total Mass (Ci)":pd.Series(reduced_total_mass)
     }
     df = pd.DataFrame(data)
-    df.to_csv(filename, index=False)
+    df.to_csv(filename, index=False,)
     
 
 
@@ -57,6 +57,7 @@ class ReductionResult:
         fname = "{}_{}.csv".format(self.flux.site, self.flux.copc)
         filename = os.path.join(dirname, fname)
         to_csv(self, filename)
+        return filename
 
     @property
     def num_reduced_points(self):
