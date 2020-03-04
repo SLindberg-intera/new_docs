@@ -355,7 +355,7 @@ def main():
         #** solute flux card text
         filename = '{0}, srf/modflow_{1}-{2}.srf,\n'
         filename2 = '{1}, srf/{0}.srf,\n'
-        comment = '#Bottom Flux for grid {0},{1}\n'
+        comment = '#Bottom Flux for P2R Surface {0},{1}\n'
         line = 'Solute Flux, {0}, 1/yr, , Bottom, {1}, {2}, {3}, {4}, 1, 1,\n'
         line_av = 'Aqueous Volumetric, m^3/yr, m^3, Bottom, {1}, {2}, {3}, {4}, 1, 1,\n'
         bottom = 'Solute Flux,{0}, 1/yr,, Bottom, 1, {1}, 1, {2}, 1, 1,\n'
@@ -460,7 +460,7 @@ def main():
         text_dic['surface_flux'] = '#------------------------------------------------------------------\n'
         text_dic['surface_flux'] += '~Surface Flux Card\n'
         text_dic['surface_flux'] += '#---------------------------------------------------------\n'
-        text_dic['surface_flux'] += '{0},\n{1}'.format(count,tmp)
+        text_dic['surface_flux'] += '{0},\n#Mass Balance Information\n{1}'.format(count,tmp)
         wo = write_outputs(template)
         wo.__next__()
         wo.send(text_dic)
