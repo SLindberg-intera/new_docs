@@ -78,7 +78,7 @@
 
 
 
-		"name":"SWR Reducer", "command":"reducer.py", "description":"qualified on 03.04.2020; used to reduce solid waste release timesteps and rates to a size compatible for input into STOMP."
+		"name":"SWR Reducer", "command":"vzreducer.py", "description":"v1.1 qualified on 03.05.2020 [renamed to vzreducer.py for unique name]; used to reduce solid waste release timesteps and rates to a size compatible for input into STOMP."
 
 
 
