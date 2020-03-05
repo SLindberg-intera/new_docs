@@ -27,7 +27,7 @@ The 'main' program.  This will:
 ### [reduce_flux](reduce_flux.py)
 ### [plots](plots.py)
 ### [summary_file](summary_file.py)
-### [recursive_contour](recursive_contour.py)
+### [Ramer-Douglas-Peucker](rpd.py)
 ### [timeseries](timeseries.py)
 ### [read_solid_waste_release](read_solid_waste_release.py)
 ### [parse_input_file](parse_input_file.py)
@@ -37,10 +37,3 @@ The 'main' program.  This will:
 ### [timeseries_math](timeseries_math.py)
 
 ## ToDo
-- Code Documentation
-- User Documentation
-- Allocate mass balance of reduced data sets to points along the flux curve (rebalance)
-- Remove orphaned code fragments
-- Tests 
-- move all constants to constants.py
-- move all hard-coded text or params to input config file
