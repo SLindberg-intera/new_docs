@@ -4,13 +4,19 @@ from scipy.signal import find_peaks
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+
 def make_line(signal):
     x, y = signal
     line_x = [x[0], x[-1]]
     line_y = [y[0], y[-1]]
-    line = interp.interp1d(line_x, line_y)
-    return x, line(x)
+    try:
+        line = interp.interp1d(line_x, line_y)
+        return x, line(x)
 
+    except Exception as e:
+        input("exception occurred in make_line line 12 {}".format(e))
+        return Exception
 def subtract(signal, line):
     x, y = signal
     return x, np.abs(y-line[1])
@@ -56,11 +62,14 @@ def reducer(signal, threshold_area, threshold_peak, branch0=0):
     segments = partition(signal, xpeak)
     if segments is None:
         return xout
-    return [reducer(segment, threshold_area, threshold_peak,
-        branch0*10+branch) 
-            for branch, segment in enumerate(segments)
-            ]
-
+    try:
+        return [reducer(segment, threshold_area, threshold_peak,
+            branch0*10+branch)
+                for branch, segment in enumerate(segments)
+                ]
+    except Exception:
+        input("exception at return[reducer...]")
+        return(Exception)
 def flatten_reduced(reduced):
     for seg in reduced:
         try:
@@ -72,15 +81,18 @@ def get_first_peak(signal):
     x, y = signal
     if len(x)<=2:
         raise ValueError("Not enough Points")
-    ix = np.argmax(y)
-    return ix, x[ix], y[ix]
+    #ix = np.argmax(y)
+    #return ix, x[ix], y[ix]
+
+    peak_indicies, _ = find_peaks(y)
+    #SLL--this code was unreachable--commented out lines 75 and 76 above and modified following lines 82-85
     # also need to find valleys
     #valleys = (y-np.max(y))
-    #valley_indicies, _ = find_peaks(valleys)
+    valley_indicies, _ = find_peaks(-y)
     p = peak_indicies
 
-    #p = set(peak_indicies).union(set(valley_indicies))
-    #p = sorted(list(p))
+    p = set(peak_indicies).union(set(valley_indicies))
+    p = sorted(list(p))
     try:
         return p[0], x[p[0]], y[p[0]]
     except IndexError:
