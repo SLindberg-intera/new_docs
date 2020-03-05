@@ -12,6 +12,7 @@ import pylib.timeseries.timeseries_math as tsmath
 from pylib.datareduction.reduction_result import ReductionResult
 import scipy.signal as sig
 import datetime
+from pathlib import Path
 
 from pylib.pygit.git import get_version
 
@@ -212,10 +213,19 @@ def reduce_dataset(timeseries, summary_file, output_folder, input_data):
 
     plot_file = summary_plot(last_result, output_folder)
     filename = last_result.to_csv(output_folder)
+    
+    git_path = None
+    git_hash = ''
+    p = Path(__file__)
+    for path in p.parents:
+        if (path.joinpath('.git').exists()):
+            git_path = (str(path.joinpath('.git')))
+            break
+    if git_path:
+        git_hash = get_version(git_path)
 
-    # eventually update a module with insert_header information functionality but keeping it here for now...
-    header_info = 'Site Name: {}\n Date Created: {}\n Script Version: {} \nCOPC: {} \n'.format(rr.mass.site, datetime.datetime.now().strftime('%Y/%m/%d'),get_version(), rr.mass.copc )
-
+   # eventually update a module with insert_header information functionality but keeping it here for now...
+    header_info = 'Site Name: {}\n Date Created: {}\n Script Version: {} \nCOPC: {} \n'.format(rr.mass.site, datetime.datetime.now().strftime('%Y/%m/%d'),git_hash, rr.mass.copc )
 
     with open(filename,'r+') as f:
         old = f.read()
