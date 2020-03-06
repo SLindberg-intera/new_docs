@@ -72,15 +72,15 @@
 
 		},
 
-
-
 		{
-
-
 
 		"name":"SWR Reducer", "command":"vzreducer.py", "description":"v1.1 qualified on 03.05.2020 [renamed to vzreducer.py for unique name]; used to reduce solid waste release timesteps and rates to a size compatible for input into STOMP."
 
+		},
 
+		{
+
+		"name":"Build Surface Flux Card", "command":"ca_build_surface_flux.py", "description":"qualified on 03.06.2020; This tool builds the Surfuce Flux Card for STOMP input file, it maps the STOMP grid to the P2R GW grid for the Stomp output."
 
 		}
 	],
