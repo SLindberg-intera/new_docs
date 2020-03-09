@@ -191,10 +191,12 @@ def adjust_flux(data,error):
             mass = seg.integrate().values[-1]
             #get Percent mass current segment is of the total mass
             p_mass =  mass/ total_mass
+            p_error = error / total_mass
+            flux_diff = p_mass * p_error
             #get find equivalent percentage of total_error
-            e_mass = error * p_mass
+            #e_mass = error * p_mass
             #divide reduced total error by total mass of segment
-            flux_diff = e_mass / mass
+            #flux_diff = e_mass / mass
             # if dif is greater than 10% reduce it to 10%
             if abs(flux_diff) > .1:
                 flux_diff=abs(flux_diff)/flux_diff*0.1
@@ -203,8 +205,8 @@ def adjust_flux(data,error):
             #    else:
             #        flux_diff = -.1
 
-            if abs(flux_diff) < 0.001:
-                flux_diff = abs(flux_diff)/flux_diff *0.001
+            #if abs(flux_diff) < 0.001:
+            #    flux_diff = abs(flux_diff)/flux_diff *0.001
 
             adjusted[x[0]] = y[0]
             max_flux = max(y)
