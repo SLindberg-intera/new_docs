@@ -1,9 +1,12 @@
 """
 rdp
 ~~~
+
 Python implementation of the Ramer-Douglas-Peucker algorithm.
+
 :copyright: 2014-2016 Fabian Hirschmann <fabian@hirschmann.email>
 :license: MIT, see LICENSE.txt for more details.
+
 """
 from math import sqrt
 from functools import partial
@@ -13,11 +16,11 @@ import sys
 if sys.version_info[0] >= 3:
     xrange = range
 
-
 def pldist(point, start, end):
     """
     Calculates the distance from ``point`` to the line given
     by the points ``start`` and ``end``.
+
     :param point: a point
     :type point: numpy array
     :param start: a point of the line
@@ -32,11 +35,12 @@ def pldist(point, start, end):
             np.abs(np.linalg.norm(np.cross(end - start, start - point))),
             np.linalg.norm(end - start))
 
-
 def rdp_rec(M, epsilon, dist=pldist):
     """
     Simplifies a given array of points.
+
     Recursive version.
+
     :param M: an array
     :type M: numpy array
     :param epsilon: epsilon in the rdp algorithm
@@ -61,7 +65,6 @@ def rdp_rec(M, epsilon, dist=pldist):
         return np.vstack((r1[:-1], r2))
     else:
         return np.vstack((M[0], M[-1]))
-
 
 def _rdp_iter(M, start_index, last_index, epsilon, dist=pldist):
     stk = []
@@ -91,11 +94,12 @@ def _rdp_iter(M, start_index, last_index, epsilon, dist=pldist):
 
     return indices
 
-
 def rdp_iter(M, epsilon, dist=pldist, return_mask=False):
     """
     Simplifies a given array of points.
+
     Iterative version.
+
     :param M: an array
     :type M: numpy array
     :param epsilon: epsilon in the rdp algorithm
@@ -112,23 +116,27 @@ def rdp_iter(M, epsilon, dist=pldist, return_mask=False):
 
     return M[mask]
 
-
-def rdp(M, epsilon=0, dist=pldist, algo="iter", return_mask=False):
+def rdp(M, epsilon=15e-10, dist=pldist, algo="iter", return_mask=False):
     """
     Simplifies a given array of points using the Ramer-Douglas-Peucker
     algorithm.
+
     Example:
+
     >>> from rdp import rdp
     >>> rdp([[1, 1], [2, 2], [3, 3], [4, 4]])
     [[1, 1], [4, 4]]
-    This is a convenience wrapper around both :func:`rdp.rdp_iter` 
+
+    This is a convenience wrapper around both :func:`rdp.rdp_iter`
     and :func:`rdp.rdp_rec` that detects if the input is a numpy array
     in order to adapt the output accordingly. This means that
     when it is called using a Python list as argument, a Python
     list is returned, and in case of an invocation using a numpy
     array, a NumPy array is returned.
+
     The parameter ``return_mask=True`` can be used in conjunction
     with ``algo="iter"`` to return only the mask of points to keep. Example:
+
     >>> from rdp import rdp
     >>> import numpy as np
     >>> arr = np.array([1, 1, 2, 2, 3, 3, 4, 4]).reshape(4, 2)
@@ -143,6 +151,7 @@ def rdp(M, epsilon=0, dist=pldist, algo="iter", return_mask=False):
     >>> arr[mask]
     array([[1, 1],
            [4, 4]])
+
     :param M: a series of points
     :type M: numpy array with shape ``(n,d)`` where ``n`` is the number of points and ``d`` their dimension
     :param epsilon: epsilon in the rdp algorithm
@@ -161,7 +170,7 @@ def rdp(M, epsilon=0, dist=pldist, algo="iter", return_mask=False):
         if return_mask:
             raise NotImplementedError("return_mask=True not supported with algo=\"rec\"")
         algo = rdp_rec
-        
+
     if "numpy" in str(type(M)):
         return algo(M, epsilon, dist)
 

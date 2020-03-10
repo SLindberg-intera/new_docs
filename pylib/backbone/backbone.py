@@ -6,7 +6,10 @@ utilities to help traverse the ICF blockchain with Python
 import sys
 import json
 import os
-import versions
+try:
+    from . import versions
+except ImportError:
+    import versions
 import itertools
 
 
@@ -19,8 +22,8 @@ ICF_BLOCK_FILENAME = "icfblock.block" # the name of the blockchain files
 META_DIR = 'meta'  # name of the "meta" directory
 DATA_DIR = 'data' # name of the "data" directory
 
-ICF_TEST_DIR = os.path.join("ICF", "Test")
-ICF_PROD_DIR = os.path.join("ICF", "Prod")
+ICF_TEST_DIR = os.path.join("ICF", "TEST")
+ICF_PROD_DIR = os.path.join("ICF", "PROD")
 TEST = 'TEST'
 PROD = 'PROD'
 
@@ -51,7 +54,7 @@ class Connection:
         return "Connection(source={}, target={}, value={})".format(
                 self.source, self.target, self.value)
     
-    def as_dict():
+    def as_dict(self):
         return {
           "source":self.source, 
           "target":self.target, "value":self.value}
@@ -59,7 +62,8 @@ class Connection:
 def check_against_prod_path(in_path):
     """ if possible, swap TEST path for PROD"""
     if(ICF_TEST_DIR in in_path):
-        prod = in_path.replace(ICF_TEST_DIR, ICF_PROD_DIR)
+        prod = in_path.replace(
+                ICF_TEST_DIR, ICF_PROD_DIR)
         if os.path.exists(prod):
             return prod
     return in_path    
@@ -67,7 +71,8 @@ def check_against_prod_path(in_path):
 def check_against_test_path(in_path):
     """ if possible, swap PROD path for TEST"""
     if(ICF_PROD_DIR in in_path):
-        test = in_path.replace(ICF_PROD_DIR, ICF_TEST_DIR)
+        test = in_path.replace(
+                ICF_PROD_DIR, ICF_TEST_DIR)
         if os.path.exists(test):
             return test
     return in_path 
@@ -88,7 +93,7 @@ class Block:
         self.timestamp = timestamp
 
     @classmethod
-    def from_path(cls, filepath):
+    def from_path(cls, filepath, rootpath=""):
         """ read a block from the blockchain
         
         will first check if the QA version exists and will return that
@@ -101,12 +106,12 @@ class Block:
             d = json.load(f)
             p = []
             rootpath = os.path.dirname(filepath)
+
+
             for path in d[INHERITANCE]:
-                path = os.path.abspath(
-                        version_path_to_blockfile(
-                            os.path.join(rootpath, path) 
-                            ))
-                path = check_against_prod_path(path)        
+
+                path = check_against_prod_path(
+                    os.path.join(rootpath, path))
                 p.append(cls.from_path(path))
             timestamp = d.get(TIMESTAMP, None)    
 
@@ -159,7 +164,7 @@ def get_fingerprint(filepath, sep="\t"):
     fingerline = lines[1]
     if "Total" not in fingerline:
         raise ValueError("Invalid fingerprint file")
-    return fingerline.split(sep)[1]    
+    return fingerline.split(sep)[1].strip()    
 
 def get_version(meta_folder_path):
     """ given a path to a meta folder, get the version number """
@@ -215,9 +220,9 @@ class WorkProductVersion:
     """
     def __init__(self, path):
         path = check_against_prod_path(path)
-        if(ICF_TEST_DIR in path)>0:
+        if(ICF_TEST_DIR.upper() in path.upper())>0:
             self._QA = TEST
-        elif(ICF_PROD_DIR in path)>0:
+        elif(ICF_PROD_DIR.upper() in path.upper())>0:
             self._QA = PROD
         else:
             raise ValueError("'{}' Is not a valid ICF Path".format(path))
@@ -271,6 +276,10 @@ class WorkProductVersion:
         return os.path.join(self.meta_path, ICF_BLOCK_FILENAME)
 
     @property
+    def timestamp(self):
+        return self.block.timestamp
+
+    @property
     def version_number(self):
         return get_version(self.path)
 
@@ -296,6 +305,12 @@ class WorkProductVersion:
         blockpath, blockfile = os.path.split(os.path.abspath(block.path))
         version_path, metadir = os.path.split(blockpath)
         return cls(version_path)
+
+    def short_desc(self):
+        outstr = "{}\t{}\t{}\t{}".format(
+                self.work_product_name,
+                self.version_str, self.path, self.qa_status)
+        return outstr
 
     def get_summary(self, sep=" "):
         block = self.block
@@ -326,6 +341,10 @@ class WorkProductVersion:
         all_products_path = self.all_work_products_path
         block_path = self.block.path
         work_products = WorkProducts(all_products_path)
+
+        def temp(item):
+            return item
+        
         _versions = [[i.path for i in work_product.versions
                     if (block_path in i.block.nodes)]
                 for work_product in work_products]

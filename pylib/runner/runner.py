@@ -3,7 +3,7 @@ import sys, os
 from config import config, parse_args
 import logging
 from pylib.info.info import Info
-from pylib.pygit.git import get_version, is_clean_master_branch
+from pylib.pygit.git import get_version, is_clean_master_branch, get_remote_master_version , get_tag, get_tool_hash
 from pathlib import Path
 
 import subprocess
@@ -30,6 +30,9 @@ def get_invoked_tool_name(args):
     """ return the tool name that was invoked at the command line"""
     return args.Name
 
+def notify_manual_mode(args):
+    logging.info(
+         config[c.MANUAL_MODE_TEMPLATE_KEY].format(manual=args.manual))
 
 def get_invoked_tool_arguments(args):
     """ return the arguments were invoked at the command line
@@ -47,9 +50,7 @@ def make_user_message(args):
 def make_tool_use_message(args):
     """ constructs a message to notify the user which tool
     is being invoked.  Message is defined in the config template
-        
     """
-
     tool_name = get_invoked_tool_name(args)
     tool_args = get_invoked_tool_arguments(args)
     return config[c.TOOL_NOTIFICATION_TEMPLATE_KEY].format(
@@ -67,91 +68,125 @@ def make_user_summary():
             uname=info.uname,
             platform=info.platform,
             username=info.username
-    )
+    ) 
 
 
 def get_approved_tools():
     return config[c.APPROVED_TOOL_KEY]
 
-def get_pathtool(args):
-    "determine which tool being invoked by the runner (if .exe (or ?) then = tool_name; if script then = 1st argument)"
+def get_pathtools(args):
+    '''
+        determine which tool/command being invoked by the runner (if .exe then = tool_name; if python or perl then 1st in arg.Arguments; if java more complicated)
+    '''
 # the following assumes that the command line statement is as follows:
-# .. python ..\runner.py 'perl\python\*.exe' "arguments [if script first argument is tool script filename..."
+# .. python ..\runner.py 'java|perl|python|*.exe' "arguments [if script (perl or python) first argument is tool script filename...java is a little more complex]"
     command = get_invoked_tool_name(args)
+    formatted_command = command.strip().lower()
 
-    
-# this conditional statement may need to be updated depending upon how the CAST tool is called by the tool runner
-    if command[-4:] == '.exe':
-        return command 
-    else:
-        get_invoked_tool_arguments(args)
-        return get_invoked_tool_arguments(args).split(' ')[0]
+    if formatted_command.endswith('.exe'):
+        return [command]
+
+    if formatted_command == 'java':
+        return get_filepathlist(args.Arguments)
+
+    # get_invoked_tool_arguments(args)  --- this appears to be unused
+    return [get_invoked_tool_arguments(args).split(' ')[0]]
          
 
 def get_currdir():
     return os.path.abspath(os.path.dirname(__file__))
 
-def get_gitpath(pathtool):
-
-    
-    p = Path(pathtool)
+def get_gitpath(pathfile):
+    '''recursively searches upward in the invoked tool path for the git directory
+        returns a string of the git directory path if found or  False if not found'''
+    p = Path(pathfile)
     for path in p.parents:
         if (path.joinpath('.git').exists()):
-            return(path.joinpath('.git'))
-    return 'not a repository' 
+            return(str(path.joinpath('.git')))
+    return False 
     
-def get_filename(path_file):
-    return Path(path_file).name
+def get_filename(pathfile):
+    return Path(pathfile).name
 
-def is_on_qualified_list(args):
-    "determine which tool being invoked by the runner (if .exe (or ?) then = tool_name; if script then = 1st argument)"
-# the following assumes that the command line statement is as follows:
-# .. python ..\runner.py 'perl\python\*.exe' "arguments [if script first argument is tool script filename..."
-    command = get_invoked_tool_name(args)
+def get_filepathlist(arguments):
+    '''checks the arg.Arguments string for files or directories--used currently to find invoked files/library for CAST
+        can be used for fingerprinter as well?'''
+    arglist = arguments.replace('=',' ').split(' ')
+    filepathlist = []
 
-# this conditional statement may need to be updated depending upon how the CAST tool is called by the tool runner
-    if command[-4:] == '.exe':
-        tool_command = get_filename(command)
-    else:
-        path_tool = get_invoked_tool_arguments(args).split(' ')[0]
-        tool_command = get_filename(path_tool)
+    for arg in arglist:
+        if(Path(arg).exists()):
+            filepathlist.append(arg)
+
+    return filepathlist
+
+def is_same_version(gitpath):
+
+    return get_version(gitpath) == get_remote_master_version(gitpath)
+
+
+#def is_on_qualified_list(args):
+def is_on_qualified_list(tool_command):
+
     approved_tools = get_approved_tools()
     for tool in approved_tools:
         if tool_command == tool['command']:
             return True
     return False
 
-def make_qa_status(args, path):
+#note: args is a artifact--not currently used in the code for checking qa status
+def make_qa_status(args, tool, path):
     """ construct a string showing the QA Status"""
-    if is_on_qualified_list(args) and is_clean_master_branch(path):
+
+    if path and is_same_version(path) and is_clean_master_branch(path) and is_on_qualified_list(get_filename(tool)):
         status = c.QA_QUALIFIED
     else:
         status = c.QA_TEST
-    return config[c.QA_STATUS_TEMPLATE_KEY].format(status=status)
+
+    return config[c.QA_STATUS_TEMPLATE_KEY].format(status='{} : {}'.format(status,tool))
 
 
-def make_version(path):
-    
-    if path != 'not a repository':
-        version = get_version(str(path))
-        
+def make_version(tool, path):
+    if path:
+        version = get_version(path)
+        release = get_tag(path)
+        if release == 'show':
+            release = 'not a QA_QUALIFIED version'
     else:
-        version = ' Tool ' + path  
+        version = 'Not a valid tool path'
+        release = ''
+    tool_hash = get_tool_hash(path, tool)
     
-    return config[c.VERSION_TEMPLATE_KEY].format(version=version)
+    return config[c.VERSION_TEMPLATE_KEY].format(
+                    version='{} {}: {}<--{}'.format(version, release,tool, tool_hash)
+                    )
 
 
-def log_header(args,runner_gpath, tool_gpath):
-    #set_git_path()
+def log_tooluse_header(args, tg_dict):
+
+    for tool, gitpath in tg_dict.items():
+        #note: args is a artifact--not currently used in the code for checking qa status
+        notify_user(make_qa_status(args, tool, gitpath))
+
+
+def log_header(args,tg_dict):
     notify_user(make_user_message(args), shell=True)
-    notify_user(make_tool_use_message(args))
-    #need to check versioning of both the runner and the tool being invoked....
-    notify_user(make_version(runner_gpath))
-    notify_user(make_version(tool_gpath))
-    notify_user(make_qa_status(args,tool_gpath))
-    notify_user(make_qa_status(args,tool_gpath))
+    #check versioning (first for loop) and QA status (second for loop) of both the runner and the tool(s) being invoked....
+    for tool, gitpath in tg_dict.items():
+        notify_user(make_version(tool, gitpath))
+    
+    if args.manual is None:
+        for tool, gitpath in tg_dict.items():
+            notify_user(make_qa_status(args, tool, gitpath))
+        notify_user(make_tool_use_message(args))
 
     notify_user(make_user_summary())
+
+def make_virtual_summary(args):
+    return config[c.VIRTUAL_SUMMARY_TEMPLATE_KEY].format(tool=args.Name)
+
+def log_virtual_run(args):
+    notify_user(make_virtual_summary(args))    
 
 def execute_program(args):
     runargs = args.Arguments.split(" ")
@@ -159,17 +194,23 @@ def execute_program(args):
         [args.Name]+runargs, shell=False)
 
 if __name__ == "__main__":
-    
-    thisdir = get_currdir()
-    
-    runner_gitpath = get_gitpath(Path(thisdir))
-    
+    toolgitdict = {}
+    #add toolrunner filename and its gitpath to tool/gitpath dictionary
+    toolgitdict[__file__] = get_gitpath(__file__)
+
+     
     args = parse_args()
-    #NOTE: there could be more than one tool associated file that needs to have path verified (ie CAST that uses several files...libraries etc) 
-    #may need to have a list of paths returned and add iterating through the lists in the subsequent function calls.
-    path_tool = get_pathtool(args)
-    tool_gitpath = get_gitpath(path_tool)
-    
+    #get the tool(s) being invoked by runner and add to tool/gitpath dictionary--CAST references a library and jar file in repository--not handled at this time
+    tool_list = get_pathtools(args)
+    for path_tool in tool_list:
+        toolgitdict[path_tool] =  get_gitpath(path_tool)
+
     configure_logger(args)
-    log_header(args,runner_gitpath, tool_gitpath)
-    execute_program(args)
+    log_header(args, toolgitdict)
+    if args.manual is not None:
+        notify_manual_mode(args)    
+    else:        
+        if args.virtual is False:    
+            execute_program(args)
+        else:
+            log_virtual_run(args)    

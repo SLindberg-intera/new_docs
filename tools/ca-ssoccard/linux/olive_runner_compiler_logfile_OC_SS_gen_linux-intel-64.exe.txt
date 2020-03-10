@@ -1,0 +1,14 @@
+INFO--01/22/2020 01:25:44 PM--Starting CA-CIE Tool Runner.	Logging to "../CA-CIE-Tools-Testing/tools/ca-ssoccard/linux/olive_runner_compiler_logfile_OC_SS_gen_linux-intel-64.exe.txt"
+INFO--01/22/2020 01:25:44 PM--Invoking: 	Command:"ifort"	Arguments:"../CA-CIE-Tools-Testing/tools/ca-ssoccard/OC_SS_gen.f -o  ../CA-CIE-Tools-Testing/tools/ca-ssoccard/linux/OC_SS_gen_linux-intel-64.exe"
+INFO--01/22/2020 01:25:44 PM--Code Version: 53308176b389f2fa9adf86a01da71851b3b09d5d v1.0: ../../../../../../opt/tools/pylib/runner/runner.py
+INFO--01/22/2020 01:25:44 PM--Code Version: 7256afd33ae5cde1d3c43da0a40686cfc4ab7a3a Local repo SHA-1 has does not correspond to a remote repo release version: ../CA-CIE-Tools-Testing/tools/ca-ssoccard/OC_SS_gen.f
+INFO--01/22/2020 01:25:44 PM--QA Status: QUALIFIED : ../../../../../../opt/tools/pylib/runner/runner.py
+INFO--01/22/2020 01:25:44 PM--QA Status: TEST : ../CA-CIE-Tools-Testing/tools/ca-ssoccard/OC_SS_gen.f
+INFO--01/22/2020 01:25:44 PM--Username:dfryar	Computer:olive	Platform:Linux 4.4.0-38-generic #57~14.04.1-Ubuntu SMP Tue Sep 6 17:20:43 UTC 2016
+INFO--01/22/2020 01:25:45 PM--Starting CA-CIE Tool Runner.	Logging to "../CA-CIE-Tools-Testing/tools/ca-ssoccard/linux/olive_runner_compiler_logfile_OC_SS_gen_linux-intel-64.exe.txt"
+INFO--01/22/2020 01:25:45 PM--Invoking: 	Command:"python"	Arguments:"../../../../../../opt/tools/pylib/fingerprint/fingerprint.py ../CA-CIE-Tools-Testing/tools/ca-ssoccard/linux/OC_SS_gen_linux-intel-64.exe --output ../CA-CIE-Tools-Testing/tools/ca-ssoccard/linux/fingerprint_OC_SS_gen_linux-intel-64.exe.txt"
+INFO--01/22/2020 01:25:45 PM--Code Version: 53308176b389f2fa9adf86a01da71851b3b09d5d v1.0: ../../../../../../opt/tools/pylib/runner/runner.py
+INFO--01/22/2020 01:25:45 PM--Code Version: 53308176b389f2fa9adf86a01da71851b3b09d5d v1.0: ../../../../../../opt/tools/pylib/fingerprint/fingerprint.py
+INFO--01/22/2020 01:25:45 PM--QA Status: QUALIFIED : ../../../../../../opt/tools/pylib/runner/runner.py
+INFO--01/22/2020 01:25:45 PM--QA Status: QUALIFIED : ../../../../../../opt/tools/pylib/fingerprint/fingerprint.py
+INFO--01/22/2020 01:25:45 PM--Username:dfryar	Computer:olive	Platform:Linux 4.4.0-38-generic #57~14.04.1-Ubuntu SMP Tue Sep 6 17:20:43 UTC 2016
