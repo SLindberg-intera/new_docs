@@ -136,7 +136,7 @@ def build_ind(text,num):
         if i > num and len(x) != 0:
             return ['ERROR: Index should have {0} values, has {1} found.'.format(num,i)]
 
-        if x.isnumeric():
+        if is_number(x):
             ind[0] = float(x)
             i += 1
         elif '@' in x:
@@ -151,6 +151,14 @@ def build_ind(text,num):
     if (i-1) != num:
         return ['ERROR: Index should have {0} values, only {1} found.'.format(num,i)]
     return ind
+#-------------------------------------------------------------------------------
+# find if a string can be converted to float
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except:
+        return False
 #-------------------------------------------------------------------------------
 # read in shape file then find all relevant grids to the stomp grid
 def build_shp_grid(shpfile,ind_x,ind_y,num_x,num_y):
