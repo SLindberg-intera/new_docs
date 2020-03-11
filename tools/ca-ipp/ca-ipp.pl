@@ -15,15 +15,24 @@
 #	Appendix F SIMV2 (sorted) - RADS
 #       Chemical Inventory (or none) - e.g. NO3, Cr, CN
 #	SAC Liquid Inventory
-#	Solid waste Release Directory (assumes "summary.csv" is there")
+#	Solid waste Release Directory
+#	Solid waste summary file (filenames)
 #	Redistribution File name (or none)
 #	New Inventory File Name (prefix) and log file
 #	
 #	v4.0 new solid waste files
+#
+#	v4.1 new solid waste files - slightly different summary file format
+#
+#	v4.2 - integrating solid waste release in summary file
+#	
+#	v4.3 - new solid waste file - reduced data cumulative solid waste
+#
+#	v4.4 = fixed bug in summary totals
 
 $dtstamp = localtime();
 
-$vers="11/11/2019 Ver 4.0 by MDWilliams, Intera Inc.";
+$vers="3/6/2020 Ver 4.4 by MDWilliams, Intera Inc.";
 
 # Half Lives from EMDT-DE-0006 Rev 1, 18-May-2015
 # Values in Years
@@ -57,7 +66,7 @@ $radinv = shift @ARGV;
 $cheminv = shift @ARGV;
 $liqinv = shift @ARGV;
 $swrdir = shift @ARGV;
-$swrind = $swrdir."/summary.csv";
+$swrind = shift @ARGV;
 $redfn = shift @ARGV;
 $outpref = shift @ARGV;
 $outpref =~ s/[\r\n]+$//;
@@ -87,14 +96,16 @@ $dashes="----------------------------------------------------------------------"
 printf(OL "Inventory preprocessor ca-ipp.pl Log File: $dtstamp\n");
 printf(OL "# Processed by IPP $vers\n");
 printf(OL "# ehsit file = $ehsit, Rad Inventory file = $radinv\n");
-printf(OL "# Chemical Inventory file = $cheminv, SAC supplemental Liquids = $liqinv\n");
+printf(OL "# Chemical Inventory file = $cheminv\n");
+printf(OL " SAC supplemental Liquids = $liqinv\n");
 printf(OL "# Solid Waste Inventory Directory = $swrdir\n");
 printf(OL "$dashes\n$dashes\n");
 
 printf(OI "CA VZ Inventory: $dtstamp\n");
 printf(OI "# Processed by IPP $vers\n");
 printf(OI "# ehsit file = $ehsit, Rad Inventory file = $radinv\n");
-printf(OI "# Chemical Inventory file = $cheminv, SAC supplemental Liquids = $liqinv\n");
+printf(OI "# Chemical Inventory file = $cheminv\n");
+printf(OI "# SAC supplemental Liquids = $liqinv\n");
 printf(OI "# Solid Waste Inventory Directory = $swrdir\n\n");
 
 printf(OS "# Inventory Summary for $outinv: $dtstamp\n");
@@ -153,6 +164,11 @@ printf(OL "\n$dashes\n$dashes\n");
 printf(OL "Loading $radinv\n");
 # load SIM Inventory
 # skip first line
+$line = <SR>;
+chomp($line);
+printf(OI "# Inventory File Header = $line\n\n");
+printf(OS "# Inventory File Header = $line\n\n");
+printf(OL "# Inventory File Header = $line\n\n");
 $line = <SR>;
 chomp($line);
 printf(OI "# Inventory File Header = $line\n\n");
@@ -624,6 +640,7 @@ $nsws=0;
 $nswsites=0;
 if ($swrdir ne "none") {
   printf(OL "Loading Solid Waste Release Site Index $swrind\n");
+  # skip header
   $line = <SWI>;
   $nsws=0;
   $nswsites=0;
@@ -632,10 +649,9 @@ if ($swrdir ne "none") {
         chomp($line);
         @a=split(",",$line);
         $swname[$nsws]=$a[1];
-        $swfile[$nsws]=$a[7];
-# replace any \ with / (DOS convention)
-	$swfile[$nsws] =~ s/\\/\//g;
 	$swcopc[$nsws]=$a[0];
+	$swredactivity[$nsws]=$a[6];
+	$swfile[$nsws]=$a[1]."_".$a[0].".csv";
 	$swused[$nsws]=0;
         if (!exists $sws_hash{$swname[$nsws]}) {
 	        $nswsites++;
@@ -796,7 +812,9 @@ for ($s=0;$s<$nsimsites;$s++) {
 		@tot = split(",",$line);
 		$tot[0]="Total";
 		$tot[$sim2sourcecol]="";
-		$tot[$sim2volcol]=0;
+		if ((!defined $tot[$sim2volcol]) || ($tot[$sim2volcol] eq "")) {
+			$tot[$sim2volcol]=0;
+		}
 		$tottmin=$tot[$sim2timecol];
 		$tottmax=$tottmin;
 		for ($i=0;$i<$ntrad+$nchem;$i++) {
@@ -833,10 +851,13 @@ for ($s=0;$s<$nsimsites;$s++) {
 	for ($sws=0;$sws<$nsws;$sws++) {
 	    if ($swname[$sws] eq $swid) {
 			# load file
-             	printf(OL "Inserting Solid Waste site $swid $swcopc[$sws] $swfile[$sws]\n");
-		$swrf=$swrdir."/".$swfile[$sws];
+             	printf(OL "Inserting Solid Waste site $swid $swcopc[$sws] $swname[$sws]\n");
+		$swrf=$swrdir."/".$swname[$sws]."_".$swcopc[$sws].".csv";
         	open(SWR,"<$swrf") || die "Can't open $swrf file $!\n";
-
+# skip 5 header lines
+		for ($i=0;$i<5;$i++) {
+			$line=<SWR>;
+		}
 # get units when Kevin put them in - $swunits
                 $swunits="(Ci/year)";
 
@@ -852,15 +873,13 @@ for ($s=0;$s<$nsimsites;$s++) {
 			exit(0);
 		}
 
-        	# skip header
-                $swline=<SWR>;
                 $ns=0;
                 while ($swline = <SWR>) {
                         chomp($swline);
                         @a=split(",",$swline);
                         $sl++;
-                        $swyear = $a[4];
-                        $swrate = $a[5];
+                        $swyear = $a[0];
+                        $swrate = $a[1];
                         if ((defined $swrate) && ($swrate ne "")
                                 && (defined $swyear) && ($swyear ne "")) {
                                 $swsly[$ns]=$swyear;
@@ -892,7 +911,11 @@ for ($s=0;$s<$nsimsites;$s++) {
                    }
                 }
 		$swused[$sws]=1;
-		printf(OS "Solid Waste Release for $swid not integrated yet\n");
+		printf(OS "Solid Waste Release for $swcopc[$sws] Reduced Activity = $swredactivity[$sws],,$swid,Solid Release Integrated,,$swsly[0] to $swsly[$ns-1],");
+		for ($k=0;$k<$swradcol;$k++) {
+                     printf(OS ",");
+                }
+		printf(OS "%12.5e,\n",$swimass);
 	}
     }
 }
@@ -930,7 +953,7 @@ for ($sws=0;$sws<$nsws;$sws++) {
 		$swid = $swname[$sws];
                 # load file
                 printf(OL "Inserting Solid Waste site $swid $swfile[$sws] $swcopc[$sws]\n");
-                $swrf=$swrdir."/".$swfile[$sws];
+                $swrf=$swrdir.$swfile[$sws];
                 open(SWR,"<$swrf") || die "Can't open $swrf file $!\n";
                 # find rad column
 
@@ -987,7 +1010,11 @@ for ($sws=0;$sws<$nsws;$sws++) {
 		   }
 		}
 		$swused[$sws]=1;
-                printf(OS "Solid Waste Release for $swid not integrated yet\n");
+                printf(OS "Solid Waste Release for $swcopc[$sws] Reduced Activity = $swredactivity[$sws],,$swid,Solid Release Integrated,,$swsly[0] to $swsly[$ns-1],");
+                for ($k=0;$k<$swradcol;$k++) {
+                     printf(OS ",");
+                }
+		printf(OS "%12.5e,\n",$swimass);
 	}
 }
 
