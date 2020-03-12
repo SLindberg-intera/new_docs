@@ -1,0 +1,18 @@
+INFO--03/12/2020 11:51:45 AM--Starting CA-CIE Tool Runner.	Logging to "../../CA-CIE-Tools-TestRepos/repo_OC_rad_gen.f/tools/ca-radoccard/linux/olive_runner_compiler_logfile_OC_rad_gen_linux-intel-64.exe.txt"
+INFO--03/12/2020 11:51:45 AM--Code Version: 147dee163e978f6038f4025817bca62529738e61 v1.16: ../../../../../../opt/tools/pylib/runner/runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+
+INFO--03/12/2020 11:51:45 AM--Code Version: 4cae07d0011274bb9f2ba830b3b8dd3d83ec4657 Local repo SHA-1 has does not correspond to a remote repo release version: ../../CA-CIE-Tools-TestRepos/repo_OC_rad_gen.f/tools/ca-radoccard/OC_rad_gen.f<--a29df1e8b1b162a580210ff859cf530b8718b363
+
+INFO--03/12/2020 11:51:45 AM--QA Status: QUALIFIED : ../../../../../../opt/tools/pylib/runner/runner.py
+INFO--03/12/2020 11:51:45 AM--QA Status: TEST : ../../CA-CIE-Tools-TestRepos/repo_OC_rad_gen.f/tools/ca-radoccard/OC_rad_gen.f
+INFO--03/12/2020 11:51:45 AM--Invoking Command:"ifort"	with Arguments:"../../CA-CIE-Tools-TestRepos/repo_OC_rad_gen.f/tools/ca-radoccard/OC_rad_gen.f -o  ../../CA-CIE-Tools-TestRepos/repo_OC_rad_gen.f/tools/ca-radoccard/linux/OC_rad_gen_linux-intel-64.exe"
+INFO--03/12/2020 11:51:45 AM--Username:dfryar	Computer:olive	Platform:Linux 4.4.0-38-generic #57~14.04.1-Ubuntu SMP Tue Sep 6 17:20:43 UTC 2016
+INFO--03/12/2020 11:51:46 AM--Starting CA-CIE Tool Runner.	Logging to "../../CA-CIE-Tools-TestRepos/repo_OC_rad_gen.f/tools/ca-radoccard/linux/olive_runner_compiler_logfile_OC_rad_gen_linux-intel-64.exe.txt"
+INFO--03/12/2020 11:51:46 AM--Code Version: 147dee163e978f6038f4025817bca62529738e61 v1.16: ../../../../../../opt/tools/pylib/runner/runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+
+INFO--03/12/2020 11:51:46 AM--Code Version: 147dee163e978f6038f4025817bca62529738e61 v1.16: ../../../../../../opt/tools/pylib/fingerprint/fingerprint.py<--13a885dc11cc15aea74c14b09c0d8584ec6cfd08
+
+INFO--03/12/2020 11:51:46 AM--QA Status: QUALIFIED : ../../../../../../opt/tools/pylib/runner/runner.py
+INFO--03/12/2020 11:51:46 AM--QA Status: QUALIFIED : ../../../../../../opt/tools/pylib/fingerprint/fingerprint.py
+INFO--03/12/2020 11:51:46 AM--Invoking Command:"python"	with Arguments:"../../../../../../opt/tools/pylib/fingerprint/fingerprint.py ../../CA-CIE-Tools-TestRepos/repo_OC_rad_gen.f/tools/ca-radoccard/linux/OC_rad_gen_linux-intel-64.exe --output ../../CA-CIE-Tools-TestRepos/repo_OC_rad_gen.f/tools/ca-radoccard/linux/fingerprint_SS_input_gen_linux-intel-64.exe.txt"
+INFO--03/12/2020 11:51:46 AM--Username:dfryar	Computer:olive	Platform:Linux 4.4.0-38-generic #57~14.04.1-Ubuntu SMP Tue Sep 6 17:20:43 UTC 2016
