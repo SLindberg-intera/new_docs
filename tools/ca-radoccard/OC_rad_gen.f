@@ -671,7 +671,7 @@ c
      >  'ZNC Aqueous Volumetric Flux (Node Centered), mm/year,'
       WRITE(22,"(i3,a1)") 1,','
       WRITE(22,"(a12)") '12070, year,'
-      WRITE(22,"(a)") '16,'
+      WRITE(22,"(a)") '17,'
       WRITE(22,"(a)") 'Rock/Soil Type, ,'
       IF(irad.eq.1) THEN
         WRITE(22,"(a)") 'Solute Aqueous Conc, C-14,1/L,'
@@ -702,6 +702,8 @@ c
      >  'YNC Aqueous Volumetric Flux (Node Centered), mm/year,'
       WRITE(22,"(a)")
      >  'ZNC Aqueous Volumetric Flux (Node Centered), mm/year,'
+      WRITE(22,"(a)")
+     >  'No Restart, ,'
 c
       WRITE(22,"(2a)") '#-------------------------------------------',
      >  '-----------------------'
