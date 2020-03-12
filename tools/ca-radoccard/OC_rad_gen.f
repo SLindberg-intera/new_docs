@@ -1,73 +1,71 @@
-c       ************************ PROGRAM OC_rad1_gen.f ****************************
-c          Generate Output Control card for the rad transport simulations.
+c       ************************ PROGRAM OC_rad_gen.f ****************************
+c          Generate Output Control card for the CA radionuclide transport simulations.
 c
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
 c
-      DIMENSION sitexy(500,2),ehxy(5000,2),ifound(500),ipltyr(100)
+      DIMENSION ipltyr(100)
       DIMENSION gridxy(500,500,2),laytop(500,500)
       DIMENSION mindxs(500),mindys(500)
-      CHARACTER mname*20
-      CHARACTER infile1*80,infile2*80,infile3*80
-      CHARACTER infile4*80,infile5*80,infile6*80
-      CHARACTER outfile1*80,outfile2*80,outfile3*80
-      CHARACTER line*256,comm*22,radch*1
-      CHARACTER site(500)*20,ehsite(5000)*20
-      CHARACTER(LEN=80) :: comlin1
-      CHARACTER(LEN=80) :: comlin2
+      CHARACTER infile1*80,infile2*80,infile3*80,infile4*80
+      CHARACTER outfile1*80,outfile2*80
+      CHARACTER line*256,comm*22,radgrp*4
+      CHARACTER(len=80), DIMENSION(:), allocatable :: args
 c
-      site=""
-      ehsite=""
-      sitexy=0.0
-      ehxy=0.0
       gridxy=0.0
-      ifound=0
       laytop=0
 c
-      infile1="../sources/rads1-src.ref"
-      infile2="../../commondata/ehsit_01122018_centroid.prn"
-      infile3="../build/input.nij"
-      infile4="../build/input.top"
-      infile5="plot_times.txt"
-      infile6="../build/input.sij"
+      infile1="../build/input.nij"
+      infile2="../build/input.top"
+      infile3=""
+      infile4="../build/input.sij"
 c
-c --- Read model name from command line
+c --- Read command line arguments
 c
-      comlin1 = ' '
-      iarg = 1
-      CALL GETARG(iarg,comlin1)
-      mname=trim(comlin1)
+      num_args = command_argument_count()
+      ALLOCATE(args(num_args))
+      args=""
 c
+      DO ix = 1, num_args
+        CALL get_command_argument(ix,args(ix))
+      ENDDO
 c
 c --- Read switch for rad1/rad2 from command line
 c
-      comlin2 = ' '
-      iarg = 2
-      CALL GETARG(iarg,comlin2)
-      READ(comlin2,"(i1)") irad
-      IF((irad.ne.1).and.(irad.ne.2)) GOTO 9991
-      WRITE(radch,"(i1)") irad
-      WRITE(*,"(a,i1)") ' Output for rad',irad
+      READ(args(1),*) radgrp
+      IF(radgrp.eq."rad1") THEN
+        irad=1
+      ELSEIF(radgrp.eq."rad2") THEN
+        irad=2
+      ELSE
+        WRITE(*,*) ' Invalid radionuclide group = ',radgrp
+        GOTO 9999
+      ENDIF
+      WRITE(*,*) ' Rad group = ',irad
 c
-      outfile1="rad"//radch//"_Output_Control_check.dat"
-      outfile2="rad"//radch//"_Output_Control.dat"
-      outfile3="rad"//radch//"_Mass_Balance_Output_Control.dat"
+c --- Read plot times path/filename from command line
+c
+      READ(args(2),"(a80)") infile3
+      WRITE(*,*) ' Plot times file = ',infile3
+c
+      IF(irad.eq.1) THEN
+        outfile1=radgrp//"_Output_Control.dat"
+        outfile2=radgrp//"_Mass_Balance_Output_Control.dat"
+      ELSE
+        outfile1=radgrp//"_Output_Control.dat"
+        outfile2=radgrp//"_Mass_Balance_Output_Control.dat"
+      ENDIF
       WRITE(*,*) outfile1
       WRITE(*,*) outfile2
 c
-      OPEN(20,FILE=outfile1,
-     >  STATUS='REPLACE',IOSTAT=IST)
-      WRITE(20,"(2a)") 'Site                         Cent_X         ',
-     >  'Cent_Y    i    j         Node_X         Node_Y       Distance'
-c
-      OPEN(21,FILE=outfile2,
+      OPEN(21,FILE=outfile1,
      >  STATUS='REPLACE',IOSTAT=IST)
 c
-      OPEN(22,FILE=outfile3,
+      OPEN(22,FILE=outfile2,
      >  STATUS='REPLACE',IOSTAT=IST)
 c
 c --- Determine grid and quadrant center coordinates.
 c
-      OPEN(16,FILE=infile6,STATUS='OLD'
+      OPEN(16,FILE=infile4,STATUS='OLD'
      >  ,IOSTAT=IST)
 c
       READ(16,*) nxs,nys
@@ -99,59 +97,9 @@ c
 c
       CLOSE(16)
 c
-c --- Read source site list.
-c
-      OPEN(11,FILE=infile1,STATUS='OLD'
-     >  ,IOSTAT=IST)
-c
-      nsite=1
-  100 READ(11,"(a256)",END=200) line
-      DO jj=1,200
-        IF(line(jj:jj+4).eq."-Part") GOTO 100
-      ENDDO
-      IF(line(1:9).ne."# Site = ") GOTO 9990
-      ndch=LEN(TRIM(line))
-      WRITE(*,*) nsite,ndch,line(10:ndch)
-      site(nsite)=line(10:ndch)
-      nsite=nsite+1
-      GOTO 100
-c
-  200 nsite=nsite-1
-      CLOSE(11)
-c
-c --- Read source site centroids.
-c
-      OPEN(12,FILE=infile2,STATUS='OLD'
-     >  ,IOSTAT=IST)
-c
-      nseh=1
-      READ(12,*)
-  210 READ(12,"(a20,40x,2f20.0)",END=300) ehsite(nseh),ehxy(nseh,1),
-     >  ehxy(nseh,2)
-c      WRITE(20,*) nseh,ehsite(nseh),ehxy(nseh,1),ehxy(nseh,2)
-      nseh=nseh+1
-      GOTO 210
-c
-  300 nseh=nseh-1
-      CLOSE(12)
-      WRITE(*,*) ' Finished centroids ',nseh
-c
-c --- Get site XYs from ehsite XYs
-c
-      DO is=1,nsite
-        DO ie=1,nseh
-          IF(site(is)(1:20).eq.ehsite(ie)(1:20)) THEN
-            sitexy(is,1)=ehxy(ie,1)
-            sitexy(is,2)=ehxy(ie,2)
-            ifound(is)=1
-          ENDIF
-        ENDDO
-      ENDDO
-      WRITE(*,*) ' Matched XYs from ehsit'
-c
 c --- Read model i/j & x/y values.
 c
-      OPEN(13,FILE=infile3,STATUS='OLD'
+      OPEN(13,FILE=infile1,STATUS='OLD'
      >  ,IOSTAT=IST)
 c
       READ(13,*) nxn,nyn
@@ -164,65 +112,7 @@ c
       WRITE(*,*) ' Read node XYs'
       CLOSE(13)
 c
-c --- Find i&j for centroids
-c
-      mindxs=0
-      mindys=0
-      DO is=1,nsite
-        dmin=1000000.0
-        DO ixx=1,nxn
-          DO iyy=1,nyn
-            dist=SQRT((gridxy(ixx,iyy,1)-sitexy(is,1))**2+
-     >                (gridxy(ixx,iyy,2)-sitexy(is,2))**2)
-            IF(dist.le.dmin) THEN
-              mindxs(is)=ixx
-              mindys(is)=iyy
-              dmin=dist
-            ENDIF
-          ENDDO
-        ENDDO
-c
-        IF(ifound(is).eq.0) THEN
-          WRITE(20,"(3a)") '------------------------------------------',
-     >      '---------------------------------------------------------',
-     >      '------------------'
-          WRITE(20,"(3a)") '------------------------------------------',
-     >      '---------------------------------------------------------',
-     >      '------------------'
-          WRITE(20,"(4a)") '******* Site ',site(is),' was not found in',
-     >      ' ehsit centroid file.'
-          WRITE(20,"(3a)") '------------------------------------------',
-     >      '---------------------------------------------------------',
-     >      '------------------'
-          WRITE(20,"(3a)") '------------------------------------------',
-     >      '---------------------------------------------------------',
-     >      '------------------'
-        ELSE
-          WRITE(20,"(a20,2f15.6,2i5,3f15.6)") site(is),sitexy(is,1),
-     >      sitexy(is,2),mindxs(is),mindys(is),gridxy(mindxs(is),
-     >      mindys(is),1),gridxy(mindxs(is),mindys(is),2),dmin
-          IF(dmin.gt.25) THEN
-            WRITE(20,"(3a)") '----------------------------------------',
-     >        '-------------------------------------------------------',
-     >        '----------------------'
-            WRITE(20,"(3a)") '----------------------------------------',
-     >        '-------------------------------------------------------',
-     >        '----------------------'
-            WRITE(20,"(5a)") '******* Site ',site(is),' centroid is',
-     >        ' more than 25 m from closest i/j. May need to adjust',
-     >        ' i/j for this site.'
-            WRITE(20,"(3a)") '----------------------------------------',
-     >        '-------------------------------------------------------',
-     >        '----------------------'
-            WRITE(20,"(3a)") '----------------------------------------',
-     >        '-------------------------------------------------------',
-     >        '----------------------'
-          ENDIF
-        ENDIF
-      ENDDO
-c
 c --- Determine grid and quadrant center i/j index values.
-c
 c
 c --- Find i for left
 c
@@ -394,7 +284,7 @@ c
 c
 c --- Read top active layer node k for model.
 c
-      OPEN(14,FILE=infile4,STATUS='OLD'
+      OPEN(14,FILE=infile2,STATUS='OLD'
      >  ,IOSTAT=IST)
 c
       DO ii=1,nxyn
@@ -454,15 +344,10 @@ c
       numlay=nummid+numq1+numq2+numq3+numq4
       WRITE(*,*) ' Number  ',numlay,nummid,numq1,numq2,numq3,numq4
 c
-      nrefn=0
-      DO is=1,nsite
-        IF(ifound(is).eq.1) nrefn=nrefn+1
-      ENDDO
-c
 c --- Read plot times.
 c
       CLOSE(14)
-      OPEN(15,FILE=infile5,STATUS='OLD'
+      OPEN(15,FILE=infile3,STATUS='OLD'
      >  ,IOSTAT=IST)
 c
       ipltyr=0
@@ -480,31 +365,13 @@ c
       WRITE(21,"(2a)") '#-------------------------------------------',
      >  '-----------------------'
       WRITE(21,"(a)") '#'
-      WRITE(21,"(4a)") '# Output Control Card for the rad',radch,
-     >  ' model for ',mname
+      WRITE(21,"(3a)") '# Output Control Card for ',radgrp,
+     >  ' Radionuclides'
       WRITE(21,"(a)") '#'
       WRITE(21,"(2a)") '#-------------------------------------------',
      >  '-----------------------'
       WRITE(21,"(a)") '~Output Control Card'
-      WRITE(21,"(i3,a1)") nrefn+numlay,','
-      WRITE(21,"(2a)") '#-------------------------------------------',
-     >  '-----------------------'
-      WRITE(21,"(a)") '#'
-      WRITE(21,"(2a)") '# Reference node profiles at waste site',
-     >  ' centriods.'
-      WRITE(21,"(a)") '#'
-      WRITE(21,"(2a)") '#-------------------------------------------',
-     >  '-----------------------'
-c
-      DO is=1,nsite
-        IF(ifound(is).eq.1) THEN
-          comm="#"//trim(site(is))
-          WRITE(21,"(a)") comm
-          WRITE(21,"(3(i3,a2))") mindxs(is),', ',mindys(is),', ',
-     >      laytop(mindxs(is),mindys(is)),', '
-        ENDIF
-      ENDDO
-c
+      WRITE(21,"(i3,a1)") numlay,','
       WRITE(21,"(2a)") '#-------------------------------------------',
      >  '-----------------------'
       WRITE(21,"(a)") '#'
@@ -624,6 +491,7 @@ c
      >  'YNC Aqueous Volumetric Flux (Node Centered), mm/year,'
       WRITE(21,"(a)")
      >  'ZNC Aqueous Volumetric Flux (Node Centered), mm/year,'
+c
       WRITE(21,"(i3,a1)") nyr,','
       DO iy=1,nyr
         IF(ipltyr(iy).le.9999) THEN
@@ -632,6 +500,7 @@ c
           WRITE(21,"(i5,a7)") ipltyr(iy),', year,'
         ENDIF
       ENDDO
+c
       WRITE(21,"(a)") '17,'
       WRITE(21,"(a)") 'Rock/Soil Type, ,'
       IF(irad.eq.1) THEN
@@ -674,8 +543,8 @@ c
       WRITE(22,"(2a)") '#-------------------------------------------',
      >  '-----------------------'
       WRITE(22,"(a)") '#'
-      WRITE(22,"(4a)") '# Output Control Card for the rad',radch,
-     >  ' mass balance model for ',mname
+      WRITE(22,"(3a)") '# Output Control Card for ',radgrp,
+     >  ' Radionuclides'
       WRITE(22,"(a)") '#'
       WRITE(22,"(2a)") '#-------------------------------------------',
      >  '-----------------------'
@@ -801,7 +670,7 @@ c
       WRITE(22,"(a)")
      >  'ZNC Aqueous Volumetric Flux (Node Centered), mm/year,'
       WRITE(22,"(i3,a1)") 1,','
-      WRITE(22,"(a12)") '22222, year,'
+      WRITE(22,"(a12)") '12070, year,'
       WRITE(22,"(a)") '16,'
       WRITE(22,"(a)") 'Rock/Soil Type, ,'
       IF(irad.eq.1) THEN
@@ -838,11 +707,7 @@ c
      >  '-----------------------'
 c
       GOTO 9999
- 9990 WRITE(20,*) ' Format problem in ref file: ',infile1
-      GOTO 9999
-c
- 9991 WRITE(*,*) ' Invalid rad1/2 switch: ',irad
-      GOTO 9999
+ 9991 WRITE(*,*) ' Invalid rad1/rad2 switch: ',radgrp
 c
  9999 CONTINUE
       STOP
