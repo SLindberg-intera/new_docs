@@ -82,6 +82,12 @@
 
 		"name":"Build Surface Flux Card", "command":"ca_build_surface_flux.py", "description":"qualified on 03.06.2020; This tool builds the Surfuce Flux Card for STOMP input file, it maps the STOMP grid to the P2R GW grid for the Stomp output."
 
+		},
+
+		{
+
+		"name":"Transient Output Card Generator", "command":"OC_rad_gen_linux-intel-64.exe", "description":"qualified on 03.16.2020; This tool creates the Output Control Card portion of a STOMP input file used for mass balance and transport production simulations."
+
 		}
 	],
 	"LOGGER":{
