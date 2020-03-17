@@ -418,7 +418,7 @@ def main():
         #******
         #** find all of the y indexes that fall in each shapefile grid
 
-        text_dic['csv'] = 'shape node, x_start, x_end, y_start, y_end, i_start, i_end, j_start, j_end,\n'
+        text_dic['csv'] = 'p2r,p2r,p2r,p2r,p2r,p2r,STOMP grid,STOMP grid,STOMP grid,STOMP grid,\nI,J,x_start,x_end,y_start,y_end,i_start,i_end,j_start,j_end,\n'
         for rec in nodes:
             x = 1
             x_start = 0
@@ -453,9 +453,8 @@ def main():
                     if y_end < y:
                         y_end = y
                 y += 1
-            text_dic['csv'] += '{0},{1},{2},{3},{4},{5} ({6}),{7} ({8}),{9} ({10}),{11} ({12}),\n'.format(rec['node'],rec['x'],rec['x_end'],rec['y'],rec['y_end'],
-                                                                                                      x_start,ind_x[x_start-1], x_end,ind_x[x_end-1], y_start,
-                                                                                                      ind_y[y_start-1], y_end,ind_y[y_end-1])
+            text_dic['csv'] += '{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},\n'.format(rec['column'],rec['row'],rec['x'],rec['x_end'],rec['y'],rec['y_end'],
+                                                                                        x_start, x_end, y_start,y_end)
             tmp += filename.format(len(contaminates)+1,rec['row'],rec['column'])
             tmp += comment.format(rec['row'],rec['column'])
             tmp += line_av.format('Aqueous Volumetric',x_start,x_end,y_start,y_end)
