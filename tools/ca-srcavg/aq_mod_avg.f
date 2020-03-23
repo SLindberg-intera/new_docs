@@ -6,10 +6,10 @@ c
 c
       DIMENSION modyr(25,4),ncomma(10)
       DIMENSION rateyr(13000)
-      CHARACTER modin*50,modout*50,modlst*50,frmt*10
+      CHARACTER modin*256,modout*256,modlst*256,frmt*10
       CHARACTER line*256,sitetmp*25,site(25)*25
-      CHARACTER srcfile*80,chngfile*80,strin*3,strot*3,dum1*1,dum2*1
-      CHARACTER(len=80), DIMENSION(:), allocatable :: args
+      CHARACTER srcfile*256,chngfile*256,strin*3,strot*3,dum1*1,dum2*1
+      CHARACTER(len=256), DIMENSION(:), allocatable :: args
 c
       srcfile=""
       chngfile=""
@@ -25,7 +25,7 @@ c
 c
 c --- Read source card file name
 c
-      DO ich=1,80
+      DO ich=1,256
         IF(args(1)(ich:ich).eq." ") EXIT
       ENDDO
       srcfile=args(1)(1:ich-1)
@@ -33,7 +33,7 @@ c
 c
 c --- Read source averaging file name
 c
-      DO ich2=1,80
+      DO ich2=1,256
         IF(args(2)(ich2:ich2).eq." ") EXIT
       ENDDO
       chngfile=args(2)(1:ich2-1)
@@ -79,7 +79,7 @@ c
      >    ,IOSTAT=IST)
         OPEN(20,FILE=modout,
      >    STATUS='REPLACE',IOSTAT=IST)
-        WRITE(*,"(a10,i5,a6,a25,a7,a25)") ' Average: ',inc,'  In: ',
+        WRITE(*,"(a10,i5,a6,a100,a7,a100)") ' Average: ',inc,'  In: ',
      >    modin,'  Out: ',modout
 c
 c --- Read card file(s).
