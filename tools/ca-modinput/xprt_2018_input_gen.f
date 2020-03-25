@@ -12,10 +12,9 @@ c             7) Path to the file containing the radiolnuclide group 2 (U 232, U
 c
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
 c
-      INTEGER tops(500,500)
 	  DIMENSION propmat(25,3),propsol(25,4)
       CHARACTER infile1*80,infile2*80,infile3*80,infile4*80,infile5*80
-      CHARACTER infile6*80,infile7*80,infile8*80,infile9*80,outfile1*80
+      CHARACTER infile6*80,infile7*80,infile9*80,outfile1*80
       CHARACTER WMATTR*80,EMATTR*80,R1SOLTR*80,R2SOLTR*80
       CHARACTER line1*1024,dum1*10,dum2*10,ewarea*4,radgrp*4
       CHARACTER frmt*10,bcn*10,zonelist(25)*25,buff*8
@@ -25,11 +24,11 @@ c
       irad=0
       izone=0
       nzone=0
-      tops=0
 	  matname=""
 	  propmat=-1000000.0
 	  solname=""
 	  propsol=-1000000.0
+      nyrend=2018
 c
 c --- Read command line arguments
 c
@@ -72,7 +71,7 @@ c
         WRITE(*,*) ' Aqueous-only buffer will not be read'
       ENDIF
 c
-c --- Read properties file names
+c --- Read properties file names from the command line arguments
 c
       READ(args(4),"(a80)") WMATTR
       READ(args(5),"(a80)") EMATTR
@@ -81,7 +80,7 @@ c
 c
       WRITE(*,*)
 c
-      nyrend=2018
+c --- Set up input/output files based on rad group, area and buffer switch 
 c
       infile1="../ss/input_SS"
       infile2="../ret/ca_tr_boundary_card.dat"
@@ -94,7 +93,6 @@ c
         GOTO 9999
       ENDIF
       infile7="../sources/buffer-aq-src.card"
-      infile8="../build/input.top"
       IF(irad.eq.1) THEN
         infile4="../trOCcards/rad1_Output_Control.dat"
         infile5="../trsurfcards/rad1_surface_flux.txt"
@@ -123,18 +121,9 @@ c
       OPEN(20,FILE=outfile1,
      >  STATUS='REPLACE',IOSTAT=IST)
 c
-c --- Read top k values for each i,j
-c
-      OPEN(18,FILE=infile8,STATUS='OLD'
-     >  ,IOSTAT=IST)
-c
-   10 READ(18,*,END=20) itp,jtp,ktp
-      tops(itp,jtp)=ktp
-      GOTO 10
-c
 c --- Read material transport parameters
 c
-   20 OPEN(13,FILE=infile3,STATUS='OLD'
+      OPEN(13,FILE=infile3,STATUS='OLD'
      >  ,IOSTAT=IST)
       READ(13,*)
 c
@@ -538,8 +527,7 @@ c
       numsrftot=0
 c
       READ(15,*)
-  940 READ(15,"(a1024)",END=1000) line1
-      IF((line1(1:1).ne."#").and.(line1(1:1).ne."~")) GOTO 950
+  910 READ(15,"(a1024)",END=1000) line1
       llen=len(trim(line1))
       IF(llen.eq.0) THEN
         WRITE(20,"(a)")
@@ -547,66 +535,7 @@ c
         WRITE(frmt,"(i5)") llen
         WRITE(20,"(a"//frmt//")") line1
       ENDIF
-      GOTO 940
-c
-  950 READ(line1,*) nsrf
-      nsrf=(nsrf-9)*2+9
-      WRITE(20,"(i5,a1)") nsrf,','
-c
-  955 READ(15,"(a1024)",END=960) line1
-      llen=len(trim(line1))
-      IF(llen.eq.0) THEN
-        WRITE(20,"(a)")
-      Else
-        WRITE(frmt,"(i5)") llen
-        WRITE(20,"(a"//frmt//")") line1
-      ENDIF
-      GOTO 955
-c
-  960 REWIND(15)
-  965 READ(15,"(a1024)") line1
-      IF(line1(1:15).eq."9, srf/modflow_") THEN
-        BACKSPACE(15)
-        GOTO 970
-      ENDIF
-      GOTO 965
-c
-  970 READ(15,"(a1024)",END=1000) line1
-      mintop=1000000
-      DO iji=1,100
-        IF(line1(iji:iji+4).eq.".srf,") THEN
-c          WRITE(20,*) ' iji=',iji
-          EXIT
-        ENDIF
-      ENDDO
-      WRITE(frmt,"(i5)") iji-1
-      WRITE(20,"(a"//frmt//",a9)") line1,'_top.srf,'
-      READ(15,"(a1024)",END=1000) line1
-      READ(line1(29:50),*) jrp2r,icp2r
-      llen=len(trim(line1))
-      WRITE(frmt,"(i5)") llen-7
-c      WRITE(20,"(a10,i5,a2,a50)") ' Got here ',llen,'  ',line1
-      WRITE(20,"(a4,a"//frmt//")") '#Top',line1(8:llen)
-      DO iit=1,9
-        READ(15,"(a1024)") line1
-c
-        DO ji=1,256
-          IF(line1(ji:ji+6).eq."Bottom,") EXIT
-        ENDDO
-        READ(line1(ji+7:ji+50),*) iimn,iimx,jjmn,jjmx
-        mintop=1000000
-        DO itp=iimn,iimx
-          DO jtp=jjmn,jjmx
-            IF(tops(itp,jtp).lt.mintop) mintop=tops(itp,jtp)
-          ENDDO
-        ENDDO
-c
-        llen=len(trim(line1))-5
-        WRITE(frmt,"(i5)") llen
-        WRITE(20,"(a"//frmt//",2(i4,a1))")
-     >    line1(1:llen),mintop,',',mintop,','
-      ENDDO
-      GOTO 970
+      GOTO 910
 c
  1000 WRITE(20,"(2a)") '#---------------------------------------',
      >  '---------------------------'
@@ -670,7 +599,7 @@ c
       ENDIF
       GOTO 1050
 c
-c --- Add aqueous-only sources
+c --- Add aqueous-only sources if the model has a buffer
 c
  1060 IF(ibuff.eq.1) THEN
         WRITE(20,"(a28)") '# Begin aqueous-only sources'
