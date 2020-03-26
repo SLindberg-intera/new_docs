@@ -1,0 +1,45 @@
+{
+   "abstract" : "Planar geometry package",
+   "author" : [
+      "Danny Van de Pol (daniel.van_de_pol@alcatel.be)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-Geometry-Planar",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Math::Geometry::Planar::GPC" : "1.04",
+            "Math::Geometry::Planar::Offset" : "1.03",
+            "POSIX" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.18",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}
