@@ -1,0 +1,122 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<title>Math::Geometry::Planar::Offset - Calculate offset polygons</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:ASSI@cygwin.nonet" />
+</head>
+
+<body id="_podtop_">
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="_podblock_" style="background-color: #cccccc; color: #000" valign="middle">
+<big><strong><span class="_podblock_">&nbsp;Math::Geometry::Planar::Offset - Calculate offset polygons</span></strong></big>
+</td></tr>
+</table>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-NOTICE">COPYRIGHT NOTICE</a></li>
+  <li><a href="#NO-WARRANTY">NO WARRANTY</a></li>
+  <li><a href="#LICENSE">LICENSE</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#offset_polygon">offset_polygon</a></li>
+    </ul>
+  </li>
+  <li><a href="#Functions">Functions</a>
+    <ul>
+      <li><a href="#pi">pi</a></li>
+      <li><a href="#OffsetPolygon">OffsetPolygon</a></li>
+    </ul>
+  </li>
+</ul>
+
+<a href="#_podtop_"><h1 id="NAME">NAME</h1></a>
+
+<p>Math::Geometry::Planar::Offset - Calculate offset polygons</p>
+
+<a href="#_podtop_"><h1 id="SYNOPSIS">SYNOPSIS</h1></a>
+
+<pre><code>  use Math::Geometry::Planar::Offset;
+
+  my (@results) = OffsetPolygon(\@points, $distance);
+  foreach my $polygon (@results) {
+    # do something with @$polygon
+  }</code></pre>
+
+<a href="#_podtop_"><h1 id="AUTHOR">AUTHOR</h1></a>
+
+<p>Eric Wilhelm @ &lt;ewilhelm at cpan dot org&gt;</p>
+
+<a href="#_podtop_"><h1 id="COPYRIGHT-NOTICE">COPYRIGHT NOTICE</h1></a>
+
+<p>Copyright (C) 2003-2007 Eric L. Wilhelm. All rights reserved.</p>
+
+<a href="#_podtop_"><h1 id="NO-WARRANTY">NO WARRANTY</h1></a>
+
+<p>Absolutely, positively NO WARRANTY, neither express or implied, is offered with this software. You use this software at your own risk. In case of loss, neither Eric Wilhelm, nor anyone else, owes you anything whatseover. You have been warned.</p>
+
+<p>Note that this includes NO GUARANTEE of MATHEMATICAL CORRECTNESS. If you are going to use this code in a production environment, it is YOUR RESPONSIBILITY to verify that the methods return the correct values.</p>
+
+<a href="#_podtop_"><h1 id="LICENSE">LICENSE</h1></a>
+
+<p>You may use this software under one of the following licenses:</p>
+
+<pre><code>  (1) GNU General Public License 
+    (found at http://www.gnu.org/copyleft/gpl.html) 
+  (2) Artistic License 
+    (found at http://www.perl.com/pub/language/misc/Artistic.html)</code></pre>
+
+<a href="#_podtop_"><h1 id="BUGS">BUGS</h1></a>
+
+<p>There are currently some problems with concurrent edge events on outward (and maybe inward) offsets. Some significant changes need to be made.</p>
+
+<a href="#_podtop_"><h1 id="METHODS">METHODS</h1></a>
+
+<p>These methods are actually defined in Math::Geometry::Planar, which uses this module.</p>
+
+<h2 id="offset_polygon">offset_polygon</h2>
+
+<p>Returns reference to an array of polygons representing the original polygon offsetted by $distance</p>
+
+<pre><code>  $polygon-&gt;offset_polygon($distance);</code></pre>
+
+<a href="#_podtop_"><h1 id="Functions">Functions</h1></a>
+
+<p>Only OffsetPolygon is exported.</p>
+
+<h2 id="pi">pi</h2>
+
+<p>Returns the constant pi</p>
+
+<h2 id="OffsetPolygon">OffsetPolygon</h2>
+
+<p>Make offset polygon subroutine.</p>
+
+<p>Call with offset distance and ref to array of points for original polygon polygon input must be pre-wrapped so point[n]=point[0]</p>
+
+<p>Will return a list of polygons (as refs.) The number of polygons in the output depends on the shape of your input polygon. It may split into several pieces during the offset.</p>
+
+<pre><code>  my (@results) = OffsetPolygon(\@points, $distance);
+  foreach my $polygon (@results) {
+    # do something with @$polygon
+  }</code></pre>
+
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="_podblock_" style="background-color: #cccccc; color: #000" valign="middle">
+<big><strong><span class="_podblock_">&nbsp;Math::Geometry::Planar::Offset - Calculate offset polygons</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>
+
+

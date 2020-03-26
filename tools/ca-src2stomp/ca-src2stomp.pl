@@ -81,19 +81,32 @@
 #   
 #   version 7.0 - fixed bug with partitioning multi-polygon sources where one
 #		  or more is clipped by a boundary
+#
+#   version 7.1 - extra header lines in inventory
+#
+#   version 7.2 - added ZTop min and max to waste site headers
+#
+#   version 7.3 - fixed source years to stomp alternating from fixed to float
+#
+#   version 7.4 - New format for zone file and changed ctl file format (added zone name)
+#
+#   version 7.5 - Removing dups from ANCs.  wastesite outline leaving some holes or other non-tank sources.
+#
+#   version 7.6 - adding more date entries for 10,000 year CA run in the summary file.  Integrating solid mass over those periods
 
 
 use Data::Dumper;
 use Math::Geometry::Planar;
 use Math::Polygon::Calc;
 
-$vers="src2stomp 11/1/2019 Ver 7.0 by MDWilliams, Intera Inc";
+$vers="src2stomp 3/24/2019 Ver 7.6 by MDWilliams, Intera Inc";
 
 $cf = shift @ARGV;	# get control file
 # control file format
 # STOMP Grid file name (surface IJ)
 # STOMP Grid .top file (K of uppermost Active IJ)
-# Polygon for sources (to clip domain if needed) or "Grid" keyword
+# Polygon file for sources (to clip domain if needed) or "Grid" keyword
+# name of zone in polygon file (new in version 7.4)
 # ehsit ascii csv file (converted from shapefile)
 # source term file (SAC 2006 for now - CA-Ref-A_inv1.res)
 # "Solid" or "No Solid" or "Only Solid"
@@ -108,8 +121,10 @@ $sgrid=<C>;
 chomp($sgrid);
 $gtop=<C>;
 chomp($gtop);
-$clippolyname=<C>;
-chomp($clippolyname);
+$zfname=<C>;
+chomp($zfname);
+$zname=<C>;
+chomp($zname);
 $ehsit=<C>;
 chomp($ehsit);
 $radinv=<C>;
@@ -227,8 +242,8 @@ for ($j=0;$j<$nsy-1;$j++) {
 close(TP);
 
 
-# load clip file (if != none)
-if ($clippolyname =~/none/i) {
+# load clip zone file (if != none)
+if ($zfname=~/none/i) {
 	$cpx[0]=$sx[0][0];
 	$cpy[0]=$sy[0][0];
 	$cpx[1]=$sx[$nsx-1][0];
@@ -245,14 +260,30 @@ if ($clippolyname =~/none/i) {
 } else {
 	@ps=[];
 	$np=0;
-	open(CP,"<$clippolyname") || die "Can't open $clippolyname file $!\n";
-	while ($line = <CP>) {
+	open(ZF,"<$zfname") || die "Can't open $zfname file $!\n";
+	# skip header
+	$line = <ZF>;
+	$flag = 0;
+	while ($line = <ZF>) {
+	   if ($flag == 0) {
+		# search for zone name
 		chomp($line);
 		@a=split(",",$line);
-		$ps[$np]=[$a[0],$a[1]];
-    		$np++;
+		if ($a[0] =~ m/$zname/i) {
+			while ($flag == 0) {
+				$ps[$np]=[$a[1],$a[2]];
+    				$np++;
+				$line = <ZF>;
+				chomp($line);
+				@a = split(",",$line);
+				if ((eof(ZF)) || ($a[0] ne '')) {
+					$flag = 1;
+				}
+			}
+		}
+	    }
 	}
-	close(CP);
+	close(ZF);
 	$cpoly = Math::Geometry::Planar->new;
         $cpoly->points(\@ps);
         $gpc_cpoly = $cpoly->convert2gpc([$cpoly]);
@@ -398,7 +429,8 @@ for ($p=0;$p<$nhsit;$p++) {
 	    $mwastename[$nms]=$wastename[$p];
             $nn=0;
             $n=0;
-            $mink=999999;
+#            $mink=999999;
+#  	     $maxk=-999999;
             for ($j=0;$j<$nsy-1;$j++) {
                 for ($i=0;$i<$nsx-1;$i++) {
                     # is the node in waste site polygon?
@@ -426,9 +458,13 @@ for ($p=0;$p<$nhsit;$p++) {
                         $msfa[$nms][$nn]=$t/$gpoly_area[$n];
                         $mscx[$nms][$nn]=$ccx[$n];
                         $mscy[$nms][$nn]=$ccy[$n];
-                        if ($top[$i+1][$j+1] < $mink) {
-                                $mink = $top[$i+1][$j+1];
-                        }
+#                        if ($top[$i+1][$j+1] < $mink) {
+#                                $mink = $top[$i+1][$j+1];
+#                        }
+#                        if ($top[$i+1][$j+1] > $maxk) {
+#                                $maxk = $top[$i+1][$j+1];
+#                        }
+
                         $nn++;
                     }
                   }
@@ -436,7 +472,8 @@ for ($p=0;$p<$nhsit;$p++) {
                 }
             }
             $mnn[$nms]=$nn;
-            $mmink[$nms]=$mink;
+#            $mmink[$nms]=$mink;
+#	     $mmaxk[$nms]=$maxk;
             $totarea=0.0;
             $totcarea=0.0;
             for ($i=0;$i<$mnn[$nms];$i++) {
@@ -454,8 +491,14 @@ for ($p=0;$p<$nhsit;$p++) {
 
 # create separate node list that is constrained by site area
 # Also - don't limit area for Ancillary Equipment (surrounds tanks)
-if (($lim == 1) || (!($sitname[$p] =~ m/ANC/i))) {
+if ($lim == 1) {
     for ($n=0;$n<$nms;$n++) {
+      if (!($msite[$n] =~ m/ANC/i)) {
+	if ($msite[$n] =~ m/ANC/i) {
+                printf("Error - shouldn't be here $msite[$n] ANC\n");
+                exit(0);
+        }
+
 	#$msite
 	#$msitearea[$n]
 	#$mnn[$n]
@@ -576,14 +619,83 @@ if (($lim == 1) || (!($sitname[$p] =~ m/ANC/i))) {
 		$mnn[$n]=$ntm;
 	    }
 	}
+     }  
 }
 
+# remove duplicates from ANC Sites
+for ($n=0;$n<$nms;$n++) {
+  if ($msite[$n] =~ m/ANC/i) {
+	printf("\nProcsessing ANC = $msite[$n], #nodes = $mnn[$n]\n");
+        #$mnn[$n]
+        #$msi[$nms][$nn]=
+        #$msj[$nms][$nn]=
+        #$msa[$nms][$nn]=
+        #$msga[$nms][$nn]=
+	for ($j=0;$j< $mnn[$n];$j++) {	
+	    $ndup=0;
+	    for ($c=0;$c<$nms;$c++) {
+		if ($c != $n) {
+		    for ($cj=0;$cj<$mnn[$c];$cj++) {
+			if (($msi[$n][$j] == $msi[$c][$cj]) && ($msj[$n][$j] == $msj[$c][$cj])) {
+			    # xy match - remove ANC node
+			    $ndup++;
+			    $msi[$n][$j]=-1;
+			}
+		    }
+
+		}
+	    }
+	}
+	if ($ndup !=0) {
+	# compress list
+	  $ar=0;
+	  $msitegarea[$n]=0;
+          for ($j=0;$j<$mnn[$n];$j++) {
+	     if ($msi[$n][$j] == -1) {
+		$ar++;
+	     } else {
+                $msi[$n][$j-$ar]=$msi[$n][$j];
+                $msj[$n][$j-$ar]=$msj[$n][$j];
+                $mscx[$n][$j-$ar]=$mscx[$n][$j];
+                $mscy[$n][$j-$ar]=$mscy[$n][$j];
+                $msa[$n][$j-$ar]=$msa[$n][$j];
+                $msga[$n][$j-$ar]=$msga[$n][$j];
+                $msitegarea[$n]+=$msga[$n][$j];
+	      }
+            }
+            $mnn[$n]=$mnn[$n]-$ar;
+	}
+	printf("Done Procsessing ANC = $msite[$n], #nodes = $mnn[$n]\n");
+    }
+}
+
+
+# recakc mink and maxk
+for ($n=0;$n<$nms;$n++) {
+            $mink=999999;
+            $maxk=-999999;
+            for ($i=0;$i<$mnn[$n];$i++) {
+                  $ti=$msi[$n][$i];
+                  $tj=$msj[$n][$i];
+                  if ($top[$ti][$tj] < $mink) {
+                          $mink = $top[$ti][$tj];
+                  }
+                  if ($top[$ti][$tj] > $maxk) {
+                          $maxk = $top[$ti][$tj];
+                  }
+	    }
+	    $mmink[$n]=$mink;
+	    $mmaxk[$n]=$maxk;
+}
+
+ 
 #print("After compressing sources for area limited list $n, $mnn[$n], $ar, $msitegarea[$n]\n");
 #for ($j=0;$j<$ntm;$j++) {
 #	print("($msi[$n][$j], $msj[$n][$j]) ");
 #}
 #print("\n");
 # Write out log file - nodes selected for waste site (this shows all waste sites - even if no inventory/volume)
+
 for ($n=0;$n<$nms;$n++) {
      	printf(OL "$msite[$n] Areas: %10.1f, %10.1f, %10.1f, $mmink[$n] $mnn[$n]\n",
 	$msitearea[$n],$msiteiarea[$n],$msitegarea[$n]);
@@ -725,8 +837,8 @@ printf(OC "$cl");
 $nsrc=0;
 
 # load SIM Inventory
-# skip first eight lines - info
-for ($i=0;$i<8;$i++) {
+# skip first bunch of lines - info
+for ($i=0;$i<11;$i++) {
 	$line = <SR>;
 }
 
@@ -800,7 +912,9 @@ for ($i=0;$i<$ninc;$i++) {
 }
 
 my %yearh;
+my %yearsum;
 my %swidh;
+$nsws=0;
 $fflag=1;
 # get first SIM2 record
 $line=<SR>;
@@ -848,11 +962,19 @@ while ($fflag) {
 	     }
 	  }  
 	  # load up volume and rad data from line for this waste site and year
+	  if (lc($yl[$sim2sourcecol])=~ m/series/) {
+                $seriesflag = 1;
+          } else {
+                $seriesflag = 0;
+          }
+
 	  if ($dupyearflag == 0) {
 		$year[$nyear]=$yl[$sim2timecol];
-		if (!defined $yearh{$year[$nyear]}) {
+		if ($seriesflag == 0) {
+		    if (!defined $yearh{$year[$nyear]}) {
                        	$yearh{$year[$nyear]} = $year[$nyear];
-               	}
+               	    }
+		}
 		$yltype= lc($yl[$sim2sourcecol]);
 	  }
 	  # get volume
@@ -865,11 +987,6 @@ while ($fflag) {
 		}
 	  } else {
 		$s2vol = 0.0;
-	  }
-	  if (lc($yltype)=~ m/series/) {
-		$seriesflag = 1;
-	  } else {
-		$seriesflag = 0;
 	  }
           $ylsum+=$s2vol;
 	  if ($dupyearflag == 1) {
@@ -955,6 +1072,9 @@ printf("$swid duplicate years at $dupyear, $yrad[$nyrad[$t]-1][$t], $yrrad[$nyra
     # ignore if already exists (inventory file) and don't do qnything if no years of data
 #    if (($nyear > 0) && (!defined $swidh{$swid})) {
      if ($nyear > 0) {
+      # ignore if solid waste site but rad not selected
+      if (!(($seriesflag == 1) && ($nrad == 0))) {
+	
 	# Check if we have this source in our clipped model domain
 	for ($m=0;$m<$nms;$m++) {
 	  if (lc($swid) eq lc($mwastename[$m])) {
@@ -1006,9 +1126,9 @@ printf("$swid duplicate years at $dupyear, $yrad[$nyrad[$t]-1][$t], $yrrad[$nyra
 		   if ($w > 0) {
 		    for ($k=0;$k<$nyear;$k++) {
 			$w=$ylval[$k]*$fract[$m];
-			printf(TC "#      $year[$k] $ylval[$k] ($w) $ylunit\n");
+			printf(TC "#      %.1f $ylval[$k] ($w) $ylunit\n",$year[$k]);
 			if (exists $yearsum{$yltype} && defined $yearsum{$yltype}{$year[$k]}) {
-			    $yearsum{$yltype}{$year[$k]} =  $yearsum{$yltype}{$year[$k]} + $w;
+			    $yearsum{$yltype}{$year[$k]} += $w;
 			} else {
 			    $yearsum{$yltype}{$year[$k]} =  $w;
 			}
@@ -1050,7 +1170,7 @@ printf("$swid duplicate years at $dupyear, $yrad[$nyrad[$t]-1][$t], $yrrad[$nyra
 			    for ($k=0;$k<$nyrad[$t];$k++) {
 				if ($yrad[$k][$t] > 0) {
 				    $w=$yrad[$k][$t]*$fract[$m];
-				    printf(TC "#     $yrrad[$k][$t] $yrad[$k][$t] ($w) $radunits[$t]\n");
+				    printf(TC "#     %.1f $yrad[$k][$t] ($w) $radunits[$t]\n",$yrrad[$k][$t]);
 				    if (exists $yearsum{$radname[$t]} && defined $yearsum{$radname[$t]}{$yrrad[$k][$t]}) {
 	                            	$yearsum{$radname[$t]}{$yrrad[$k][$t]}+= $w;
 				    } else {
@@ -1078,7 +1198,14 @@ printf("$swid duplicate years at $dupyear, $yrad[$nyrad[$t]-1][$t], $yrrad[$nyra
                                 $ac=($c2+$c1)/2.0;
                                 $dt=($y2-$y1);
                                 $tw=$tw+($ac*$dt);
-                            }
+				# setup for year totals in summary file
+				$swssyear[$nsws] = $y1;
+				$swseyear[$nsws] = $y2;
+				$swsyearlyrate[$nsws] = ($ac*$dt)*$fract[$m];
+				$swsrad[$nsws] = $radname[$t];
+				$swssite[$nsws] = $msite[$m];
+                            	$nsws++;
+			    }
                             # overwrite earlier calc's total
                             # sig figs (8)
                             $tw=sprintf("%14.8e",$tw);
@@ -1088,17 +1215,18 @@ printf("$swid duplicate years at $dupyear, $yrad[$nyrad[$t]-1][$t], $yrrad[$nyra
 	                    $sitesum{$radname[$t]}{$msite[$m]} = $w;
                             for ($k=0;$k<$nyrad[$t];$k++) {
                                     $w=$yrad[$k][$t]*$fract[$m];
-                                    printf(TC "#     $yrrad[$k][$t] $yrad[$k][$t] ($w) $radunits[$t]\n");
-                                    if (exists $yearsum{$radname[$t]} && defined $yearsum{$radname[$t]}{$yrrad[$k][$t]}) {
-                                        $yearsum{$radname[$t]}{$yrrad[$k][$t]}+= $w;
-                                    } else {
-                                        $yearsum{$radname[$t]}{$yrrad[$k][$t]} = $w;
-                                    }
+                                    printf(TC "#     %.1f $yrad[$k][$t] ($w) $radunits[$t]\n",$yrrad[$k][$t]);
+#                                   if (exists $yearsum{$radname[$t]} && defined $yearsum{$radname[$t]}{$yrrad[$k][$t]}) {
+#                                      $yearsum{$radname[$t]}{$yrrad[$k][$t]}+= $w;
+#                                    } else {
+#                                        $yearsum{$radname[$t]}{$yrrad[$k][$t]} = $w;
+#                                    }
                             }
                       }
 		 }
 		}
 		printf(TC "# Number of Nodes=$mnn[$m]\n");
+		printf(TC "# KTop min and max=, $mmink[$m], $mmaxk[$m]\n");
 		printf(TC "$cl");
 		# set up aq times
 		$nl=0;
@@ -1119,6 +1247,9 @@ printf("$swid duplicate years at $dupyear, $yrad[$nyrad[$t]-1][$t], $yrrad[$nyra
 				}
 				$tl[$nl]=$year[$i];
 # vl is now volume per area - needed to scale volume for different grid spacing within waste site
+				if ($msitegarea[$m] <= 0) {
+					printf("Error - zero garea $msite[$m] garea=$msitegarea[$m]\n");
+				}
 				$vl[$nl]=($ylval[$i]*$fract[$m])/($msitegarea[$m]);
 #				$vl[$nl]=($ylval[$i]/$mnn[$m])*$fract[$m];
 				$nl++;
@@ -1151,7 +1282,7 @@ printf("$swid duplicate years at $dupyear, $yrad[$nyrad[$t]-1][$t], $yrrad[$nyra
 			" $nl,\n");
 		    for ($i=0;$i<$nl;$i++) {
 #			    printf(TC "$vl[$i], $msitegarea[$m], $nija[$m][$g]\n");
-			    printf(TC "$tl[$i], year, %12.5e, $unit,\n",$vl[$i]*$nija[$m][$g]);
+			    printf(TC "%.1f, year, %12.5e, $unit,\n",$tl[$i],$vl[$i]*$nija[$m][$g]);
 		    }
 		    $nsrc++;
 		    # make site list 
@@ -1160,7 +1291,7 @@ printf("$swid duplicate years at $dupyear, $yrad[$nyrad[$t]-1][$t], $yrrad[$nyra
 				printf(OSL "$msite[$m],Aqueous Volumetric,");
 				printf(OSL "$i,$j,$mmink[$m],");
 				for ($ti=0;$ti<$nl;$ti++) {
-					printf(OSL "$tl[$ti],");
+					printf(OSL "%.1f,",$tl[$ti]);
 				}
 				printf(OSL "\n");
 			}
@@ -1215,7 +1346,7 @@ printf("$swid duplicate years at $dupyear, $yrad[$nyrad[$t]-1][$t], $yrrad[$nyra
 				" $mmink[$m], $mmink[$m],".
 				" $nl,\n");
 		    	 for ($i=0;$i<$nl;$i++) {
-		    	printf(TC "$tl[$i], year, %12.5e, $unit,\n",$vl[$i]*$nija[$m][$g]);
+		    	printf(TC "%.1f, year, %12.5e, $unit,\n",$tl[$i],$vl[$i]*$nija[$m][$g]);
 		    	 }
                     # make site list
                     for ($i=$nis[$m][$g];$i<=$nie[$m][$g];$i++) {
@@ -1223,7 +1354,7 @@ printf("$swid duplicate years at $dupyear, $yrad[$nyrad[$t]-1][$t], $yrrad[$nyra
                                 printf(OSL "$msite[$m],$radname[$s],");
                                 printf(OSL "$i,$j,$mmink[$m],");
                                 for ($ti=0;$ti<$nl;$ti++) {
-                                        printf(OSL "$tl[$ti],");
+                                        printf(OSL "%.1f,",$tl[$ti]);
                                 }
                                 printf(OSL "\n");
                         }
@@ -1232,6 +1363,7 @@ printf("$swid duplicate years at $dupyear, $yrad[$nyrad[$t]-1][$t], $yrrad[$nyra
 		   }
 	        }
 	     }
+	 }
 	}
       }
     }
@@ -1277,6 +1409,34 @@ close(OSL);
 # Example 2 - Multidimensional Hash sort
 my @sorted_key1;
 my %sorted_key2;
+
+# create bins
+$bstart[0]=1944;
+$bend[0]=1945;
+$nb=1;
+# 5 year bins to 2100
+while ($bend[$nb-1]<2100) {
+	$bstart[$nb]=$bend[$nb-1];
+	$bend[$nb]=$bstart[$nb]+5;
+	$nb++;
+}
+# 10 years for 500 years
+while ($bend[$nb-1]<2670) {
+        $bstart[$nb]=$bend[$nb-1];
+        $bend[$nb]=$bstart[$nb]+10;
+	$nb++;
+}
+# 100 years for rest
+while ($bend[$nb-1]<12070) {
+	$bstart[$nb]=$bend[$nb-1];
+        $bend[$nb]=$bstart[$nb]+100;
+	$nb++;
+}
+for ($i=0;$i<$nb;$i++) {
+        for ($j=0;$j<$nsim2rad;$j++) {
+                $bmass[$i][$j]=0;
+        }
+}
 
 foreach $key1 (sort keys %sitesum) {
 	push @sorted_key1,$key1;
@@ -1396,6 +1556,7 @@ print(OS "\n\n");
 #print(OS "$lb,\n");
 #print(OS "\n\n");
 
+printf(OS "Liquid Waste Sites\n");
 undef @sorted_key1;
 undef %sorted_key2;
 foreach $key1 (sort keys %yearsum) {
@@ -1421,12 +1582,25 @@ foreach $key1 (@sorted_key1){
                 $tot=0.0;
                 $lkey=$key1;
         }
+	$kind=-1;
+	for ($r=0;$r<$nsim2rad;$r++) {
+        	if (lc($sim2radname[$r]) eq lc($key1)) {
+			$kind=$r;
+		}
+	}
         foreach $key2 (@{ $sorted_key2{$key1} } ){
                 $la=$la.",".$key2;
 		if (exists $yearsum{$key1}{$key2}) {
                 	$tot=$tot+$yearsum{$key1}{$key2}+0.0;
 			$lb=$lb.",".sprintf("%12.5e",$yearsum{$key1}{$key2});
-
+			if ($kind != -1) {
+				# find bin year
+				for ($b=0;$b<$nb;$b++) {
+                                   if (($key2 >= $bstart[$b]) && ($key2 < $bend[$b])) {
+					$bmass[$b][$kind]+=$yearsum{$key1}{$key2};
+				   }
+				}	
+			}
 		} else {
 			$lb=$lb.",".sprintf("%12.5e",0.0);
 		}
@@ -1438,6 +1612,79 @@ $lb=$lkey.",".sprintf("%12.5e",$tot).",".$lb;
 print(OS "$la,\n");
 print(OS "$lb,\n");
 print(OS "\n\n");
+
+printf(OS "Solid Waste Sites\n");
+for ($r=0;$r<$nsim2rad;$r++) {
+	printf(OS "$sim2radname[$r]\n");
+	$tot=0;
+	printf(OS "SiteName, Start Year, End Year, Yearly Rad Rate\n");
+	$lastname = "";
+	$nameflag = 1;
+	$sub=0;
+	for ($k=0;$k<$nsws;$k++) {
+		if (lc($sim2radname[$r]) eq lc($swsrad[$k])) {
+			if (($nameflag == 0) && ($lastname ne $swssite[$k])) {
+				printf(OS "Site total mass = $sub\n");
+				$sub = 0;
+			} 
+			$nameflag = 0;
+			printf(OS "$swssite[$k],$swssyear[$k],$swseyear[$k],$swsyearlyrate[$k]\n");
+			# find bin(s) to put this in
+			$bn=0;
+			for ($b=0;$b<$nb;$b++) {
+				if (($swssyear[$k] >= $bstart[$b]) && ($swssyear[$k] < $bend[$b])) {
+					if ($swseyear[$k] <= $bend[$b]) {
+						$ny=$swseyear[$k]-$swssyear[$k];
+					} else { 
+						$ny=$bend[$b]-$swssyear[$k];
+					}
+					$bmass[$b][$r]+=$swsyearlyrate[$k]*$ny;
+					# see if record in other bins too
+					$bn=$b+1;
+					while (($bn < $nb) && ($swseyear[$k] >= $bstart[$bn])){
+                                        	if ($swseyear[$k] <= $bend[$bn]) {
+                                                	$ny=$swseyear[$k]-$bstart[$bn];
+                                        	} else {
+                                                	$ny=$bend[$bn]-$bstart[$bn];
+                                        	}
+                                        	$bmass[$bn][$r]+=$swsyearlyrate[$k]*$ny;
+						$bn++;
+					}
+				}
+			}
+			$lastname=$swssite[$k];
+			$mass =  ($swsyearlyrate[$k]*($swseyear[$k]-$swssyear[$k]));
+			$tot += $mass;
+			$sub += $mass;
+		}
+	}
+	printf(OS "Total Mass = $tot\n\n");
+}
+
+printf(OS "Totals - liquid and solid sites (binned)\n");
+printf(OS "Start Year, End Year,");
+for ($i=0;$i<$nsim2rad;$i++) {
+	printf(OS "$sim2radname[$i],")
+}
+printf(OS "\n");
+for ($j=0;$j<$nsim2rad;$j++) {
+	$atot[$j]=0;
+}
+
+for ($i=0;$i<$nb;$i++) {
+	printf(OS "$bstart[$i],$bend[$i],");
+	for ($j=0;$j<$nsim2rad;$j++) {
+		printf(OS "$bmass[$i][$j],");
+		$atot[$j]+=$bmass[$i][$j];
+	}
+	printf(OS "\n");
+}
+printf(OS "Totals,,");
+for ($j=0;$j<$nsim2rad;$j++) {
+        printf(OS "$atot[$j],");
+}
+printf(OS "\n");
+
 
 close(SR);
 close(SN);
