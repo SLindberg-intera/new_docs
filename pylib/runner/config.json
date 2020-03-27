@@ -88,6 +88,12 @@
 
 		"name":"Transient Output Card Generator", "command":"OC_rad_gen_linux-intel-64.exe", "description":"qualified on 03.16.2020; This tool creates the Output Control Card portion of a STOMP input file used for mass balance and transport production simulations."
 
+		},
+
+		{
+
+		"name":"2018 STOMP Input File Generator", "command":"xprt_2018_input_gen_linux-intel-64.exe", "description":"qualified on 03.27.2020; This tool creates The 2018 STOMP Input File Generator Tool generates the 1943-2018 STOMP transport input file"
+
 		}
 	],
 	"LOGGER":{
