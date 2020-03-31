@@ -12,7 +12,7 @@ c
       DIMENSION ditval(250,4)
       DIMENSION u10(250),u10ovf(250),ovflow(250)
       DIMENSION ovfu9(250),ovfu11(250)
-      CHARACTER infile1*256,infile2*80
+      CHARACTER infile1*256,infile2*256
       CHARACTER outfile1*80,outfile2*80,outfile3*80,outfile4*80
       CHARACTER im*80,simsite*80,casite*80,st*80
       CHARACTER line*1024,sites(10)*12,dum1*8
@@ -52,6 +52,11 @@ c
       READ(args(1),"(a256)") infile1
       WRITE(*,*) ' SIMV2 csv file = ',infile1
 c
+c --- Read B-3 Pond fractions filename
+c
+      READ(args(2),"(a256)") infile2
+      WRITE(*,*) ' B-3 Pond fractions file = ',infile2
+c
 c --- Reroute sites
 c
       sites=(/"216-Z-11","216-Z-19","216-Z-1D","216-U-14",
@@ -66,7 +71,6 @@ c
      >  194229.402893,67237.8559196,2144.24717683,20959.2514744,
      >  146094.747,44332.226,62630.25,17600.00/)
 c
-	  infile2="B-3_Pond_Fractions.csv"
       outfile1="U-10_B-3_reroute_in.dat"
       outfile2="U-10_B-3_reroute_fractions.dat"
       outfile3="U-10_B-3_reroute_rates.dat"
