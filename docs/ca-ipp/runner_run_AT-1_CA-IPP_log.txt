@@ -1,0 +1,9 @@
+INFO--03/27/2020 08:54:05 AM--Starting CA-CIE Tool Runner.	Logging to "runner_run_AT-1_CA-IPP_log.txt"
+INFO--03/27/2020 08:54:05 AM--Code Version: 0b4478192d987adbff818006239cda369278912a v2.2: /opt/tools/pylib/runner/runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+
+INFO--03/27/2020 08:54:05 AM--Code Version: a27b8bc997309317b6f2f818dfd51c40276d2c6a Local repo SHA-1 has does not correspond to a remote repo release version: /home/pallena/CAVE/CA-CIE-Tools-TestRepos/ca_ipp/CA-CIE-Tools/tools/ca-ipp/ca-ipp.pl<--1df1cd98a7c2755771e6f8427217047706466801
+
+INFO--03/27/2020 08:54:05 AM--QA Status: QUALIFIED : /opt/tools/pylib/runner/runner.py
+INFO--03/27/2020 08:54:05 AM--QA Status: TEST : /home/pallena/CAVE/CA-CIE-Tools-TestRepos/ca_ipp/CA-CIE-Tools/tools/ca-ipp/ca-ipp.pl
+INFO--03/27/2020 08:54:05 AM--Invoking Command:"perl"	with Arguments:"/home/pallena/CAVE/CA-CIE-Tools-TestRepos/ca_ipp/CA-CIE-Tools/tools/ca-ipp/ca-ipp.pl /opt/ICF/Prod/VZEHSIT/v1.1/data/Original/WasteSites(ehsit)_Geometry_SIMV2_CA-dos2unix.csv /opt/ICF/Prod/VZINV/v1.0/data/F_CP-61786_R1_sorted_mar42020.csv none /opt/ICF/Prod/CLEANINV/v1.0/data/inflow-04_inv1-edited.res /opt/ICF/Prod/RCASWR/v1.0/data/ /opt/ICF/Prod/RCASWR/v1.0/data/CASWR_Output_20200219_summary_03.09.2020.csv ./reroute-list preprocessed_inventory"
+INFO--03/27/2020 08:54:05 AM--Username:pallena	Computer:olive	Platform:Linux 4.4.0-38-generic #57~14.04.1-Ubuntu SMP Tue Sep 6 17:20:43 UTC 2016

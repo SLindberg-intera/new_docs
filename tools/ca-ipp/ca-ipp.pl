@@ -15,15 +15,26 @@
 #	Appendix F SIMV2 (sorted) - RADS
 #       Chemical Inventory (or none) - e.g. NO3, Cr, CN
 #	SAC Liquid Inventory
-#	Solid waste Release Directory (assumes "summary.csv" is there")
+#	Solid waste Release Directory
+#	Solid waste summary file (filenames)
 #	Redistribution File name (or none)
 #	New Inventory File Name (prefix) and log file
 #	
 #	v4.0 new solid waste files
+#
+#	v4.1 new solid waste files - slightly different summary file format
+#
+#	v4.2 - integrating solid waste release in summary file
+#	
+#	v4.3 - new solid waste file - reduced data cumulative solid waste
+#
+#	v4.4 = fixed bug in summary totals
+#
+#       v4.5 - Fixed a bug in additing additional solid waste sites (not in inventory(
 
 $dtstamp = localtime();
 
-$vers="11/11/2019 Ver 4.0 by MDWilliams, Intera Inc.";
+$vers="3/22/2020 Ver 4.5 by MDWilliams, Intera Inc.";
 
 # Half Lives from EMDT-DE-0006 Rev 1, 18-May-2015
 # Values in Years
@@ -57,7 +68,7 @@ $radinv = shift @ARGV;
 $cheminv = shift @ARGV;
 $liqinv = shift @ARGV;
 $swrdir = shift @ARGV;
-$swrind = $swrdir."/summary.csv";
+$swrind = shift @ARGV;
 $redfn = shift @ARGV;
 $outpref = shift @ARGV;
 $outpref =~ s/[\r\n]+$//;
@@ -87,14 +98,16 @@ $dashes="----------------------------------------------------------------------"
 printf(OL "Inventory preprocessor ca-ipp.pl Log File: $dtstamp\n");
 printf(OL "# Processed by IPP $vers\n");
 printf(OL "# ehsit file = $ehsit, Rad Inventory file = $radinv\n");
-printf(OL "# Chemical Inventory file = $cheminv, SAC supplemental Liquids = $liqinv\n");
+printf(OL "# Chemical Inventory file = $cheminv\n");
+printf(OL " SAC supplemental Liquids = $liqinv\n");
 printf(OL "# Solid Waste Inventory Directory = $swrdir\n");
 printf(OL "$dashes\n$dashes\n");
 
 printf(OI "CA VZ Inventory: $dtstamp\n");
 printf(OI "# Processed by IPP $vers\n");
 printf(OI "# ehsit file = $ehsit, Rad Inventory file = $radinv\n");
-printf(OI "# Chemical Inventory file = $cheminv, SAC supplemental Liquids = $liqinv\n");
+printf(OI "# Chemical Inventory file = $cheminv\n");
+printf(OI "# SAC supplemental Liquids = $liqinv\n");
 printf(OI "# Solid Waste Inventory Directory = $swrdir\n\n");
 
 printf(OS "# Inventory Summary for $outinv: $dtstamp\n");
@@ -153,6 +166,11 @@ printf(OL "\n$dashes\n$dashes\n");
 printf(OL "Loading $radinv\n");
 # load SIM Inventory
 # skip first line
+$line = <SR>;
+chomp($line);
+printf(OI "# Inventory File Header = $line\n\n");
+printf(OS "# Inventory File Header = $line\n\n");
+printf(OL "# Inventory File Header = $line\n\n");
 $line = <SR>;
 chomp($line);
 printf(OI "# Inventory File Header = $line\n\n");
@@ -624,6 +642,7 @@ $nsws=0;
 $nswsites=0;
 if ($swrdir ne "none") {
   printf(OL "Loading Solid Waste Release Site Index $swrind\n");
+  # skip header
   $line = <SWI>;
   $nsws=0;
   $nswsites=0;
@@ -632,10 +651,9 @@ if ($swrdir ne "none") {
         chomp($line);
         @a=split(",",$line);
         $swname[$nsws]=$a[1];
-        $swfile[$nsws]=$a[7];
-# replace any \ with / (DOS convention)
-	$swfile[$nsws] =~ s/\\/\//g;
 	$swcopc[$nsws]=$a[0];
+	$swredactivity[$nsws]=$a[6];
+	$swfile[$nsws]=$a[1]."_".$a[0].".csv";
 	$swused[$nsws]=0;
         if (!exists $sws_hash{$swname[$nsws]}) {
 	        $nswsites++;
@@ -796,7 +814,9 @@ for ($s=0;$s<$nsimsites;$s++) {
 		@tot = split(",",$line);
 		$tot[0]="Total";
 		$tot[$sim2sourcecol]="";
-		$tot[$sim2volcol]=0;
+		if ((!defined $tot[$sim2volcol]) || ($tot[$sim2volcol] eq "")) {
+			$tot[$sim2volcol]=0;
+		}
 		$tottmin=$tot[$sim2timecol];
 		$tottmax=$tottmin;
 		for ($i=0;$i<$ntrad+$nchem;$i++) {
@@ -827,16 +847,65 @@ for ($s=0;$s<$nsimsites;$s++) {
 
     }
 
-    # insert solid waste release
-    if ($swsflag == 1) {
-	# load Solid Waste Release files (one per wastesite and copc)
-	for ($sws=0;$sws<$nsws;$sws++) {
-	    if ($swname[$sws] eq $swid) {
-			# load file
-             	printf(OL "Inserting Solid Waste site $swid $swcopc[$sws] $swfile[$sws]\n");
-		$swrf=$swrdir."/".$swfile[$sws];
-        	open(SWR,"<$swrf") || die "Can't open $swrf file $!\n";
+    # print total
+    if ($swsflag != 1) {
+       for ($i=0;$i<5;$i++) {
+        printf(OS "$tot[$i],");
+       }
+       printf(OS "%6.1F to %6.1F,",$tottmin, $tottmax);
+       for ($i=0;$i<$ntrad+$nchem;$i++) {
+        if (defined $tot[6+$i]) {
+            printf(OS "$tot[6+$i],");
+        } else {
+            printf(OS ",");
+        }
+       }
+       printf(OS "\n");
+    }
 
+    # insert solid waste release
+    if (($swsflag == 1) || ($s == ($nsimsites-1))) {
+     # if out of simv2 recs, add in any additional ones
+     if (($swsflag == 1) && ($s < ($nsimsites-1))) {
+	$once =1;
+     } else {
+	$once=0;
+     }
+
+     $first=1;
+     $found=1;
+     while ($found == 1)  {
+      $found=0;
+      if ($once == 0) {
+	for ($sws=0;$sws<$nsws;$sws++) {
+		if ($swused[$sws] == 0) {
+			$swid = $swname[$sws];
+			$found=1;
+			last;
+		}
+	 }
+      } else {
+	if ($first == 1) {
+		$found = 1;
+		$first = 0;
+	} else {
+		$found = 0;
+        }
+      }
+
+	# load Solid Waste Release files (one per wastesite and copc)
+      if ($found == 1) {
+	for ($sws=0;$sws<$nsws;$sws++) {
+#	    if (($swname[$sws] eq $swid) || (($s == ($nsimsites-1)) && (($swused[$sws] == 0)))) {
+	    if (($swname[$sws] eq $swid) && ($swused[$sws] == 0)) {
+		# load file
+             	printf(OL "Inserting Solid Waste site $swid $swcopc[$sws] $swname[$sws]\n");
+		$swrf=$swrdir."/".$swname[$sws]."_".$swcopc[$sws].".csv";
+        	open(SWR,"<$swrf") || die "Can't open $swrf file $!\n";
+# skip 5 header lines
+		for ($i=0;$i<5;$i++) {
+			$line=<SWR>;
+		}
 # get units when Kevin put them in - $swunits
                 $swunits="(Ci/year)";
 
@@ -852,15 +921,13 @@ for ($s=0;$s<$nsimsites;$s++) {
 			exit(0);
 		}
 
-        	# skip header
-                $swline=<SWR>;
                 $ns=0;
                 while ($swline = <SWR>) {
                         chomp($swline);
                         @a=split(",",$swline);
                         $sl++;
-                        $swyear = $a[4];
-                        $swrate = $a[5];
+                        $swyear = $a[0];
+                        $swrate = $a[1];
                         if ((defined $swrate) && ($swrate ne "")
                                 && (defined $swyear) && ($swyear ne "")) {
                                 $swsly[$ns]=$swyear;
@@ -892,105 +959,32 @@ for ($s=0;$s<$nsimsites;$s++) {
                    }
                 }
 		$swused[$sws]=1;
-		printf(OS "Solid Waste Release for $swid not integrated yet\n");
+		printf(OS "Solid Waste Release for $swcopc[$sws] Reduced Activity = $swredactivity[$sws],,$swid,Solid Release Integrated,,$swsly[0] to $swsly[$ns-1],");
+		for ($k=0;$k<$swradcol;$k++) {
+                     printf(OS ",");
+                }
+		printf(OS "%12.5e,\n",$swimass);
+          }
 	}
+      } 
     }
-}
-
-    # print total
-    for ($i=0;$i<5;$i++) {
-    	printf(OS "$tot[$i],");
-    }
-    printf(OS "$tottmin to $tottmax,");
-    for ($i=0;$i<$ntrad+$nchem;$i++) {
-	if (defined $tot[6+$i]) {
-	    printf(OS "$tot[6+$i],");
-	} else {
-	    printf(OS ",");
-        }
-    }
-    printf(OS "\n");
-	
+  }
 }
 
 # Add any SAC Liquid - if in ehsit but not in SIM
 for ($s=0;$s<$nsac;$s++) {
 	if ((exists $ehsit_hash{$sacname[$s]}) && (!exists $simv2_hash{$sacname[$s]})) {
 	    printf(OL "Adding $sacname[$s] from $liqinv to Inventory (in ehsit but not in SIMV2)\n");
+	    $sacsum=0;
 	    for ($i=0;$i<$sacnyears[$s];$i++) {
 	       printf(OI "Liquid from $liqinv ($saclunit[$s][$i]),,$sacname[$s],Liquid,$sacliq[$s][$i],$sacyear[$s][$i],,,,,,,,,,,,,,,,,\n");
+		$sacsum=+$sacliq[$s][$i];
 	       # update totals
 	    }
+	    $t=$sacnyears[$s]-1;
+	    printf(OS "Total Liquid from $liqinv ($saclunit[$s][0]),,$sacname[$s],Liquid,$sacsum,$sacyear[$s][0] to $sacyear[$s][$t],,,,,,,,,,,,,,,,,\n");
 	}
 }
-
-# Add any Solid Waste Sites not in SIMV2
-for ($sws=0;$sws<$nsws;$sws++) {
-        if ($swused[$sws] == 0) {
-		$swid = $swname[$sws];
-                # load file
-                printf(OL "Inserting Solid Waste site $swid $swfile[$sws] $swcopc[$sws]\n");
-                $swrf=$swrdir."/".$swfile[$sws];
-                open(SWR,"<$swrf") || die "Can't open $swrf file $!\n";
-                # find rad column
-
-# get units when Kevin put them in - $swunits
-		$swunits="(Ci/year)";
-                $swradcol = -1;
-                for ($i=0;$i<$nsim2rad;$i++) {
-                        if ($sim2radname[$i]  eq $swcopc[$sws]) {
-                                $swradcol=$i;
-                        }
-                }
-                if ($swradcol == -1) {
-                        printf("Error - SWCOPC $swcopc[$sws] not found in header\n");
-                        exit(0);
-                }
-
-                # skip header
-                $swline=<SWR>;
-		$ns=0;
-                while ($swline = <SWR>) {
-                        chomp($swline);
-			@a=split(",",$swline);
-                        $sl++;
-                        $swyear = $a[4];
-                        $swrate = $a[5];
-                        if ((defined $swrate) && ($swrate ne "")
-                                && (defined $swyear) && ($swyear ne "")) {
-				$swsly[$ns]=$swyear;
-				$swrate = sprintf("%12.5e",$swrate);
-				$swslr[$ns]=$swrate;
-				$ns++;
-                        }
-                }
-                close(SWR);
-		$swimass=0.0;
-		for ($k=0;$k<$ns-1;$k++) {
-			# calclate integrated mass in series
-			$c1=$swslr[$k];
-			$c2=$swslr[$k+1];
-			$y1=$swsly[$k];
-			$y2=$swsly[$k+1];
-			# mean conc over period
-                        $ac=($c2+$c1)/2.0;
-                        $dt=($y2-$y1);
-                        $swimass=$swimass+($ac*$dt);
-		}
-		if ($swimass > 0) {
-		  for ($ss=0;$ss<$ns;$ss++) {
-	printf(OI "Solid Waste Release for $swcopc[$sws],,$swid,Solid Release Series,,$swsly[$ss],");
-                                for ($k=0;$k<$swradcol;$k++) {
-                                        printf(OI ",");
-                                }
-                                printf(OI "$swslr[$ss],\n");
-		   }
-		}
-		$swused[$sws]=1;
-                printf(OS "Solid Waste Release for $swid not integrated yet\n");
-	}
-}
-
 
 close(OI);
 close(OL);
