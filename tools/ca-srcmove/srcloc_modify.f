@@ -224,12 +224,11 @@ c
      >      'Block move for ',site(inc),' from ',imod(inc,1),'/',
      >      jmod(inc,1),' to ',imod(inc,2),'/',jmod(inc,2),' - Aqueous'
 c
+          knew=kmin
           DO ibl=imod(inc,2),imod(inc,2)+numi-1
             DO jbl=jmod(inc,2),jmod(inc,2)+numj-1
-              IF(ktop(ibl,jbl).lt.kmin) THEN
+              IF(ktop(ibl,jbl).lt.knew) THEN
                 knew=ktop(ibl,jbl)
-              ELSE
-                knew=kmin
               ENDIF
             ENDDO
           ENDDO
@@ -285,6 +284,7 @@ c
           GOTO 310
         ENDIF
 c
+        ifound=1
         IF(nlines.gt.200) THEN
           WRITE(*,*) ' Too many yearly rate lines ',nlines
           GOTO 9999
@@ -314,7 +314,7 @@ c
 c
           WRITE(20,"(a8,a6,a1,7(i4,a1))") "Solute, ",radname,",",
      >      imod(inc,2),",",imod(inc,2),",",jmod(inc,2),",",
-     >      jmod(inc,2),",",kmin,",",kmax,",",nlines,","
+     >      jmod(inc,2),",",knew,",",knew,",",nlines,","
           DO nln=1,nlines
             WRITE(20,"(a256)") lineyr(nln)
           ENDDO
@@ -352,12 +352,11 @@ c
      >      'Block move for ',site(inc),' from ',imod(inc,1),'/',
      >      jmod(inc,1),' to ',imod(inc,2),'/',jmod(inc,2),' - ',radname
 c
+          knew=kmin
           DO ibl=imod(inc,2),imod(inc,2)+numi-1
             DO jbl=jmod(inc,2),jmod(inc,2)+numj-1
-              IF(ktop(ibl,jbl).lt.kmin) THEN
+              IF(ktop(ibl,jbl).lt.knew) THEN
                 knew=ktop(ibl,jbl)
-              ELSE
-                knew=kmin
               ENDIF
             ENDDO
           ENDDO
