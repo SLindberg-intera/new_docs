@@ -1,41 +1,47 @@
 c       ************************ PROGRAM aq_mod_avg ************************
-c          Read src card input from Mark's script and average aqueous rate
-c          for selected source nodes (input file - "src_node_aq_avg.dat".
+c          Read src card input from ca-src2stomp and average aqueous rate
+c          for selected sites/years.
 c
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
 c
       DIMENSION modyr(25,4),ncomma(10)
-      DIMENSION iyear(13000),rate(13000),rateyr(13000)
-      CHARACTER modin*50,modout*50,modlst*50,frmt*10
+      DIMENSION rateyr(13000)
+      CHARACTER modin*256,modout*256,modlst*256,frmt*10
       CHARACTER line*256,sitetmp*25,site(25)*25
-      CHARACTER srcfile*80,strin*3,strot*3,dum1*1,dum2*1
-      CHARACTER tunit(13000)*7,runit(13000)*11
-      CHARACTER(len=80), DIMENSION(:), allocatable :: args
-      CHARACTER date*8,time*10
+      CHARACTER srcfile*256,chngfile*256,strin*3,strot*3,dum1*1,dum2*1
+      CHARACTER(len=256), DIMENSION(:), allocatable :: args
 c
       srcfile=""
+      chngfile=""
 c
 c --- Read command line arguments
 c
       num_args = command_argument_count()
-      IF(num_args.gt.1) ibuff=1
       ALLOCATE(args(num_args))
       args=""
       DO ix = 1, num_args
         CALL get_command_argument(ix,args(ix))
       ENDDO
 c
-      DO ich=1,80
+c --- Read source card file name
+c
+      DO ich=1,256
         IF(args(1)(ich:ich).eq." ") EXIT
       ENDDO
       srcfile=args(1)(1:ich-1)
-      WRITE(*,*) srcfile
+      WRITE(*,*) ' Source File = ',srcfile
 c
-      CALL DATE_AND_TIME (date,time)
+c --- Read source averaging file name
 c
-c --- read source node changes
+      DO ich2=1,256
+        IF(args(2)(ich2:ich2).eq." ") EXIT
+      ENDDO
+      chngfile=args(2)(1:ich2-1)
+      WRITE(*,*) ' Source/Year Averaging File = ',chngfile
 c
-      OPEN(11,FILE="src_node_aq_avg.dat",STATUS='OLD'
+c --- read sources/years to average (limited to 25)
+c
+      OPEN(11,FILE=chngfile,STATUS='OLD'
      >  ,IOSTAT=IST)
       nmod=1
       READ(11,*)
@@ -73,7 +79,7 @@ c
      >    ,IOSTAT=IST)
         OPEN(20,FILE=modout,
      >    STATUS='REPLACE',IOSTAT=IST)
-        WRITE(*,"(a10,i5,a6,a25,a7,a25)") ' Average: ',inc,'  In: ',
+        WRITE(*,"(a10,i5,a6,a100,a7,a100)") ' Average: ',inc,'  In: ',
      >    modin,'  Out: ',modout
 c
 c --- Read card file(s).
@@ -179,7 +185,11 @@ c
         ENDDO
         aqavg=aqsum/FLOAT(modyr(inc,4)-modyr(inc,3)+1)
         minoyr=MIN(minyr,modyr(inc,3))
-        maxoyr=MAX(maxyr,modyr(inc,4))
+        IF(modyr(inc,4).gt.modyr(inc,2)) THEN
+          maxoyr=MAX(maxyr,modyr(inc,4)+1)
+        ELSE
+          maxoyr=MAX(maxyr,modyr(inc,4))
+        ENDIF
         nlnout=1+(maxoyr-minoyr)*2
         WRITE(*,"(a11,2i5,a14,2i5)") ' In years: ',minyr,maxyr,
      >    '   Out years: ',minoyr,maxoyr
@@ -218,15 +228,6 @@ c
         READ(20,"(a256)") line
         WRITE(22,"(a256)") line
       ENDDO
-c
-      WRITE(22,"(a)") '#'
-      WRITE(22,"(3a)") '# Source nodes (aqueous) averaged by ',
-     >  'aq_mod_avg_olive.exe ',
-     >  ' Version 1.0 - 11-8-2019'
-      WRITE(22,"(12a)") '# Run on ',date(5:6),'-',
-     >  date(7:8),'-',date(1:4),' at ',time(1:2),':',
-     >  time(3:4),':',time(5:6)
-      WRITE(22,"(a)") '#'
 c
   700 READ(20,"(a256)",END=9999) line
       llen=LEN(TRIM(line))
