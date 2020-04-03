@@ -98,7 +98,13 @@
 
 		{
 
-		"name":"CA-IPP Tool", "command":"ca-ipp.pl", "description":"qualified on 04.01.2020; This tool create a comprehensive data set consisting of radionuclide and aqueous volume releases as a function of time for Central Plateau sites"
+		"name":"CA-IPP Tool", "command":"ca-ipp.pl", "description":"qualified on 04.01.2020; This tool creates a comprehensive data set consisting of radionuclide and aqueous volume releases as a function of time for Central Plateau sites"
+
+		},
+
+		{
+
+		"name":"Aqueous Source Averaging Tool", "command":"aq_mod_avg_linux-intel-64.exe", "description":"qualified on 04.02.2020; This tool averages aqueous source rates for user-specified waste sites and times"
 
 		}
 	],
