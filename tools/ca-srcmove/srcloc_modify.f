@@ -1,14 +1,15 @@
 c       ************************ PROGRAM srcloc_modify.f ****************************
-c          Read src card input from Mark's script and adjust locations of
-c          selected source nodes (input file - "src_node_changes.dat").
+c          Read src card input from ca-src2stomp and adjust locations of
+c          selected source nodes.
 c
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
 c
       DIMENSION imod(50,2),jmod(50,2),ncomma(10),ktop(1000,1000)
-      CHARACTER modin*25,modout*25,modlst*25,radname*25
+      CHARACTER modin*256,modout*256,modlst*256,radname*25
       CHARACTER line*256,lineyr(200)*256,sitetmp*25,site(50)*25
-      CHARACTER(len=80), DIMENSION(:), allocatable :: args
-      CHARACTER srcfile*80,strin*3,strot*3,type(50)*6,ttmp*6
+      CHARACTER(len=256), DIMENSION(:), allocatable :: args
+      CHARACTER srcfile*256,topfile*256,ctlfile*256
+      CHARACTER strin*3,strot*3,type(50)*6,ttmp*6
       CHARACTER date*8,time*10
 c
       srcfile=""
@@ -24,26 +25,36 @@ c
         CALL get_command_argument(ix,args(ix))
       ENDDO
 c
-      DO ich=1,80
+      DO ich=1,256
         IF(args(1)(ich:ich).eq." ") EXIT
       ENDDO
       srcfile=args(1)(1:ich-1)
-      WRITE(*,*) srcfile
+      WRITE(*,*) ' Source file = ',srcfile
 c
-      CALL DATE_AND_TIME (date,time)
+      DO ich2=1,256
+        IF(args(2)(ich2:ich2).eq." ") EXIT
+      ENDDO
+      topfile=args(2)(1:ich2-1)
+      WRITE(*,*) ' Tops file = ',topfile
 c
-c --- read input.top
+      DO ich3=1,256
+        IF(args(3)(ich3:ich3).eq." ") EXIT
+      ENDDO
+      ctlfile=args(3)(1:ich3-1)
+      WRITE(*,*) ' Control file = ',ctlfile
+c
+c --- read Tops file output from CAST
 c
       ktop=0
-      OPEN(12,FILE="input.top",STATUS='OLD'
+      OPEN(12,FILE=topfile,STATUS='OLD'
      >  ,IOSTAT=IST)
    50 READ(12,*,END=60) inod,jnod,knod
       ktop(inod,jnod)=knod
       GOTO 50
 c
-c --- read source node changes
+c --- read source node changes from the control file
 c
-   60 OPEN(11,FILE="src_node_changes.dat",STATUS='OLD'
+   60 OPEN(11,FILE=ctlfile,STATUS='OLD'
      >  ,IOSTAT=IST)
       nmod=0
       READ(11,*)
@@ -86,7 +97,7 @@ c
      >    STATUS='REPLACE',IOSTAT=IST)
         WRITE(*,*) inc,modin,modout
 c
-c --- Read card file(s).
+c --- Read source card file(s).
 c
   200   READ(10,"(a256)",END=600) line
         DO ic=1,200
@@ -114,6 +125,8 @@ c
         ENDDO
         WRITE(20,"(a256)") line
         GOTO 310
+c
+c --- Moving Aqueous Volumetric
 c
   400   nc=1
         DO ic=1,200
@@ -164,7 +177,8 @@ c
             knew=ktop(imod(inc,2),jmod(inc,2))
             WRITE(*,*)
             WRITE(*,"(a5,i3,a1,i3,a24,i3,a4,i3)") ' Node ',imod(inc,2),
-     >        '/',jmod(inc,2),' top adjusted down from ',kmin,' to ',knew
+     >        '/',jmod(inc,2),' top adjusted down from ',kmin,' to ',
+     >        knew
             WRITE(*,*)
           ELSE
             knew=kmin
@@ -200,16 +214,21 @@ c
 c
 c --- Block move
 c
+        if((imod(inc,1).ne.imin).or.(jmod(inc,1).ne.jmin)) THEN
+          WRITE(*,*) ' Incorrect block i-index or j-index = ',
+     >      imod(inc,1),jmod(inc,1)
+          GOTO 9999
+        ENDIF
+c
           WRITE(*,"(2a15,a6,i5,a1,i5,a4,i5,a1,i5,a10)")
      >      'Block move for ',site(inc),' from ',imod(inc,1),'/',
      >      jmod(inc,1),' to ',imod(inc,2),'/',jmod(inc,2),' - Aqueous'
 c
+          knew=kmin
           DO ibl=imod(inc,2),imod(inc,2)+numi-1
             DO jbl=jmod(inc,2),jmod(inc,2)+numj-1
-              IF(ktop(ibl,jbl).lt.kmin) THEN
+              IF(ktop(ibl,jbl).lt.knew) THEN
                 knew=ktop(ibl,jbl)
-              ELSE
-                knew=kmin
               ENDIF
             ENDDO
           ENDDO
@@ -233,6 +252,8 @@ c
           WRITE(*,*) ' Invalid move type - ,',imod,type(inc)
           GOTO 9999
         ENDIF
+c
+c --- Moving Solute
 c
   500   nc=1
         DO ic=1,200
@@ -263,6 +284,7 @@ c
           GOTO 310
         ENDIF
 c
+        ifound=1
         IF(nlines.gt.200) THEN
           WRITE(*,*) ' Too many yearly rate lines ',nlines
           GOTO 9999
@@ -283,7 +305,8 @@ c
             knew=ktop(imod(inc,2),jmod(inc,2))
             WRITE(*,*)
             WRITE(*,"(a5,i3,a1,i3,a24,i3,a4,i3)") ' Node ',imod(inc,2),
-     >        '/',jmod(inc,2),' top adjusted down from ',kmin,' to ',knew
+     >        '/',jmod(inc,2),' top adjusted down from ',kmin,' to ',
+     >        knew
             WRITE(*,*)
           ELSE
             knew=kmin
@@ -291,7 +314,7 @@ c
 c
           WRITE(20,"(a8,a6,a1,7(i4,a1))") "Solute, ",radname,",",
      >      imod(inc,2),",",imod(inc,2),",",jmod(inc,2),",",
-     >      jmod(inc,2),",",kmin,",",kmax,",",nlines,","
+     >      jmod(inc,2),",",knew,",",knew,",",nlines,","
           DO nln=1,nlines
             WRITE(20,"(a256)") lineyr(nln)
           ENDDO
@@ -319,16 +342,21 @@ c
 c
 c --- Block move
 c
+        if((imod(inc,1).ne.imin).or.(jmod(inc,1).ne.jmin)) THEN
+          WRITE(*,*) ' Incorrect block i-index or j-index = ',
+     >      imod(inc,1),jmod(inc,1)
+          GOTO 9999
+        ENDIF
+c
           WRITE(*,"(2a15,a6,i5,a1,i5,a4,i5,a1,i5,a3,a6)")
      >      'Block move for ',site(inc),' from ',imod(inc,1),'/',
      >      jmod(inc,1),' to ',imod(inc,2),'/',jmod(inc,2),' - ',radname
 c
+          knew=kmin
           DO ibl=imod(inc,2),imod(inc,2)+numi-1
             DO jbl=jmod(inc,2),jmod(inc,2)+numj-1
-              IF(ktop(ibl,jbl).lt.kmin) THEN
+              IF(ktop(ibl,jbl).lt.knew) THEN
                 knew=ktop(ibl,jbl)
-              ELSE
-                knew=kmin
               ENDIF
             ENDDO
           ENDDO
@@ -362,19 +390,6 @@ c
       modlst=srcfile(1:ich-6)//"_mod_last.card"
       OPEN(22,FILE=modlst,
      >  STATUS='REPLACE',IOSTAT=IST)
-c
-      DO ii4=1,4
-        READ(20,"(a256)") line
-        WRITE(22,"(a256)") line
-      ENDDO
-c
-      WRITE(22,"(a)") '#'
-      WRITE(22,"(2a)") '# Source nodes moved by ',
-     >  'srcloc_modify_olive.exe  Version 1.0 - 11-8-2019'
-      WRITE(22,"(12a)") '# Run on ',date(5:6),'-',
-     >  date(7:8),'-',date(1:4),' at ',time(1:2),':',
-     >  time(3:4),':',time(5:6)
-      WRITE(22,"(a)") '#'
 c
   700 READ(20,"(a256)",END=9999) line
       DO ic=1,200
