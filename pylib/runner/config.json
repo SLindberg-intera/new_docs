@@ -112,6 +112,12 @@
 
 		"name":"Source Rerouting Tool", "command":"reroute_sources_linux-intel-64.exe", "description":"qualified on 04.08.2020; This tool redistributes aqueous volume and contaminant loading for the U-10 Pond system and the B-3 Pond system"
 
+		},
+
+		{
+
+		"name":"Source Node Moving Tool", "command":"srcloc_modify_linux-intel-64.exe", "description":"qualified on 04.08.2020; This tool moves source nodes from the locations selected by the Source Cards Generation tool (ca-src2stomp.pl)"
+
 		}
 	],
 	"LOGGER":{
