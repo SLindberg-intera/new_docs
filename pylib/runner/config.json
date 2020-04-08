@@ -106,6 +106,12 @@
 
 		"name":"Aqueous Source Averaging Tool", "command":"aq_mod_avg_linux-intel-64.exe", "description":"qualified on 04.02.2020; This tool averages aqueous source rates for user-specified waste sites and times"
 
+		},
+
+		{
+
+		"name":"Source Rerouting Tool", "command":"reroute_sources_linux-intel-64.exe", "description":"qualified on 04.08.2020; This tool redistributes aqueous volume and contaminant loading for the U-10 Pond system and the B-3 Pond system"
+
 		}
 	],
 	"LOGGER":{
