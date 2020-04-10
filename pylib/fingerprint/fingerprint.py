@@ -61,7 +61,10 @@ def extract_fingerprints(target):
     hasher = get_hasher()
     if not is_dir(target):
         raise FileNotFoundError("Could not find '{}'".format(target))
+
     for dirpath, dirnames, filenames in os.walk(target):
+        dirnames.sort()
+        filenames.sort()
         for filename in filenames:
             p = os.path.join(dirpath, filename)
             finger_print = fingerprint_file(p)
