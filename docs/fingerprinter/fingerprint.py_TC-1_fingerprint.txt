@@ -1,3 +1,0 @@
-Fingerprint generated at 2020-02-04 10:44:23.350462
-testfile.txt	d1e4935200ec390d46f2c2cc38409eb33a9625b51c51543c8d2445726cae0ec8
-

@@ -1,7 +1,0 @@
-Fingerprint generated at 2020-02-04 10:46:37.328299
-Total for 4 files	f5d9c0149bfed045473ba14d542c96d4d3408ca9947ab97ffdc4d275712aee14
-
-./TestFolder_1/TestDocument.xlsx	7a6b67a6171929bda9e03a55e947c7f7c5fff54584de65eb39f05d02c5b86ed2
-./TestFolder_1/TestFolder1a/TestDocument1.txt	b1c955c72a10e669dc21198715de0f912cf3439122e2e89252c4215a561fbc63
-./TestFolder_1/TestFolder1a/TestDocument2.txt	a9a5cd2d608f8de836ce12d49bffea44c489c445086d7a4d612a58a0ae2a099f
-./TestFolder_1/TestFolder1b/TestDocument1b.docx	953114c622a45f3da502855a21f425bbe3c12586d9c404b7c5480f7f6d8b7996
