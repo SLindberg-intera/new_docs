@@ -92,7 +92,7 @@
 
 		{
 
-		"name":"2018 STOMP Input File Generator", "command":"xprt_2018_input_gen_linux-intel-64.exe", "description":"qualified on 03.27.2020; This tool creates The 2018 STOMP Input File Generator Tool generates the 1943-2018 STOMP transport input file"
+		"name":"2018 STOMP Input File Generator", "command":"xprt_2018_input_gen_linux-intel-64.exe", "description":"v1.1 qualified on 04.14.2020 (sig. figs. for dispersivity values in output file updated); This tool creates The 2018 STOMP Input File Generator Tool generates the 1943-2018 STOMP transport input file"
 
 		},
 
