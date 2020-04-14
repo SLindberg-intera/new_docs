@@ -14,8 +14,10 @@
 #	version 2.5 - added a line "some" for sites that have dups.
 #	
 #	version 2.6 - removed unused variables
+#
+#	version 2.7 - changed "Sources" to "Sites" in Output
 
-$vers="ca-dups 4/6/2020 Ver 2.6 by MDWilliams, Intera Inc";
+$vers="ca-dups 4/13/2020 Ver 2.7 by MDWilliams, Intera Inc";
 $dtstamp = localtime();
 # get and open source list file (created by ca-src2stomp.pl)
 $sf = shift @ARGV;  # src card file
@@ -160,8 +162,8 @@ printf(SR "Number of sources = $nsrc\n");
 printf(SR "Number of source nodes = $nn\n\n");
 for ($s=0;$s<$nsn;$s++) {
     printf(SR "$sep\n");
-    printf(SR "Source Name = $srcnames[$s]\n");
-    printf(SR "Other Sources with x,y,z overlap:\n");
+    printf(SR "Site Name = $srcnames[$s]\n");
+    printf(SR "Other Sites with x,y,z overlap:\n");
     $nmatch=0;
     for ($sn=0;$sn<$nn;$sn++) {
 	if ($nname[$sn] eq $srcnames[$s]) {
