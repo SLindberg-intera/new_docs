@@ -410,7 +410,7 @@ c
         ENDIF
         llen=len(trim(zonelist(izn)))
         WRITE(frmt,"(i5)") llen
-        WRITE(20,"(a"//frmt//",a1,f4.1,a4,f5.2,a4)") zonelist(izn),
+        WRITE(20,"(a"//frmt//",a1,f5.2,a4,f6.3,a4)") zonelist(izn),
      >    ',',propmat(iznnmp,1),', m,',propmat(iznnmp,2),', m,'
         DO isn=1,nsprop
           IF(propsol(isn,1).ge.10.0_8) THEN
