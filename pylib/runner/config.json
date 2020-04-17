@@ -124,6 +124,12 @@
 
 		"name":"Duplicate Source Nodes Tool", "command":"ca-dups.pl", "description":"qualified on 04.15.2020; This tool scans all sites within an input source card file, compares each site’s spatial representation against all the other sites, identifies any source nodes that overlap spatially, and writes the duplicate source node(s) to the output file"
 
+		},
+
+		{
+
+		"name":"Source to STOMP Tool", "command":"ca-src2stomp.pl", "description":"qualified on 04.17.2020; This tool combines the site spatial information with the corresponding inventory and creates a STOMP-readable source card file containing grid cell definitions of fluxes (solute and/or liquid) for the model simulation"
+
 		}
 	],
 	"LOGGER":{
