@@ -1,0 +1,11 @@
+MDWilliams - 11/14/2017
+
+- multi polygons
+#- change fluxes for zones with non-uniform grid block area (Dennis)
+- log file - limited - use for PV Calc
+#- csv file - sorted and excell template
+- center nodes on limited
+#- organize IJK's better
+#- Cumulative sum by Volume/COPC (Praveena request)
+#- Fix log file (export to GIS) to show only arealimited nodes (Praveena 10/11)  
+
