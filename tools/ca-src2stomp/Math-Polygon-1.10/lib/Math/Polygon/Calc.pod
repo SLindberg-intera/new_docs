@@ -1,0 +1,154 @@
+=encoding utf8
+
+=head1 NAME
+
+Math::Polygon::Calc - Simple polygon calculations
+
+=head1 INHERITANCE
+
+ Math::Polygon::Calc
+   is a Exporter
+
+=head1 SYNOPSIS
+
+ my @poly = ( [1,2], [2,4], [5,7], [1, 2] );
+
+ my ($xmin, $ymin, $xmax, $ymax) = polygon_bbox @poly;
+
+ my $area = polygon_area @poly;
+ MY $L    = polygon_perimeter @poly;
+ if(polygon_is_clockwise @poly) { ... };
+ 
+ my @rot  = polygon_start_minxy @poly;
+
+=head1 DESCRIPTION
+
+This package contains a wide variaty of relatively easy polygon
+calculations.  More complex calculations are put in separate
+packages.
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item B<polygon_area>(@points)
+
+Returns the area enclosed by the polygon.  The last point of the list
+must be the same as the first to produce a correct result.
+
+The algorithm was found at L<http://mathworld.wolfram.com/PolygonArea.html>,
+and sounds:
+
+ A = abs( 1/2 * (x1y2-x2y1 + x2y3-x3y2 ...)
+
+=item B<polygon_bbox>(@points)
+
+Returns a list with four elements: (xmin, ymin, xmax, ymax), which describe
+the bounding box of the polygon (all points of the polygon are within that
+area.
+
+=item B<polygon_beautify>( [\%options], @points )
+
+Polygons, certainly after some computations, can have a lot of
+horrible artifacts: points which are double, spikes, etc.
+The optional HASH contains the %options.
+
+ -Option       --Default
+  remove_spikes  <false>
+
+=over 2
+
+=item remove_spikes => BOOLEAN
+
+Spikes contain of three successive points, where the first is on the
+line between the second and the third.  The line goes from first to
+second, but then back to get to the third point.
+
+At the moment, only pure horizontal and pure vertical spikes are
+removed.
+
+=back
+
+=item B<polygon_centroid>(@points)
+
+Returns the centroid location of the polygon.  The last point of the list
+must be the same as the first to produce a correct result.
+
+The algorithm was found at
+F<http://en.wikipedia.org/wiki/Centroid#Centroid_of_polygon>
+
+=item B<polygon_clockwise>(@points)
+
+Be sure the polygon points are in clockwise order.
+
+=item B<polygon_contains_point>($point, @points)
+
+Returns true if the point is inside the closed polygon.  On an edge will
+be flagged as 'inside'.  But be warned of rounding issues, caused by
+the floating-point calculations used by this algorithm.
+
+=item B<polygon_counter_clockwise>(@points)
+
+Be sure the polygon points are in counter-clockwise order.
+
+=item B<polygon_distance>($point, @polygon)
+
+[1.05] calculate the shortest distance between a point and any vertex of
+a closed polygon.
+
+=item B<polygon_equal>( \@points1, \@points2, [$tolerance] )
+
+Compare two polygons, on the level of points. When the polygons are
+the same but rotated, this will return false. See L<polygon_same()|Math::Polygon::Calc/"FUNCTIONS">.
+
+=item B<polygon_format>($format, @points)
+
+[1.07] Map the $format over all @points, both the X and Y coordinate.  This
+is especially useful to reduce the number of digits in the stringification.
+For instance, when you want reproducible results in regression scripts.
+
+The format is anything supported by printf(), for instance "%5.2f".  Or,
+you can pass a code reference which accepts a single value.
+
+=item B<polygon_is_clockwise>(@points)
+
+=item B<polygon_is_closed>(@points)
+
+=item B<polygon_perimeter>(@points)
+
+The length of the line of the polygon.  This can also be used to compute
+the length of any line: of the last point is not equal to the first, then
+a line is presumed; for a polygon they must match.
+
+This is simply Pythagoras.
+
+ $l = sqrt((x1-x0)^2 + (y1-y0)^2) + sqrt((x2-x1)^2+(y2-y1)^2) + ...
+
+=item B<polygon_same>( \@points1, \@points2, [$tolerance] )
+
+Compare two polygons, where the polygons may be rotated wrt each
+other. This is (much) slower than L<polygon_equal()|Math::Polygon::Calc/"FUNCTIONS">, but some algorithms
+will cause un unpredictable rotation in the result.
+
+=item B<polygon_start_minxy>(@points)
+
+Returns the polygon, where the point which is closest to the left-bottom
+corner of the bounding box is made first.
+
+=item B<polygon_string>(@points)
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Math-Polygon distribution version 1.10,
+built on January 03, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+
+=head1 LICENSE
+
+Copyrights 2004-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+
