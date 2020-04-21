@@ -36,30 +36,15 @@ c
       nyrend=12070
 c
       irad=1
-      ibuff=0
       DO ii=1,70
         IF(infile1(ii:ii+5).eq.'XPRT-2') irad=2
-        IF(infile1(ii:ii+10).eq.'with_buffer') ibuff=1
       ENDDO
       WRITE(*,"(a20,i1)") ' Radionuclide Group ',irad
-      IF(ibuff.eq.1) THEN
-        WRITE(*,*) ' Model includes aqueous-only buffer'
-      ELSE
-        WRITE(*,*) ' Model does not include aqueous-only buffer'
-      ENDIF
 c
       IF(irad.eq.1) THEN
-        IF(ibuff.eq.1) THEN
-          outfile1="input_XPRT-MB1_with_buffer"
-        ELSE
-          outfile1="input_XPRT-MB1_no_buffer"
-        ENDIF
+        outfile1="input_XPRT-MB1"
       ELSE
-        IF(ibuff.eq.1) THEN
-          outfile1="input_XPRT-MB2_with_buffer"
-        ELSE
-          outfile1="input_XPRT-MB2_no_buffer"
-        ENDIF
+        outfile1="input_XPRT-MB2"
       ENDIF
 c
       OPEN(20,FILE=outfile1,
