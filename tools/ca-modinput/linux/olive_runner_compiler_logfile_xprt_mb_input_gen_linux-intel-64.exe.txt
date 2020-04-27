@@ -1,0 +1,18 @@
+INFO--04/21/2020 12:20:36 PM--Starting CA-CIE Tool Runner.	Logging to "../../CA-CIE-Tools-TestRepos/repo_xprt_mb_input_gen.f/tools/ca-modinput/linux/olive_runner_compiler_logfile_xprt_mb_input_gen_linux-intel-64.exe.txt"
+INFO--04/21/2020 12:20:36 PM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: ../../../../../../opt/tools/pylib/runner/runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+
+INFO--04/21/2020 12:20:36 PM--Code Version: 66f9ba2decfc9cb36f8906002be9a69b6ec95b7b Local repo SHA-1 has does not correspond to a remote repo release version: ../../CA-CIE-Tools-TestRepos/repo_xprt_mb_input_gen.f/tools/ca-modinput/xprt_mb_input_gen.f<--5b4b57dbac49cb91f4942f56a34f71f9a2e4d019
+
+INFO--04/21/2020 12:20:37 PM--QA Status: QUALIFIED : ../../../../../../opt/tools/pylib/runner/runner.py
+INFO--04/21/2020 12:20:37 PM--QA Status: TEST : ../../CA-CIE-Tools-TestRepos/repo_xprt_mb_input_gen.f/tools/ca-modinput/xprt_mb_input_gen.f
+INFO--04/21/2020 12:20:37 PM--Invoking Command:"ifort"	with Arguments:"../../CA-CIE-Tools-TestRepos/repo_xprt_mb_input_gen.f/tools/ca-modinput/xprt_mb_input_gen.f -o  ../../CA-CIE-Tools-TestRepos/repo_xprt_mb_input_gen.f/tools/ca-modinput/linux/xprt_mb_input_gen_linux-intel-64.exe"
+INFO--04/21/2020 12:20:37 PM--Username:dfryar	Computer:olive	Platform:Linux 4.4.0-38-generic #57~14.04.1-Ubuntu SMP Tue Sep 6 17:20:43 UTC 2016
+INFO--04/21/2020 12:20:37 PM--Starting CA-CIE Tool Runner.	Logging to "../../CA-CIE-Tools-TestRepos/repo_xprt_mb_input_gen.f/tools/ca-modinput/linux/olive_runner_compiler_logfile_xprt_mb_input_gen_linux-intel-64.exe.txt"
+INFO--04/21/2020 12:20:37 PM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: ../../../../../../opt/tools/pylib/runner/runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+
+INFO--04/21/2020 12:20:37 PM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: ../../../../../../opt/tools/pylib/fingerprint/fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
+
+INFO--04/21/2020 12:20:37 PM--QA Status: QUALIFIED : ../../../../../../opt/tools/pylib/runner/runner.py
+INFO--04/21/2020 12:20:37 PM--QA Status: QUALIFIED : ../../../../../../opt/tools/pylib/fingerprint/fingerprint.py
+INFO--04/21/2020 12:20:37 PM--Invoking Command:"python"	with Arguments:"../../../../../../opt/tools/pylib/fingerprint/fingerprint.py ../../CA-CIE-Tools-TestRepos/repo_xprt_mb_input_gen.f/tools/ca-modinput/linux/xprt_mb_input_gen_linux-intel-64.exe --output ../../CA-CIE-Tools-TestRepos/repo_xprt_mb_input_gen.f/tools/ca-modinput/linux/fingerprint_xprt_mb_input_gen_linux-intel-64.exe.txt"
+INFO--04/21/2020 12:20:37 PM--Username:dfryar	Computer:olive	Platform:Linux 4.4.0-38-generic #57~14.04.1-Ubuntu SMP Tue Sep 6 17:20:43 UTC 2016
