@@ -14,13 +14,16 @@
 #       version 2.4 - removed extra spaces
 #
 #	version 2.5 - renamed from ca-rtd to ca-rtdic
+#
+#	version 2.6 - getting ztopmax from input file grid card
 
 $dtstamp = localtime();
 
-$vers="ca-rtdic 4/24/2020 Ver 2.5 by MDWilliams, Intera Inc";
+$vers="ca-rtdic 4/29/2020 Ver 2.6 by MDWilliams, Intera Inc";
 # get and open source list file (created by ca-src2stomp.pl)
 $sf = shift @ARGV;  # src card file
 $icl = shift @ARGV; # RTD Site list: waste site name, excavation depth, number of nodes to clear below bottom.
+$inpf = shift @ARGV; # stomp input file
 $icf = shift @ARGV; # output IC file for RTD restarts
 
 # get list of solutes from command line
@@ -33,11 +36,38 @@ for ($i=0;$i<$nsol;$i++) {
 }
 
 open(SL,"<$sf") ||  die "Can't open $sf file $!\n";
+open(IN,"<$inpf") ||  die "Can't open $inpf file $!\n";
 open(IC,">$icf") ||  die "Can't open $icf file $!\n";
 
 printf(IC "# $vers\n");
 printf(IC "# Generated from $sf on $dtstamp\n");
 printf(IC "#\n");
+
+# get grid card from input file to for setting ztopmax (global)
+$flag=0;
+while ($line=<IN>) {
+	chomp($line);
+	if ($line =~ m/~grid/i) {
+		$flag = 1;
+		# skip two lines to get to nx,ny,nx
+		$line=<IN>;
+		$line=<IN>;
+		$line=<IN>;
+		chomp($line);
+		@a=split(",", $line);
+#		$nx=$a[0];
+#		$ny=$a[1];
+		$nz=$a[2];
+		$globalktop = $nz;
+		last;
+	}
+}
+if ($flag == 0) {
+	printf("Error - could not find grid card in $inpf\n");
+	exit(0);
+}
+close(IN);
+
 
 $nrtd=0;
 @rtdname=[];
@@ -118,32 +148,16 @@ while ($flag == 0) {
 		last;
 	}
 	$c="";
-	$ktopmin = 0;
-	$ktopmax = 0;
 	while ($line = <SL>) {
                 chomp($line);
 		$c=substr($line,0,1);
         	if ($c ne "#") {
                 	last;
-		} else {
-			if ($line =~ m/# KTop min and max=/) {
-#				printf("We've got a KTop Match ");
-				@a=split(",",$line);
-				$ktopmin = $a[1];
-				$ktopmax = $a[2];
-				$ktopmin =~s/^\s+|\s+$//g;
-				$ktopmax =~s/^\s+|\s+$//g;
-#				printf(" Min=$ktopmin, Max=$ktopmax\n");
-			}
 		}
         }
 	if (eof(SL)) {
 		$c="#";
 		$flag=1;
-	}
-	if ($ktopmax eq 0) {
-		printf("error - No ktopmax for wastesite = $sname\n");
-		exit(0);
 	}
 	while ($c ne "#") {
 		@a=split(",",$line);		
@@ -186,7 +200,7 @@ while ($flag == 0) {
                         	printf(IC "Overwrite Solute Volumetric Concentration,");
                         	printf(IC "$sol[$i], 0.0, 1/L, , , , , , ,");
                         	$bot = $b[4]-$zrbot;
-                        	printf(IC "$b[0],$b[1],$b[2],$b[3],$bot,$ktopmax,\n");
+                        	printf(IC "$b[0],$b[1],$b[2],$b[3],$bot,$globalktop,\n");
                         	$lsite=$sname;
 			}
 		    }
