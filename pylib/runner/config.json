@@ -136,6 +136,12 @@
 
 		"name":"Mass Balance STOMP Input File Generator Tool", "command":"xprt_mb_input_gen_linux-intel-64.exe", "description":"qualified on 04.27.2020; This tool generates the mass balance STOMP transport input file"
 
+		},
+
+		{
+
+		"name":"RTD STOMP Input File Generator Tool", "command":"xprt_RTD_input_gen_linux-intel-64.exe", "description":"qualified on 04.28.2020; This tool generates the 2018 – RTD year STOMP transport input file"
+
 		}
 	],
 	"LOGGER":{
