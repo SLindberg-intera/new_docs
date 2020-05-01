@@ -1,0 +1,18 @@
+INFO--05/01/2020 08:03:58 AM--Starting CA-CIE Tool Runner.	Logging to "../../CA-CIE-Tools-TestRepos/final_input_gen/tools/ca-modinput/linux/olive_runner_compiler_logfile_xprt_12070_input_gen_linux-intel-64.exe.txt"
+INFO--05/01/2020 08:03:58 AM--Code Version: 9fc677a264d164fa9287e1d8e34a8b9df48e2642 v2.12: ../../../../../../opt/tools/pylib/runner/runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+
+INFO--05/01/2020 08:03:58 AM--Code Version: 91c4137bcc967ddcf37f7162d24060eacc2db152 Local repo SHA-1 has does not correspond to a remote repo release version: ../../CA-CIE-Tools-TestRepos/final_input_gen/tools/ca-modinput/xprt_12070_input_gen.f<--5713ce12832cccf7bae0174436f73b0bdb3b80a5
+
+INFO--05/01/2020 08:03:58 AM--QA Status: QUALIFIED : ../../../../../../opt/tools/pylib/runner/runner.py
+INFO--05/01/2020 08:03:58 AM--QA Status: TEST : ../../CA-CIE-Tools-TestRepos/final_input_gen/tools/ca-modinput/xprt_12070_input_gen.f
+INFO--05/01/2020 08:03:58 AM--Invoking Command:"ifort"	with Arguments:"../../CA-CIE-Tools-TestRepos/final_input_gen/tools/ca-modinput/xprt_12070_input_gen.f -o  ../../CA-CIE-Tools-TestRepos/final_input_gen/tools/ca-modinput/linux/xprt_12070_input_gen_linux-intel-64.exe"
+INFO--05/01/2020 08:03:58 AM--Username:jfullerton	Computer:olive	Platform:Linux 4.4.0-38-generic #57~14.04.1-Ubuntu SMP Tue Sep 6 17:20:43 UTC 2016
+INFO--05/01/2020 08:03:59 AM--Starting CA-CIE Tool Runner.	Logging to "../../CA-CIE-Tools-TestRepos/final_input_gen/tools/ca-modinput/linux/olive_runner_compiler_logfile_xprt_12070_input_gen_linux-intel-64.exe.txt"
+INFO--05/01/2020 08:03:59 AM--Code Version: 9fc677a264d164fa9287e1d8e34a8b9df48e2642 v2.12: ../../../../../../opt/tools/pylib/runner/runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+
+INFO--05/01/2020 08:03:59 AM--Code Version: 9fc677a264d164fa9287e1d8e34a8b9df48e2642 v2.12: ../../../../../../opt/tools/pylib/fingerprint/fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
+
+INFO--05/01/2020 08:03:59 AM--QA Status: QUALIFIED : ../../../../../../opt/tools/pylib/runner/runner.py
+INFO--05/01/2020 08:03:59 AM--QA Status: QUALIFIED : ../../../../../../opt/tools/pylib/fingerprint/fingerprint.py
+INFO--05/01/2020 08:03:59 AM--Invoking Command:"python"	with Arguments:"../../../../../../opt/tools/pylib/fingerprint/fingerprint.py ../../CA-CIE-Tools-TestRepos/final_input_gen/tools/ca-modinput/linux/xprt_12070_input_gen_linux-intel-64.exe --output ../../CA-CIE-Tools-TestRepos/final_input_gen/tools/ca-modinput/linux/fingerprint_xprt_12070_input_gen_linux-intel-64.exe.txt"
+INFO--05/01/2020 08:03:59 AM--Username:jfullerton	Computer:olive	Platform:Linux 4.4.0-38-generic #57~14.04.1-Ubuntu SMP Tue Sep 6 17:20:43 UTC 2016
