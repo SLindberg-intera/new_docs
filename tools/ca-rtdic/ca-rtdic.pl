@@ -15,11 +15,14 @@
 #
 #	version 2.5 - renamed from ca-rtd to ca-rtdic
 #
-#	version 2.6 - getting ztopmax from input file grid card
+#	version 2.8 - getting ktop min and max from .card file
+#
+#	version 3.1 - getting ktop max from grid file and ktopmin from .card file. note that is also makes sure
+#		      the ktop min is consistent for each waste site (lowest ktopmin).
 
 $dtstamp = localtime();
 
-$vers="ca-rtdic 4/29/2020 Ver 2.6 by MDWilliams, Intera Inc";
+$vers="ca-rtdic 5/2/2020 Ver 3.1 by MDWilliams, Intera Inc";
 # get and open source list file (created by ca-src2stomp.pl)
 $sf = shift @ARGV;  # src card file
 $icl = shift @ARGV; # RTD Site list: waste site name, excavation depth, number of nodes to clear below bottom.
@@ -46,25 +49,25 @@ printf(IC "#\n");
 # get grid card from input file to for setting ztopmax (global)
 $flag=0;
 while ($line=<IN>) {
-	chomp($line);
-	if ($line =~ m/~grid/i) {
-		$flag = 1;
-		# skip two lines to get to nx,ny,nx
-		$line=<IN>;
-		$line=<IN>;
-		$line=<IN>;
-		chomp($line);
-		@a=split(",", $line);
-#		$nx=$a[0];
-#		$ny=$a[1];
-		$nz=$a[2];
-		$globalktop = $nz;
-		last;
-	}
+        chomp($line);
+        if ($line =~ m/~grid/i) {
+                $flag = 1;
+                # skip two lines to get to nx,ny,nx
+                $line=<IN>;
+                $line=<IN>;
+                $line=<IN>;
+                chomp($line);
+                @a=split(",", $line);
+#               $nx=$a[0];
+#               $ny=$a[1];
+                $nz=$a[2];
+                $globalktop = $nz;
+                last;
+        }
 }
 if ($flag == 0) {
-	printf("Error - could not find grid card in $inpf\n");
-	exit(0);
+        printf("Error - could not find grid card in $inpf\n");
+        exit(0);
 }
 close(IN);
 
@@ -72,36 +75,31 @@ close(IN);
 $nrtd=0;
 @rtdname=[];
 @rtdzdown=[];
-if (lc($icl) ne "all") {
-   if (lc($icl) ne "none") {
-	open(IL,"<$icl") ||  die "Can't open $icl file $!\n";
-	# skip header
+open(IL,"<$icl") ||  die "Can't open $icl file $!\n";
+# skip header
+$line=<IL>;
+chomp($line);
+while (substr($line,0,1) eq "#") {
 	$line=<IL>;
-	chomp($line);
-	while (substr($line,0,1) eq "#") {
-		$line=<IL>;
-        	chomp($line);
-	}
-	$ilflag=0;
-	while ($ilflag == 0) {
-		@a=split(",", $line);
-		$rtdname[$nrtd]=$a[0];
-		$rtdname[$nrtd]=~s/^\s+|\s+$//g;
-#		printf("RTD Name = $rtdname[$nrtd]\n");
-		# skip depth = only for comment
-		$rtdzdown[$nrtd]=$a[2];
-		$nrtd++;
-		if (eof(IL)) {
-                        $ilflag=1;
-                } else {
-			$line=<IL>;
-			chomp($line);
-		}
-	}
-	close(IL);
-    }
+       	chomp($line);
 }
-
+$ilflag=0;
+while ($ilflag == 0) {
+	@a=split(",", $line);
+	$rtdname[$nrtd]=$a[0];
+	$rtdname[$nrtd]=~s/^\s+|\s+$//g;
+#	printf("RTD Name = $rtdname[$nrtd]\n");
+	# skip depth = only for comment
+	$rtdzdown[$nrtd]=$a[2];
+	$nrtd++;
+	if (eof(IL)) {
+               $ilflag=1;
+        } else {
+		$line=<IL>;
+		chomp($line);
+	}
+}
+close(IL);
 
 # scan source code file
 # find first non-comment and skip Source Card Header
@@ -109,55 +107,68 @@ $line="";
 while ($line = <SL>) {
 	chomp($line);
 	$c=substr($line,0,1);
-	if (($c ne "#") && ($c ne "~")) {
-#		@a=split(",",$line);
-#		$nc = $a[0];
+	if (($c ne "#") && ($line !~ m/~Source Card/i)) {
 		last;
 	}
 		
 }
+# skip number of sources
+$line = <SL>;
 
 
 $flag = 0;
-$nsrc=0;
 $nlines=0;
-$lsite="";
-$ind_hash = {};
-$nn=0;
-@nname=[];
-@nkey=[];
-@nyears=[];
-@ny=[];
+$ns=0;
+@snames = [];
+@ijlist = [];
+@nij = [];
+@ktopmax = [];
+@ktopmin = [];
+$nhash = {};
 while ($flag == 0) {
 	# find site name
+	$sn = "";
 	while ($line = <SL>) {
-		$sname = "";
 		chomp($line);
 		if ($line =~ m/# Site = /i) {
 			@a=split("# Site = ",$line);
-			$sname=$a[1];
-			$sname=~s/^\s+|\s+$//g;
-#			printf("sname=$sname\n");
+			$sn=$a[1];
+			$sn=~s/^\s+|\s+$//g;
+			if (exists ($nhash{$sn})) {
+				$s=$nhash{$sn};
+			} else {
+				$nhash{$sn} = $ns;
+				$snames[$ns]=$sn;
+				$s=$ns;
+				$nij[$s]=0;
+				$ktopmax[$s]=0;
+				$ktopmin[$s]=9999999;
+				$ns++;
+			}
 			last;
 		}
 	}
-
-	# skip to source data for this site
-	if ($sname eq "") {
+	if (eof(SL)) {
+		$flag=1;
+		last;
+	}
+	if ($sn eq "") {
 		$flag = 1;
 		last;
 	}
 	$c="";
+	# skip to cards
 	while ($line = <SL>) {
                 chomp($line);
 		$c=substr($line,0,1);
         	if ($c ne "#") {
                 	last;
-		}
+		} 
         }
 	if (eof(SL)) {
 		$c="#";
 		$flag=1;
+		last;
 	}
 	while ($c ne "#") {
 		@a=split(",",$line);		
@@ -165,87 +176,78 @@ while ($flag == 0) {
 	    	for ($i=0;$i<scalar(@a);$i++) {
 			$a[$i] =~ s/^\s+|\s+$//g;
 		}
-		$nlines=$a[8];
-		$ind="";
 		if ($a[0] =~ m/solute/i) {
-			$ind=$a[2].",".$a[3].",".$a[4].",".$a[5].",".$a[6].",".$a[7];
-			$nkh=$a[0].",".$a[1];
+			$ind=$a[2].",".$a[3].",".$a[4].",".$a[5];
+			$kmin=$a[6];
+			$kmax=$a[7];
 			$nlines=$a[8];
 		} else {
-			$ind=$a[1].",".$a[2].",".$a[3].",".$a[4].",".$a[5].",".$a[6];
-			$nkh=$a[0];
+			$ind=$a[1].",".$a[2].",".$a[3].",".$a[4];
+			$kmin=$a[5];
+			$kmax=$a[6];
 			$nlines=$a[7];
 		}
-		if (!(exists $ind_hash{$ind})) {
-		    $ind_hash{$ind}=$ind;
-		    $tflag = 0;
-		    $zrbot = 8;
-		    if (lc($icl) eq "all") {
-			$tflag = 1;
-		    } else {
-			for ($i=0;$i<$nrtd;$i++) {
-				if (lc($sname) eq lc($rtdname[$i])) {
-					$tflag = 1;
-					$zrbot = $rtdzdown[$i];
+		$hit=0;
+		printf("$nij[$s]\n");
+		for ($i=0;$i<$nij[$s];$i++) {
+			if (!defined($ind)) {
+				printf("Error - ind not defined");
+				exit(0);
+			}
+			if (!defined($ijlist[$s][$i])) {
+				printf("Error - ijlist[s] not defined");
+				exit(0);
+			}
+			printf("$ind $ijlist[$s][$i]\n");
+			if ($ind eq $ijlist[$s][$i]) {
+				printf("matched $ind\n");
+				$hit=1;
+				if ($kmax > $ktopmax[$s]) {
+					$ktopmax[$s]=$kmax;
+				}
+				if ($kmin < $ktopmin[$s]) {
+					$ktopmin[$s]=$kmin;
 				}
 			}
-		    }
-		    if ($tflag == 1) {
-		 	if ($sname ne $lsite) {
-                                printf(IC "# Site = $sname\n");
-				printf("Matched IC Site = $sname\n");
-                        }
-			@b=split(",",$ind);
-			for ($i=0;$i<$nsol;$i++) {
-                        	printf(IC "Overwrite Solute Volumetric Concentration,");
-                        	printf(IC "$sol[$i], 0.0, 1/L, , , , , , ,");
-                        	$bot = $b[4]-$zrbot;
-                        	printf(IC "$b[0],$b[1],$b[2],$b[3],$bot,$globalktop,\n");
-                        	$lsite=$sname;
-			}
-		    }
-		} 
-
-
-		# get year lines
-#		printf("nlines=$nlines\n");
-		@y=[];
-		for ($i=0;$i<$nlines;$i++) {
-			$line=<SL>;
-			chomp($line);
-			@ys=split(",",$line);
-			$y[$i]=$ys[0];
+		}
+		if ($hit == 0) {
+			$ijlist[$s][$nij[$s]]=$ind;
+			$ktopmin[$s]=$kmin;
+			$ktopmax[$s]=$kmax;
+			$nij[$s]++;
+			printf("adding $ind\n");
 		}
 
-		$nsrc++;
-                # make list for dup check
-                @b=split(",",$ind);
-#		printf("nn=$nn $b[0],$b[1],$b[2],$b[3]");
-                for ($i=$b[0];$i<=$b[1];$i++) {
-                        for ($j=$b[2];$j<=$b[3];$j++) {
-                        	$dkey=$nkh.",".$i.",".$j.",".$b[4];
-				$nname[$nn]=$sname;
-				$nkey[$nn]=$dkey;
-				$nyears[$nn]=$nlines;
-				for ($k=0;$k<$nlines;$k++) {
-					$ny[$nn][$k]=$y[$k];
-				}
-				$nn++;
-			}
-		}
-#		printf(" New nn=$nn\n");
-		
-
-		if (eof(SL)) {
-			$flag=1;
-			last;
-		} 
-		$line = <SL>;
-#		printf("$line\n");
+                # get year lines
+                for ($i=0;$i<$nlines;$i++) {
+                        $line=<SL>;
+                }
+                if (eof(SL)) {
+                        $flag=1;
+                        last;
+                }
+                $line = <SL>;
                 chomp($line);
-		$c=substr($line,0,1);
+                $c=substr($line,0,1);
+        }
+}
+		
+for ($s=0;$s<$ns;$s++) {
+	# see if it matches RTD sites
+	for ($r=0;$r<$nrtd;$r++) {
+		if ($snames[$s] eq $rtdname[$r]) {
+                        printf(IC "# Site = $snames[$s]\n");
+			printf("Matched IC Site = $snames[$s]\n");
+		    	for ($i=0;$i<$nsol;$i++) {
+			    for ($l=0;$l<$nij[$s];$l++) {
+                       		printf(IC "Overwrite Solute Volumetric Concentration,");
+                       		printf(IC "$sol[$i], 0.0, 1/L, , , , , , ,");
+                       		$bot = $ktopmin[$s]-$rtdzdown[$r];
+                       		printf(IC "$ijlist[$s][$l],$bot,$globalktop,\n");
+			    }
+		    	}
+		}
 	}
-
 }
 
 close(SL);
