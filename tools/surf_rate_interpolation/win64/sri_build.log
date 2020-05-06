@@ -1,30 +1,30 @@
 ###Executing Fingerprint Tool### 
-INFO--04/24/2020 08:06:04 AM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
-INFO--04/24/2020 08:06:09 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+INFO--05/06/2020 12:31:30 PM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
+INFO--05/06/2020 12:31:34 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
 
-INFO--04/24/2020 08:06:12 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
+INFO--05/06/2020 12:31:37 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
 
-INFO--04/24/2020 08:06:16 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
-INFO--04/24/2020 08:06:19 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
-INFO--04/24/2020 08:06:19 AM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\surf_rate_interp.sln --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
-INFO--04/24/2020 08:06:19 AM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
-Fingerprint generated at 2020-04-24 08:06:20.132887
+INFO--05/06/2020 12:31:42 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
+INFO--05/06/2020 12:31:45 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
+INFO--05/06/2020 12:31:45 PM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\surf_rate_interp.sln --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
+INFO--05/06/2020 12:31:45 PM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
+Fingerprint generated at 2020-05-06 12:31:46.377086
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\surf_rate_interp.sln	3981912ff415bf605b8911812dd57b9e52c4d1b7773ee49f37a0c61de05035bc
 
 ###Finished Process###  
 ###################### 
 ################################ 
 ###Executing Fingerprint Tool### 
-INFO--04/24/2020 08:06:20 AM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
-INFO--04/24/2020 08:06:23 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+INFO--05/06/2020 12:31:47 PM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
+INFO--05/06/2020 12:31:50 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
 
-INFO--04/24/2020 08:06:26 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
+INFO--05/06/2020 12:31:53 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
 
-INFO--04/24/2020 08:06:30 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
-INFO--04/24/2020 08:06:33 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
-INFO--04/24/2020 08:06:33 AM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\packages --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
-INFO--04/24/2020 08:06:33 AM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
-Fingerprint generated at 2020-04-24 08:06:35.262864
+INFO--05/06/2020 12:31:58 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
+INFO--05/06/2020 12:32:02 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
+INFO--05/06/2020 12:32:02 PM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\packages --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
+INFO--05/06/2020 12:32:02 PM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
+Fingerprint generated at 2020-05-06 12:32:03.007533
 Total for 10 files	369ed9dc3c927ff62fa5c9ab25dd8ef3b7ae680e8a0110ee809e8897bcf7252a
 
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\packages\Microsoft.Office.Interop.Excel.15.0.4795.1000\Microsoft.Office.Interop.Excel.15.0.4795.1000.nupkg	f2cfd40243bfc9408e64386c4ddb2584ae0052f257d8dfb65b9d4a31a1883571
@@ -41,121 +41,121 @@ C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\packages\Windows
 ###################### 
 ################################ 
 ###Executing Fingerprint Tool### 
-INFO--04/24/2020 08:06:35 AM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
-INFO--04/24/2020 08:06:38 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+INFO--05/06/2020 12:32:03 PM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
+INFO--05/06/2020 12:32:07 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
 
-INFO--04/24/2020 08:06:41 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
+INFO--05/06/2020 12:32:10 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
 
-INFO--04/24/2020 08:06:45 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
-INFO--04/24/2020 08:06:48 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
-INFO--04/24/2020 08:06:48 AM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\app.config --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
-INFO--04/24/2020 08:06:48 AM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
-Fingerprint generated at 2020-04-24 08:06:49.342304
+INFO--05/06/2020 12:32:15 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
+INFO--05/06/2020 12:32:19 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
+INFO--05/06/2020 12:32:19 PM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\app.config --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
+INFO--05/06/2020 12:32:19 PM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
+Fingerprint generated at 2020-05-06 12:32:19.508201
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\app.config	dbe137071c1507062971ae5d07e760dbed47bd8dec3b60738966c6c7381a8505
 
 ###Finished Process###  
 ###################### 
 ################################ 
-INFO--04/24/2020 08:06:49 AM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
-INFO--04/24/2020 08:06:52 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+INFO--05/06/2020 12:32:20 PM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
+INFO--05/06/2020 12:32:23 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
 
-INFO--04/24/2020 08:06:55 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
+INFO--05/06/2020 12:32:27 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
 
-INFO--04/24/2020 08:06:59 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
-INFO--04/24/2020 08:07:02 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
-INFO--04/24/2020 08:07:02 AM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\app.xaml --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
-INFO--04/24/2020 08:07:02 AM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
-Fingerprint generated at 2020-04-24 08:07:03.173760
+INFO--05/06/2020 12:32:31 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
+INFO--05/06/2020 12:32:35 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
+INFO--05/06/2020 12:32:35 PM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\app.xaml --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
+INFO--05/06/2020 12:32:35 PM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
+Fingerprint generated at 2020-05-06 12:32:35.969311
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\app.xaml	b24803638d31db9b7dd389de2219a35414d92c3e6f6823ae5af22285e36d81e4
 
 ###Finished Process###  
 ###################### 
 ################################ 
-INFO--04/24/2020 08:07:03 AM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
-INFO--04/24/2020 08:07:07 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+INFO--05/06/2020 12:32:37 PM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
+INFO--05/06/2020 12:32:40 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
 
-INFO--04/24/2020 08:07:10 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
+INFO--05/06/2020 12:32:44 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
 
-INFO--04/24/2020 08:07:14 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
-INFO--04/24/2020 08:07:18 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
-INFO--04/24/2020 08:07:18 AM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\app.xaml.cs --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
-INFO--04/24/2020 08:07:18 AM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
-Fingerprint generated at 2020-04-24 08:07:18.435656
+INFO--05/06/2020 12:32:48 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
+INFO--05/06/2020 12:32:52 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
+INFO--05/06/2020 12:32:52 PM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\app.xaml.cs --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
+INFO--05/06/2020 12:32:52 PM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
+Fingerprint generated at 2020-05-06 12:32:52.530604
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\app.xaml.cs	56ea91041a2ef908da66cfb142b436de380a11938f12a29ac1520da39b8f2da1
 
 ###Finished Process###  
 ###################### 
 ################################ 
-INFO--04/24/2020 08:07:19 AM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
-INFO--04/24/2020 08:07:22 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+INFO--05/06/2020 12:32:53 PM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
+INFO--05/06/2020 12:32:56 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
 
-INFO--04/24/2020 08:07:25 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
+INFO--05/06/2020 12:33:00 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
 
-INFO--04/24/2020 08:07:28 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
-INFO--04/24/2020 08:07:32 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
-INFO--04/24/2020 08:07:32 AM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\MainWindow.xaml --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
-INFO--04/24/2020 08:07:32 AM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
-Fingerprint generated at 2020-04-24 08:07:32.842056
+INFO--05/06/2020 12:33:04 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
+INFO--05/06/2020 12:33:08 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
+INFO--05/06/2020 12:33:08 PM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\MainWindow.xaml --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
+INFO--05/06/2020 12:33:08 PM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
+Fingerprint generated at 2020-05-06 12:33:09.001144
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\MainWindow.xaml	1af7ce30fd231d286f913ff5b16031425e722b8c93471cbfbfa3ac73b077624c
 
 ###Finished Process###  
 ###################### 
 ################################ 
-INFO--04/24/2020 08:07:33 AM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
-INFO--04/24/2020 08:07:36 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+INFO--05/06/2020 12:33:09 PM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
+INFO--05/06/2020 12:33:13 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
 
-INFO--04/24/2020 08:07:39 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
+INFO--05/06/2020 12:33:16 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
 
-INFO--04/24/2020 08:07:43 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
-INFO--04/24/2020 08:07:46 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
-INFO--04/24/2020 08:07:46 AM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\MainWindow.xaml.cs --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
-INFO--04/24/2020 08:07:47 AM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
-Fingerprint generated at 2020-04-24 08:07:47.382578
+INFO--05/06/2020 12:33:20 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
+INFO--05/06/2020 12:33:24 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
+INFO--05/06/2020 12:33:24 PM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\MainWindow.xaml.cs --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
+INFO--05/06/2020 12:33:24 PM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
+Fingerprint generated at 2020-05-06 12:33:25.079393
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\MainWindow.xaml.cs	fc25465350ebdc60cb8cb0bd781dcd6a8a21af5b55d7a739983a7fe85cacd273
 
 ###Finished Process###  
 ###################### 
 ################################ 
-INFO--04/24/2020 08:07:48 AM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
-INFO--04/24/2020 08:07:51 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+INFO--05/06/2020 12:33:25 PM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
+INFO--05/06/2020 12:33:29 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
 
-INFO--04/24/2020 08:07:54 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
+INFO--05/06/2020 12:33:33 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
 
-INFO--04/24/2020 08:07:57 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
-INFO--04/24/2020 08:08:01 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
-INFO--04/24/2020 08:08:01 AM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\packages.config --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
-INFO--04/24/2020 08:08:01 AM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
-Fingerprint generated at 2020-04-24 08:08:01.820183
+INFO--05/06/2020 12:33:37 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
+INFO--05/06/2020 12:33:41 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
+INFO--05/06/2020 12:33:41 PM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\packages.config --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
+INFO--05/06/2020 12:33:41 PM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
+Fingerprint generated at 2020-05-06 12:33:41.770405
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\packages.config	96fe8e0913d07311a2ce92626a24436b921e86b3368f974306bc3b861b1b2ee8
 
 ###Finished Process###  
 ###################### 
 ################################ 
-INFO--04/24/2020 08:08:02 AM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
-INFO--04/24/2020 08:08:05 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+INFO--05/06/2020 12:33:42 PM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
+INFO--05/06/2020 12:33:46 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
 
-INFO--04/24/2020 08:08:08 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
+INFO--05/06/2020 12:33:49 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
 
-INFO--04/24/2020 08:08:12 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
-INFO--04/24/2020 08:08:16 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
-INFO--04/24/2020 08:08:16 AM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\surf_rate_interp.csproj --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
-INFO--04/24/2020 08:08:16 AM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
-Fingerprint generated at 2020-04-24 08:08:16.910508
+INFO--05/06/2020 12:33:54 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
+INFO--05/06/2020 12:33:58 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
+INFO--05/06/2020 12:33:58 PM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\surf_rate_interp.csproj --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
+INFO--05/06/2020 12:33:58 PM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
+Fingerprint generated at 2020-05-06 12:33:58.663593
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\surf_rate_interp.csproj	c20563ebecf9a96473d4b87f2e44b1d2ca6499effd408b8d1ac1c5547a7cc941
 
 ###Finished Process###  
 ###################### 
 ################################ 
-INFO--04/24/2020 08:08:17 AM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
-INFO--04/24/2020 08:08:20 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+INFO--05/06/2020 12:33:59 PM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
+INFO--05/06/2020 12:34:03 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
 
-INFO--04/24/2020 08:08:23 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
+INFO--05/06/2020 12:34:06 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
 
-INFO--04/24/2020 08:08:27 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
-INFO--04/24/2020 08:08:30 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
-INFO--04/24/2020 08:08:30 AM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\data --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
-INFO--04/24/2020 08:08:30 AM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
-Fingerprint generated at 2020-04-24 08:08:31.124877
+INFO--05/06/2020 12:34:12 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
+INFO--05/06/2020 12:34:16 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
+INFO--05/06/2020 12:34:16 PM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\data --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
+INFO--05/06/2020 12:34:16 PM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
+Fingerprint generated at 2020-05-06 12:34:16.645046
 Total for 8 files	8b496a00d2236291a3ff503dfc56eee280f2bbf9fa1a81ddfef68ecf88af3249
 
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\data\cellData.cs	3db4dce5fc5934be8163420c54b93b7e59a113d637d6442a16a40e9eeebd7f43
@@ -169,41 +169,41 @@ C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_mod
 ###Finished Process###  
 ###################### 
 ################################ 
-INFO--04/24/2020 08:08:31 AM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
-INFO--04/24/2020 08:08:35 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+INFO--05/06/2020 12:34:17 PM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
+INFO--05/06/2020 12:34:20 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
 
-INFO--04/24/2020 08:08:37 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
+INFO--05/06/2020 12:34:23 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
 
-INFO--04/24/2020 08:08:41 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
-INFO--04/24/2020 08:08:45 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
-INFO--04/24/2020 08:08:45 AM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\framework --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
-INFO--04/24/2020 08:08:45 AM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
-Fingerprint generated at 2020-04-24 08:08:46.108000
-Total for 5 files	8e96edaf678111ee74415bc262e7fa06aba4370320c808e9e81b3acc701cf7c0
+INFO--05/06/2020 12:34:28 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
+INFO--05/06/2020 12:34:32 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
+INFO--05/06/2020 12:34:32 PM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\framework --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
+INFO--05/06/2020 12:34:32 PM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
+Fingerprint generated at 2020-05-06 12:34:32.694821
+Total for 5 files	8fa7d118fdba70d19af51b8ba3d6dfd0f00b067565fe4c1a1b2eefc9d8b6c1b1
 
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\framework\hssp.cs	117c889fff05a6beb48ebca2afad2c910cc119a4d7b45f25eec020ad782eb3f0
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\framework\hssp_threaded.cs	a7000a83d8d64e2a4502fd9a8e2ca947b0e6cbe019e1e0071b430fabda345c11
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\framework\interpolate_data.cs	a334a2976640482f26ba9353a2cbd5145af404ad6aeb43eb33effbd6e794b5a4
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\framework\outputs.cs	eb31ad96f78d117fb1768a61a75c7f379fb3b9029c6647ba42a1ca328b00461c
-C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\framework\process_srf.cs	07f549170fff183cae1852c2dc97aae3ece5d6ae2d366e7dda487c0c3e79ccc4
+C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\framework\process_srf.cs	8436b90a29d5ee15c88d2c6c3999b0d14147ad7ac6c581fa0167fde693583cc4
 ###Finished Process###  
 ###################### 
 ################################ 
-INFO--04/24/2020 08:08:46 AM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
-INFO--04/24/2020 08:08:49 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+INFO--05/06/2020 12:34:34 PM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
+INFO--05/06/2020 12:34:37 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
 
-INFO--04/24/2020 08:08:52 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
+INFO--05/06/2020 12:34:40 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
 
-INFO--04/24/2020 08:08:56 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
-INFO--04/24/2020 08:08:59 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
-INFO--04/24/2020 08:08:59 AM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\gui --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
-INFO--04/24/2020 08:08:59 AM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
-Fingerprint generated at 2020-04-24 08:09:00.277334
-Total for 11 files	2e9491dbdc19794b239704c7d9b5523bf20e5abe9b54d5dac8f34dcfdee60f9f
+INFO--05/06/2020 12:34:45 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
+INFO--05/06/2020 12:34:49 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
+INFO--05/06/2020 12:34:49 PM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\gui --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
+INFO--05/06/2020 12:34:49 PM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
+Fingerprint generated at 2020-05-06 12:34:49.940360
+Total for 11 files	7dfce7f27f9aebf00b67e5c715c8932e3ce17f64977236b97cb6f02b68ac9ecb
 
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\gui\DataGridDoubleColumn.cs	d278b40185b6438181fbd57a817eddaf58ee9885da6a6e6282a5cbcfdfe92231
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\gui\Interpolate.xaml	5dace9455ac44912f3e6c184422de9f9f427347a642baa689e2598edbfbeb192
-C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\gui\Interpolate.xaml.cs	abd2f06251a6af23c882da6e23b699a97a7fdc346e895706d1e0ed454d65ba41
+C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\gui\Interpolate.xaml.cs	cddb73c36ac5a69b86d755aaedc84bcdc8a912e0717e92af741f1606aff90d4e
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\gui\buildHSS.xaml	6843fe9d6a3e16889ce8f772f566ba662a632ad4919eb949eea18ab75b45934b
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\gui\buildHSS.xaml.cs	f71b0a5275d66c7d084069fccd319c4659c00c31dd97e5165a25b29836ef07c7
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\gui\columnSetting.xaml	b1b6bae34328792e35fcdd5e024c8f5f1dc0c6e9ce5e561fe9f9f0e3bd209217
@@ -215,16 +215,16 @@ C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_mod
 ###Finished Process###  
 ###################### 
 ################################ 
-INFO--04/24/2020 08:09:01 AM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
-INFO--04/24/2020 08:09:04 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+INFO--05/06/2020 12:34:50 PM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
+INFO--05/06/2020 12:34:57 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
 
-INFO--04/24/2020 08:09:07 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
+INFO--05/06/2020 12:35:00 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
 
-INFO--04/24/2020 08:09:12 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
-INFO--04/24/2020 08:09:16 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
-INFO--04/24/2020 08:09:16 AM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\properties --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
-INFO--04/24/2020 08:09:16 AM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
-Fingerprint generated at 2020-04-24 08:09:16.694220
+INFO--05/06/2020 12:35:05 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
+INFO--05/06/2020 12:35:09 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
+INFO--05/06/2020 12:35:09 PM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\properties --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
+INFO--05/06/2020 12:35:09 PM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
+Fingerprint generated at 2020-05-06 12:35:10.325513
 Total for 5 files	30809eb1df80605fee856fb8542eb2d29a86cfd60811be94c71e9057627fe749
 
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\properties\AssemblyInfo.cs	11bf3402b63bb0cb8e463018c098f3d04c8bfd602b873d73b04bf381ebb78d7f
@@ -235,16 +235,16 @@ C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_mod
 ###Finished Process###  
 ###################### 
 ################################ 
-INFO--04/24/2020 08:09:17 AM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
-INFO--04/24/2020 08:09:20 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+INFO--05/06/2020 12:35:11 PM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
+INFO--05/06/2020 12:35:15 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
 
-INFO--04/24/2020 08:09:23 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
+INFO--05/06/2020 12:35:18 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
 
-INFO--04/24/2020 08:09:26 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
-INFO--04/24/2020 08:09:30 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
-INFO--04/24/2020 08:09:30 AM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\utility --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
-INFO--04/24/2020 08:09:30 AM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
-Fingerprint generated at 2020-04-24 08:09:30.794034
+INFO--05/06/2020 12:35:22 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
+INFO--05/06/2020 12:35:26 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
+INFO--05/06/2020 12:35:26 PM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\utility --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
+INFO--05/06/2020 12:35:27 PM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
+Fingerprint generated at 2020-05-06 12:35:27.465306
 Total for 2 files	fe7b2658b7ed0c359956d9b4b58b2e927fbf541b837410db433da5781dbdcbe9
 
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\utility\UiServices.cs	05ad3125929d510d61b205434fb69fd051690d03d81e49f61b38ae57b5f1c484
@@ -253,58 +253,58 @@ C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_mod
 ###################### 
 ############################################### 
 ###Compiling Surface Rate Interpolation Tool### 
-INFO--04/24/2020 08:09:31 AM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
-INFO--04/24/2020 08:09:34 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+INFO--05/06/2020 12:35:28 PM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
+INFO--05/06/2020 12:35:31 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
 
-INFO--04/24/2020 08:09:34 AM--Code Version: Not a valid tool path : project\surf_rate_interp.sln<--e33da78d0624fd481405b69dc556b827e02a0310
+INFO--05/06/2020 12:35:31 PM--Code Version: Not a valid tool path : project\surf_rate_interp.sln<--e33da78d0624fd481405b69dc556b827e02a0310
 
-INFO--04/24/2020 08:09:37 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
-INFO--04/24/2020 08:09:37 AM--QA Status: TEST : project\surf_rate_interp.sln
-INFO--04/24/2020 08:09:37 AM--Invoking Command:"msbuild"	with Arguments:"project\surf_rate_interp.sln -p:Configuration=win64"
-INFO--04/24/2020 08:09:38 AM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
+INFO--05/06/2020 12:35:36 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
+INFO--05/06/2020 12:35:36 PM--QA Status: TEST : project\surf_rate_interp.sln
+INFO--05/06/2020 12:35:36 PM--Invoking Command:"msbuild"	with Arguments:"project\surf_rate_interp.sln -p:Configuration=win64"
+INFO--05/06/2020 12:35:36 PM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
 ###Finished Process###  
 ###################### 
 ################################ 
-INFO--04/24/2020 08:09:41 AM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
-INFO--04/24/2020 08:09:44 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+INFO--05/06/2020 12:35:37 PM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
+INFO--05/06/2020 12:35:41 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
 
-INFO--04/24/2020 08:09:48 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
+INFO--05/06/2020 12:35:44 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
 
-INFO--04/24/2020 08:09:52 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
-INFO--04/24/2020 08:09:55 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
-INFO--04/24/2020 08:09:55 AM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\surf_rate_interp_win_intel_64.exe --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
-INFO--04/24/2020 08:09:55 AM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
-Fingerprint generated at 2020-04-24 08:09:56.033306
-C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\surf_rate_interp_win_intel_64.exe	13f32b059a17454f19854edd364615c3399776fdf16f5ce8533d7c7f6d8cf08e
+INFO--05/06/2020 12:35:49 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
+INFO--05/06/2020 12:35:53 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
+INFO--05/06/2020 12:35:53 PM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\surf_rate_interp_win_intel_64.exe --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
+INFO--05/06/2020 12:35:53 PM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
+Fingerprint generated at 2020-05-06 12:35:53.632070
+C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\surf_rate_interp_win_intel_64.exe	1f915e4c8b6aadca0674830fd2ba7562f7f3c6bb0552f94da179bbf8d80ccaa0
 
 ###Finished Process###  
 ###################### 
 ################################ 
-INFO--04/24/2020 08:09:56 AM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
-INFO--04/24/2020 08:09:59 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+INFO--05/06/2020 12:35:54 PM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
+INFO--05/06/2020 12:35:58 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
 
-INFO--04/24/2020 08:10:02 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
+INFO--05/06/2020 12:36:01 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
 
-INFO--04/24/2020 08:10:06 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
-INFO--04/24/2020 08:10:10 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
-INFO--04/24/2020 08:10:10 AM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\Microsoft.WindowsAPICodePack.Shell.dll --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
-INFO--04/24/2020 08:10:10 AM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
-Fingerprint generated at 2020-04-24 08:10:10.693387
+INFO--05/06/2020 12:36:06 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
+INFO--05/06/2020 12:36:10 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
+INFO--05/06/2020 12:36:10 PM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\Microsoft.WindowsAPICodePack.Shell.dll --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
+INFO--05/06/2020 12:36:10 PM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
+Fingerprint generated at 2020-05-06 12:36:11.038038
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\Microsoft.WindowsAPICodePack.Shell.dll	e6fa9d9e34ff3bf63ce782654b14e4b54a3abd1022c87bc099032c2948157672
 
 ###Finished Process###  
 ###################### 
 ################################ 
-INFO--04/24/2020 08:10:11 AM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
-INFO--04/24/2020 08:10:14 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+INFO--05/06/2020 12:36:11 PM--Starting CA-CIE Tool Runner.	Logging to "win64\sri_build.log"
+INFO--05/06/2020 12:36:15 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
 
-INFO--04/24/2020 08:10:17 AM--Code Version: abf2036978b773627ccbaca9dd6b216fb2bda2fb v2.9: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
+INFO--05/06/2020 12:36:18 PM--Code Version: b12d5e8ccca9e84952cba844ef6c0e12b2789d30 v2.13: S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py<--e9692a4faec2ee264fe50417b6b6a516ba82b2f6
 
-INFO--04/24/2020 08:10:21 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
-INFO--04/24/2020 08:10:25 AM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
-INFO--04/24/2020 08:10:25 AM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\Microsoft.WindowsAPICodePack.dll --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
-INFO--04/24/2020 08:10:25 AM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
-Fingerprint generated at 2020-04-24 08:10:25.490424
+INFO--05/06/2020 12:36:22 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\runner\runner.py
+INFO--05/06/2020 12:36:26 PM--QA Status: QUALIFIED : S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py
+INFO--05/06/2020 12:36:26 PM--Invoking Command:"python"	with Arguments:"S:\PSC\!HANFORD\ICF\CA-CIE-Tools\CA-CIE-Tools\pylib\fingerprint\fingerprint.py C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\Microsoft.WindowsAPICodePack.dll --output C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\sri_build.log --outputmode a"
+INFO--05/06/2020 12:36:26 PM--Username:NPowers	Computer:PSC-Potassium	Platform:Windows 10 10.0.18362
+Fingerprint generated at 2020-05-06 12:36:26.717774
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\win64\Microsoft.WindowsAPICodePack.dll	808e96f59e7dd2212eace049079d25545f6c9c3f05244ec9cdc539fda18d34d6
 
 ###Finished Process###  

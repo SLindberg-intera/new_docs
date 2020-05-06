@@ -44,7 +44,14 @@ namespace stomp_extrap_modflow.gui
             OpenFileDialog openfiledialog1 = new OpenFileDialog();
             process_srf srf = new process_srf();
             //openfiledialog1.InitialDirectory = dir;
-            openfiledialog1.Filter = "csv (*.csv)|*.csv|srf (*.srf)|*.srf|All Files (*.*)|*.*";
+            if (delim == ',')
+            {
+                openfiledialog1.Filter = "csv (*.csv)|*.csv|srf (*.srf)|*.srf|dat (*.dat)|*.dat|All Files (*.*)|*.*";
+            }
+            else
+            {
+                openfiledialog1.Filter = "All Files (*.*)|*.*|csv (*.csv)|*.csv|srf (*.srf)|*.srf|dat (*.dat)|*.dat";
+            }
             openfiledialog1.FilterIndex = 1;
             openfiledialog1.Multiselect = true;
             openfiledialog1.RestoreDirectory = false;  //leave it where the files actually are for reading the raw data files (03-27-2012)
