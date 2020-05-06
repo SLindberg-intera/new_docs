@@ -96,13 +96,13 @@ c
         ENDIF
       ELSE
         IF(nyrstrt.eq.2018) THEN
-          WRITE(20,"(a26,a1,i4,a1,i5,a1)") 
+          WRITE(20,"(a26,a1,i4,a1,i5,a2)") 
      >      'Rad2 Transport Simulation ',
-     >      '(',nyrstrt,'-',nyrend,')'
+     >      '(',nyrstrt,'-',nyrend,'),'
         ELSE
-          WRITE(20,"(a26,a1,i4,a14,i5,a1)") 
+          WRITE(20,"(a26,a1,i4,a14,i5,a2)") 
      >      'Rad2 Transport Simulation ',
-     >      '(',nyrstrt,' [RTD Year] - ',nyrend,')'
+     >      '(',nyrstrt,' [RTD Year] - ',nyrend,'),'
         ENDIF
       ENDIF
 c
