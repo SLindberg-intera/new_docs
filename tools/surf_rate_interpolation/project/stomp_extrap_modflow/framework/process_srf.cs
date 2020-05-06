@@ -81,7 +81,7 @@ namespace stomp_extrap_modflow.framework
                         
                         break;
                     }
-                    //check if ther is a first line yet. if not set it
+                    //check if there is a first line yet. if not set it
                     else if (last_line1.Length < 2)
                     {
                         last_line1 = temp.Split(new[] { delim }, StringSplitOptions.None);
@@ -97,9 +97,12 @@ namespace stomp_extrap_modflow.framework
                     //As the new line is not data, move line2 to line1 and set line2 as the current line.
                     else
                     {
-                        last_line1 = last_line2;
+                        if (last_line1[0].ToLower() != "time")
+                        {
+                            last_line1 = last_line2;
+                            h1 = i - 1;
+                        }
                         last_line2 = temp.Split(new[] { delim }, StringSplitOptions.None);
-                        h1 = i - 1;
                         h2 = i;
                     }
                 }
