@@ -148,6 +148,12 @@
 
 		"name":"RTD IC Tool", "command":"ca-rtdic.pl", "description":"qualified on 05.05.2020; This tool scans an input source card file and a steady-state STOMP input file and generates Initial Conditions Cards for RTD restarts"
 
+		},
+
+		{
+
+		"name":"12070 STOMP Input File Generator Tool", "command":"xprt_12070_input_gen_linux-intel-64.exe", "description":"qualified on 05.06.2020; This tool generates the 2018 (or RTD year if the model has RTD) - 12070 STOMP transport input file"
+
 		}
 	],
 	"LOGGER":{
