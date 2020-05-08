@@ -8,6 +8,7 @@ using Excel = Microsoft.Office.Interop.Excel;
 using System.Windows;
 using System.Runtime.InteropServices;
 using System.Globalization;
+using System.IO;
 
 namespace stomp_extrap_modflow.framework
 {
@@ -35,6 +36,26 @@ namespace stomp_extrap_modflow.framework
             new_filename = new_filename.Replace("?", "_").Replace("*", "_");
             return new_filename;
         }
+        private void write_output(string fileName, string data)
+        {
+            //remove duplicate slashes from path
+            fileName = fileName.Replace("\\\\", "\\");
+            try
+            {
+                File.WriteAllText(fileName, data);
+            }
+            catch (IOException)
+            {
+                // Initializes the variables to pass to the MessageBox.Show method.
+                string message = "Failed writing to file (" + fileName + ")!" + Environment.NewLine + Environment.NewLine + "A file with the same name may already be open by another application or user.";
+                string caption = "Error Detected in Output!";
+                MessageBoxButton buttons = MessageBoxButton.OK;
+
+                // Displays the MessageBox.
+                MessageBox.Show(message, caption, buttons);
+                return;
+            }
+        }
         public void build_yearly_csv_by_def(Dictionary<string, Dictionary<int, decimal>> data,string path,string sep,string o_file)
         {
             string ext = "csv";
@@ -53,7 +74,7 @@ namespace stomp_extrap_modflow.framework
                     Environment.NewLine,
                     data[key].Select(d => d.Key + sep + d.Value + sep)
                 );
-                System.IO.File.WriteAllText(fileName, csv);
+                write_output(fileName, csv);                
             }
         }
         public void build_yearly_csv_single_file(Dictionary<string, Dictionary<int, decimal>> data, string path, string sep, string o_file)
@@ -87,7 +108,7 @@ namespace stomp_extrap_modflow.framework
                     Environment.NewLine,
                     c_data.Select(d => d.Key + sep + string.Join(sep, d.Value))
                 );
-            System.IO.File.WriteAllText(fileName, csv);
+            write_output(fileName, csv);
         }
         public void build_cum_csv_by_def(Dictionary<string, SortedDictionary<decimal, decimal>> data, string path, string o_file)
         {
@@ -103,7 +124,7 @@ namespace stomp_extrap_modflow.framework
                     Environment.NewLine,
                     data[key].Select(d => d.Key + "," + d.Value + ",")
                 );
-                System.IO.File.WriteAllText(fileName, csv);
+                write_output(fileName, csv);
             }
         }
         public void build_cum_csv_by_single_file(Dictionary<string, SortedDictionary<decimal, decimal>> data, string path, string o_file)
@@ -131,7 +152,7 @@ namespace stomp_extrap_modflow.framework
                     Environment.NewLine,
                     c_data.Select(d => d.Key + sep + string.Join(sep, d.Value))
                 );
-            System.IO.File.WriteAllText(fileName, csv);
+            write_output(fileName, csv);
         }
         public void build_hss_file(string path,hssFile hss, List<cellData> files)
         {
@@ -143,7 +164,7 @@ namespace stomp_extrap_modflow.framework
                 output += string.Format("{0} {1}{2}",file.HSSFileName,file.inHSSFile, Environment.NewLine);
                 output += string.Format("{0} {1} {2} {3} {4}{5}",file.kSource,file.iSource, file.jSource,file.SourceName,file.iHSSComp,Environment.NewLine);
             }
-            System.IO.File.WriteAllText(path+"mt3d.hss", output);
+            write_output(path+"mt3d.hss", output);
         }
         public void build_hss_dat_files(string path,Dictionary<string, List<datafile>> data)
         {
@@ -155,7 +176,7 @@ namespace stomp_extrap_modflow.framework
                 {
                     output += String.Format("{0}{1}{2}{3}",rec.year.ToString("0.#####").PadRight(17,' '),rec.radius.ToString("0.#").PadRight(9,' '),rec.concentration.ToString("E9"), Environment.NewLine);
                 }
-                System.IO.File.WriteAllText(path + file, output);
+                write_output(path + file, output);
             }
             
         }
@@ -166,7 +187,7 @@ namespace stomp_extrap_modflow.framework
                     Environment.NewLine,
                     log.Select(d => d)
                 );
-            System.IO.File.WriteAllText(fileName, lines);
+            write_output(fileName, lines);
         }
 
         public void build_ecf(Dictionary<string, Dictionary<int, decimal>> idata, Dictionary<string, Dictionary<decimal, decimal>> odata, string path)
