@@ -152,7 +152,7 @@ namespace stomp_extrap_modflow.framework
         {
             //bool header1 = false;
             //bool header2 = false;
-            bool firstline = false;          
+            //bool firstline = false;          
             
             int i = 0;
             int row = 0;

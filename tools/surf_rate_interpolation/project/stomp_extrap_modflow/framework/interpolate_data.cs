@@ -8,13 +8,13 @@ namespace stomp_extrap_modflow.framework
 {
     class interpolate_data
     {
-        public Dictionary<string, Dictionary<decimal, decimal>> f_data;
-        public Dictionary<string, Dictionary<decimal, decimal>> c_data;
+        public Dictionary<string, SortedDictionary<decimal, decimal>> f_data;
+        public Dictionary<string, SortedDictionary<decimal, decimal>> c_data;
         public Dictionary<string, Dictionary<int, decimal>> year_data;
         public void convert_time_yearly(Dictionary<int,decimal[]> data, List<columns> column_def,bool useCumulative)
         {
-            f_data = new Dictionary<string, Dictionary<decimal, decimal>>();
-            c_data = new Dictionary<string, Dictionary<decimal, decimal>>();
+            f_data = new Dictionary<string, SortedDictionary<decimal, decimal>>();
+            c_data = new Dictionary<string, SortedDictionary<decimal, decimal>>();
             List<int> ind = data.Keys.ToList();
             int time = column_def.Where(c => c.definition.ToLower() == "time").Select(c => c.column_num-1).FirstOrDefault();
             decimal start_year = column_def.Where(c => c.definition.ToLower() == "time").Select(c => c.conv_factor).FirstOrDefault();
@@ -51,7 +51,7 @@ namespace stomp_extrap_modflow.framework
                         }
                         else
                         {
-                            f_data.Add(col.definition, new Dictionary<decimal, decimal>());
+                            f_data.Add(col.definition, new SortedDictionary<decimal, decimal>());
                             f_data[col.definition].Add(data[i][time]+start_year, (data[i][col.column_num - 1] * col.conv_factor));
                             first = i;
                         }
@@ -80,7 +80,7 @@ namespace stomp_extrap_modflow.framework
                             }
                             else
                             {
-                                c_data.Add(col.definition, new Dictionary<decimal, decimal>());
+                                c_data.Add(col.definition, new SortedDictionary<decimal, decimal>());
                                 c_data[col.definition].Add(data[i][time] + start_year, (data[i][col.column_num] * col.conv_factor));
                                 first = i;
                             }
@@ -159,7 +159,7 @@ namespace stomp_extrap_modflow.framework
         {
             foreach(string key in f_data.Keys)
             {
-                c_data.Add(key, new Dictionary<decimal, decimal>());
+                c_data.Add(key, new SortedDictionary<decimal, decimal>());
                 decimal last_yr = -1;
                 foreach(decimal yr in f_data[key].Keys)
                 {
@@ -183,7 +183,7 @@ namespace stomp_extrap_modflow.framework
             year_data = new Dictionary<string, Dictionary<int, decimal>>();
             foreach (string key in f_data.Keys)
             {
-                Dictionary<decimal, decimal> data = f_data[key];
+                SortedDictionary<decimal, decimal> data = f_data[key];
                 year_data.Add(key, new Dictionary<int, decimal>());
                 int max = (int)Math.Floor(data.Keys.ToList().Max());
                 if(max > 15000)

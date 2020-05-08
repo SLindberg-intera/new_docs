@@ -89,7 +89,7 @@ namespace stomp_extrap_modflow.framework
                 );
             System.IO.File.WriteAllText(fileName, csv);
         }
-        public void build_cum_csv_by_def(Dictionary<string, Dictionary<decimal, decimal>> data, string path, string o_file)
+        public void build_cum_csv_by_def(Dictionary<string, SortedDictionary<decimal, decimal>> data, string path, string o_file)
         {
             foreach (string key in data.Keys.ToList())
             {
@@ -97,6 +97,7 @@ namespace stomp_extrap_modflow.framework
                 string file_key = rem_invalid_char(key);
                 string fileName = path + "\\" + o_filename + "_"+ file_key + "_cumulative.csv";
                 string csv = key;
+
                 csv += Environment.NewLine + "Year, Total " + units + Environment.NewLine;
                 csv += String.Join(
                     Environment.NewLine,
@@ -105,7 +106,7 @@ namespace stomp_extrap_modflow.framework
                 System.IO.File.WriteAllText(fileName, csv);
             }
         }
-        public void build_cum_csv_by_single_file(Dictionary<string, Dictionary<decimal, decimal>> data, string path, string o_file)
+        public void build_cum_csv_by_single_file(Dictionary<string, SortedDictionary<decimal, decimal>> data, string path, string o_file)
         {
             string fileName = path + o_file.Substring(o_file.LastIndexOf("\\"), o_file.LastIndexOf(".") - o_file.LastIndexOf("\\")) + "_cumulative.csv";
             Dictionary<decimal, List<decimal>> c_data = new Dictionary<decimal, List<decimal>>();
@@ -115,7 +116,6 @@ namespace stomp_extrap_modflow.framework
             csv += String.Join(sep, data.Keys.Select(d => d));
             foreach (string key in data.Keys.ToArray())
             {
-                csv += sep + units;
                 int len = data[key].Keys.Count;
                 foreach (decimal year in data[key].Keys.ToArray())
                 {
