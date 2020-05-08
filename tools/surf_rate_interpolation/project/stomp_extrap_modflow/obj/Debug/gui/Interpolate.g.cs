@@ -252,7 +252,7 @@ namespace stomp_extrap_modflow.gui {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/stomp_extrap_modflow;component/gui/interpolate.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/surf_rate_interp_win_intel_64;component/gui/interpolate.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\gui\Interpolate.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

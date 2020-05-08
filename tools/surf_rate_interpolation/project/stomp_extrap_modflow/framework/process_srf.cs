@@ -7,6 +7,9 @@ using System.IO;
 //using System.Text;
 //using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using System.Windows;
+
+
 namespace stomp_extrap_modflow.framework
 {
     
@@ -18,9 +21,27 @@ namespace stomp_extrap_modflow.framework
         public string[] line_header2;
         public int h1 = 0;
         public int h2 = 0;
+
         public void process_header(string fileName,char delim)
         {
-            IEnumerable<string> lines = File.ReadLines(fileName);
+            IEnumerable<string> lines = new List<string>();
+            try
+            {
+                lines = File.ReadLines(fileName);
+            }
+            catch (IOException)
+            {
+                // Initializes the variables to pass to the MessageBox.Show method.
+                string message = "Cannot open file ("+fileName+")."+ Environment.NewLine + Environment.NewLine + "The file may already be open by another application or user.";
+                string caption = "Error Detected in Input";
+                MessageBoxButton buttons = MessageBoxButton.OK;
+
+                // Displays the MessageBox.
+                MessageBox.Show(message, caption, buttons);
+                line_header1 = null;
+                line_header2 = null;
+                return;
+            }
             int i = 1;
             bool h1_set = false;
             bool h2_set = false;
