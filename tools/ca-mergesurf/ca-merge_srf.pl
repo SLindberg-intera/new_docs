@@ -1,10 +1,10 @@
 #!/usr/bsn/perl -w
 # $RCSfile$ $Date$ $Author$ $Revision$
-# ca-mergesurf.pl
-# Created by MDWilliams, 6-19-2019
+# ca-merg_srf.pl
+# Created by MDWilliams, 6-19-2019; Modified by DGFryar, 5-4-2020
 #	Merges two stomp surface files.  Carries over
 #	cumulative from end of first file to add to 
-#	cumulatives in the second file
+#	cumulative in the second file
 #	
 #	
 #
@@ -13,7 +13,7 @@ use Scalar::Util qw(looks_like_number);
 
 $dtstamp = localtime();
 
-$vers="ca-mergesurf 6/24/2019 Ver 1.3 by MDWilliams, Intera Inc";
+$vers="ca-merge_srf 5/5/2020 Ver 1.0 by MDWilliams/DGFryar, Intera Inc";
 # get and open source list file (created by ca-src2stomp.pl)
 $slf = shift @ARGV; # get list of surface files
 $fsd = shift @ARGV; # First surface file directory
@@ -49,6 +49,7 @@ for ($f=0;$f<$nf;$f++) {
 	printf(OS "# Generated from $fsf and $ssf on $dtstamp\n");
 	printf("Merging files $fsf and $ssf\n");
 	printf(OS "#\n");
+    printf(OS "# #### merged file - $fsf\n");
 
 	#copy over first file completely
 	$sline="";
@@ -81,8 +82,9 @@ $dima=scalar(@a);
 #printf("saved line = $sline\n");
 	
 	# Read and process second file
-	printf(OS "# merged file - $ssf\n");
+	printf(OS "# #### merged file - $ssf\n");
 	while ($line = <SS>) {
+			$tline = $line;
 	    	chomp($line);
 		$line =~ s/^\s+|\s+$//g;
                 @b=split(" ",$line);
@@ -95,7 +97,7 @@ $dima=scalar(@a);
 				printf("$line\n");
 				exit(0);
 			}
-			printf(OS "$b[0]");
+			printf(OS " $b[0]");
 			for ($i=1;$i<scalar(@b);$i++) {
 				if (($i % 2) == 0) {
 					# cumulative - add in value of last line of first file
@@ -105,6 +107,11 @@ $dima=scalar(@a);
 				printf(OS "  $b[$i]");
 			}
 			printf(OS "\n");
+                   } else {
+                    if($b[0] eq "Time" or $b[0] eq "[year") {
+		        printf(OS "$tline");
+                       }
+#            printf(OS "\n");
                    }
                 }
         }
