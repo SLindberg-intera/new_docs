@@ -99,6 +99,7 @@
     </ApplicationDefinition>
     <Compile Include="data\water_table.cs" />
     <Compile Include="framework\hssp_threaded.cs" />
+    <Compile Include="framework\WaitCursor.cs" />
     <Compile Include="utility\UiServices.cs" />
     <Compile Include="utility\WaitCursor.cs" />
     <Page Include="gui\buildHSS.xaml">

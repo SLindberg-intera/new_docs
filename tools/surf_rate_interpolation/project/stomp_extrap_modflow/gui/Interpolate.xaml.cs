@@ -18,6 +18,7 @@ using stomp_extrap_modflow.framework;
 using stomp_extrap_modflow.data;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Text.RegularExpressions;
+using surf_rate_interp.framework;
 
 namespace stomp_extrap_modflow.gui
 {
@@ -60,82 +61,86 @@ namespace stomp_extrap_modflow.gui
 
             openfiledialog1.ShowDialog();
             //check that one or more files were selected.
-            if (openfiledialog1.FileNames.Length > 0)
+            using (new WaitCursor())
             {
-                string outpath = System.IO.Path.GetDirectoryName(openfiledialog1.FileName) + "\\";
-                files = openfiledialog1.FileNames;
-                srf.h1 = string_to_int(tb_h1_row.Text);
-                srf.h2 = string_to_int(tb_h2_row.Text);
-                srf.process_header(openfiledialog1.FileName, delim);
-                if (srf.line_header1 == null)
+                if (openfiledialog1.FileNames.Length > 0)
                 {
-                    files = null;
-                    return;
-                }
-                if (srf.h1.ToString() != tb_h1_row.Text)
-                {
-                    tb_h1_row.Text = srf.h1.ToString();
-                }
-                if (srf.h2.ToString() != tb_h2_row.Text)
-                {
-                    tb_h2_row.Text = srf.h2.ToString();
-                }
-
-                tb_fileName.Text = String.Join(Environment.NewLine, files);
-
-                openfiledialog1 = null;
-
-                header1 = srf.line_header1;
-                header2 = srf.line_header2;
-                //
-                colSet.column_def = new List<columns>();
-                if (srf.line_header1 != null)
-                {
-                    for (int i = 0; i < srf.line_header1.Length; i++)
+                    string outpath = System.IO.Path.GetDirectoryName(openfiledialog1.FileName) + "\\";
+                    files = openfiledialog1.FileNames;
+                    srf.h1 = string_to_int(tb_h1_row.Text);
+                    srf.h2 = string_to_int(tb_h2_row.Text);
+                    srf.process_header(openfiledialog1.FileName, delim);
+                    if (srf.line_header1 == null)
                     {
-                        columns temp = new columns();
-                        temp.column_num = i + 1;
-                        if (header2 != null && header2.Length > i)
-                            temp.title = String.Format("{0} {1}", header1[i], header2[i]);
-                        else
-                            temp.title = header1[i];
-                       
-
-                        temp.definition = "";
-                        temp.conv_factor = 1;
-                        if(ckbx_ci_pci.IsChecked == true)
-                        {
-                            temp.conv_factor = 1000000000000;
-                        }
-                        else if (ckbx_g_ug.IsChecked == true)
-                        {
-                            temp.conv_factor = 1000000;
-                        }
-                        else if (ckbx_custom.IsChecked == true)
-                        {
-                            temp.conv_factor = string_to_decimal(tb_custom.Text); 
-                        }
-                        if (header1[i].ToLower() == "time")
-                        {
-                            temp.time = true;
-                            temp.definition = "year";
-                        }
-                        else if (temp.title.Contains("modflow_"))
-                        {
-                            temp.definition = temp.title.Substring(8);
-                        }
-                        else
-                        {
-                            temp.definition = "";
-                        }
-                        colSet.column_def.Add(temp);
+                        files = null;
+                        return;
                     }
-                }
-                colSet.refresh();
-                if (tb_outdir.Text == null || tb_outdir.Text == "")
-                {
-                    tb_outdir.Text = outpath + "\\"; 
-                    
+                    if (srf.h1.ToString() != tb_h1_row.Text)
+                    {
+                        tb_h1_row.Text = srf.h1.ToString();
+                    }
+                    if (srf.h2.ToString() != tb_h2_row.Text)
+                    {
+                        tb_h2_row.Text = srf.h2.ToString();
+                    }
+
+                    tb_fileName.Text = String.Join(Environment.NewLine, files);
+
+                    openfiledialog1 = null;
+
+                    header1 = srf.line_header1;
+                    header2 = srf.line_header2;
+                    //
+                    colSet.column_def = new List<columns>();
+
+                    if (srf.line_header1 != null)
+                    {
+                        for (int i = 0; i < srf.line_header1.Length; i++)
+                        {
+                            columns temp = new columns();
+                            temp.column_num = i + 1;
+                            if (header2 != null && header2.Length > i)
+                                temp.title = String.Format("{0} {1}", header1[i], header2[i]);
+                            else
+                                temp.title = header1[i];
+
+
+                            temp.definition = "";
+                            temp.conv_factor = 1;
+                            if (ckbx_ci_pci.IsChecked == true)
+                            {
+                                temp.conv_factor = 1000000000000;
+                            }
+                            else if (ckbx_g_ug.IsChecked == true)
+                            {
+                                temp.conv_factor = 1000000;
+                            }
+                            else if (ckbx_custom.IsChecked == true)
+                            {
+                                temp.conv_factor = string_to_decimal(tb_custom.Text);
+                            }
+                            if (header1[i].ToLower() == "time")
+                            {
+                                temp.time = true;
+                                temp.definition = "year";
+                            }
+                            else if (temp.title.Contains("modflow_"))
+                            {
+                                temp.definition = temp.title.Substring(8);
+                            }
+                            else
+                            {
+                                temp.definition = "";
+                            }
+                            colSet.column_def.Add(temp);
+                        }
+                    }
+                    colSet.refresh();
+                    if (tb_outdir.Text == null || tb_outdir.Text == "")
+                    {
+                        tb_outdir.Text = outpath + "\\";
+
+                    }
                 }
             }
         }
@@ -148,62 +153,74 @@ namespace stomp_extrap_modflow.gui
         }
         private void data_by_year(object sender, RoutedEventArgs e)
         {
-            if (files == null || files.Length < 1)
+            string message = "";
+            string caption = "";
+            MessageBoxButton buttons = MessageBoxButton.OK;
+            using (new WaitCursor())
             {
-                // Initializes the variables to pass to the MessageBox.Show method.
-                string message = "No files are selected.";
-                string caption = "Error Detected in Input";
-                MessageBoxButton buttons = MessageBoxButton.OK;
+                if (files == null || files.Length < 1)
+                {
+                    // Initializes the variables to pass to the MessageBox.Show method.
+                    message = "No files are selected.";
+                    caption = "Error Detected in Input";
+                    
 
-                // Displays the MessageBox.
-                MessageBox.Show(message, caption, buttons);
-                return;
-            }
-            interpolate_data interp = new interpolate_data();
-            string units = "[1/year]";
-            if (ckbx_ci_pci.IsChecked == true)
-            {
-                units = "[pCi/year]";
-            }
-            else if (ckbx_g_ug.IsChecked == true)
-            {
-                units = "[ug/year]";
-            }
-            else if (tb_custom_unit.Text.Length > 0)
-            {
-                units = "[" + tb_custom_unit.Text + "/year]";
-            }
-            
-            outputs outfile = new outputs(units);
-           
-            foreach (string fileName in files)
-            {
-                process_srf srf = new process_srf();
-                srf.h1 = string_to_int(tb_h1_row.Text);
-                srf.h2 = string_to_int(tb_h2_row.Text);
-                srf.process_file(fileName, delim);
-                //srf.data = srf.data;
-                bool useCum = false;
-                if (ckbx_cumulative.IsChecked == true)
-                {
-                    useCum = true;
+                    // Displays the MessageBox.
+                    MessageBox.Show(message, caption, buttons);
+                    return;
                 }
-                interp.convert_time_yearly(srf.data, colSet.column_def, useCum);
+                interpolate_data interp = new interpolate_data();
+                string units = "[1/year]";
+                if (ckbx_ci_pci.IsChecked == true)
+                {
+                    units = "[pCi/year]";
+                }
+                else if (ckbx_g_ug.IsChecked == true)
+                {
+                    units = "[ug/year]";
+                }
+                else if (tb_custom_unit.Text.Length > 0)
+                {
+                    units = "[" + tb_custom_unit.Text + "/year]";
+                }
 
-                //outfile.build_ecf(interp.year_data, interp.f_data, path);
-                //outfile.build_yearly_csv_by_def(interp.year_data, path, "\t");
-                if (ckbx_Consolidate_file.IsChecked == false)
+                outputs outfile = new outputs(units);
+
+                foreach (string fileName in files)
                 {
-                    outfile.build_yearly_csv_by_def(interp.year_data, path, ",",fileName);
-                    outfile.build_cum_csv_by_def(interp.c_data, path, fileName);
+                    process_srf srf = new process_srf();
+                    srf.h1 = string_to_int(tb_h1_row.Text);
+                    srf.h2 = string_to_int(tb_h2_row.Text);
+                    srf.process_file(fileName, delim);
+                    //srf.data = srf.data;
+                    bool useCum = false;
+                    if (ckbx_cumulative.IsChecked == true)
+                    {
+                        useCum = true;
+                    }
+                    interp.convert_time_yearly(srf.data, colSet.column_def, useCum);
+
+                    //outfile.build_ecf(interp.year_data, interp.f_data, path);
+                    //outfile.build_yearly_csv_by_def(interp.year_data, path, "\t");
+                    if (ckbx_Consolidate_file.IsChecked == false)
+                    {
+                        outfile.build_yearly_csv_by_def(interp.year_data, path, ",", fileName);
+                        outfile.build_cum_csv_by_def(interp.c_data, path, fileName);
+                    }
+                    else
+                    {
+                        outfile.build_yearly_csv_single_file(interp.year_data, path, ",", fileName);
+                        outfile.build_cum_csv_by_single_file(interp.c_data, path, fileName);
+                    }
+
                 }
-                else
-                {
-                    outfile.build_yearly_csv_single_file(interp.year_data, path, ",", fileName);
-                    outfile.build_cum_csv_by_single_file(interp.c_data, path,fileName);
-                }
-                
             }
+            // Initializes the variables to pass to the MessageBox.Show method.
+            message = "Process Completed Successfully.";
+            caption = "Process Complete";
+
+            // Displays the MessageBox.
+            MessageBox.Show(message, caption, buttons);
         }
 
         private void btn_outDir_Click(object sender, RoutedEventArgs e)
