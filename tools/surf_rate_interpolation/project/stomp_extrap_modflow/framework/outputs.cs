@@ -18,16 +18,35 @@ namespace stomp_extrap_modflow.framework
             units = m;
         }
         private string units;
-        public void build_yearly_csv_by_def(Dictionary<string, Dictionary<int, decimal>> data,string path,string sep)
+        // remove any characters that would invalidate a file name and replace them with an underscore (_)
+        // < (less than)
+        // > (greater than)
+        // : (colon - sometimes works, but is actually NTFS Alternate Data Streams)
+        // " (double quote)
+        // / (forward slash)
+        // \ (backslash)
+        // | (vertical bar or pipe)
+        // ? (question mark)
+        // * (asterisk)
+        private string rem_invalid_char(string filename)
+        {
+            string new_filename = filename.Replace("<", "_").Replace(">", "_").Replace(":", "_").Replace(":", "_");
+            new_filename = new_filename.Replace("\"", "_").Replace("/", "_").Replace("\\", "_").Replace("|", "_");
+            new_filename = new_filename.Replace("?", "_").Replace("*", "_");
+            return new_filename;
+        }
+        public void build_yearly_csv_by_def(Dictionary<string, Dictionary<int, decimal>> data,string path,string sep,string o_file)
         {
             string ext = "csv";
             if(sep == "\t")
             {
                 ext = "dat";
             }
+            string o_filename = o_file.Substring(o_file.LastIndexOf("\\"), o_file.LastIndexOf(".") - o_file.LastIndexOf("\\"));
             foreach (string key in data.Keys.ToList())
             {
-                string fileName = path+"\\"+key+"_yearly_steps."+ext;
+                string file_key = rem_invalid_char(key);
+                string fileName = path+"\\" + o_filename + "_"+file_key +"_yearly_steps."+ext;
                 string csv = key;
                 csv += Environment.NewLine + "Year"+sep+ units + Environment.NewLine;
                 csv += String.Join(
@@ -70,11 +89,13 @@ namespace stomp_extrap_modflow.framework
                 );
             System.IO.File.WriteAllText(fileName, csv);
         }
-        public void build_cum_csv_by_def(Dictionary<string, Dictionary<decimal, decimal>> data, string path)
+        public void build_cum_csv_by_def(Dictionary<string, Dictionary<decimal, decimal>> data, string path, string o_file)
         {
             foreach (string key in data.Keys.ToList())
             {
-                string fileName = path + "\\" + key + "_cumulative.csv";
+                string o_filename = o_file.Substring(o_file.LastIndexOf("\\"), o_file.LastIndexOf(".") - o_file.LastIndexOf("\\"));
+                string file_key = rem_invalid_char(key);
+                string fileName = path + "\\" + o_filename + "_"+ file_key + "_cumulative.csv";
                 string csv = key;
                 csv += Environment.NewLine + "Year, Total " + units + Environment.NewLine;
                 csv += String.Join(
@@ -83,6 +104,34 @@ namespace stomp_extrap_modflow.framework
                 );
                 System.IO.File.WriteAllText(fileName, csv);
             }
+        }
+        public void build_cum_csv_by_single_file(Dictionary<string, Dictionary<decimal, decimal>> data, string path, string o_file)
+        {
+            string fileName = path + o_file.Substring(o_file.LastIndexOf("\\"), o_file.LastIndexOf(".") - o_file.LastIndexOf("\\")) + "_cumulative.csv";
+            Dictionary<decimal, List<decimal>> c_data = new Dictionary<decimal, List<decimal>>();
+            string csv = o_file;
+            string sep = ",";
+            csv += Environment.NewLine + "Time" + sep;
+            csv += String.Join(sep, data.Keys.Select(d => d));
+            foreach (string key in data.Keys.ToArray())
+            {
+                csv += sep + units;
+                int len = data[key].Keys.Count;
+                foreach (decimal year in data[key].Keys.ToArray())
+                {
+                    if (!c_data.Keys.Contains(year))
+                    {
+                        c_data.Add(year, new List<decimal>());
+                    }
+                    c_data[year].Add(data[key][year]);
+                }
+            }
+            csv += Environment.NewLine;
+            csv += String.Join(
+                    Environment.NewLine,
+                    c_data.Select(d => d.Key + sep + string.Join(sep, d.Value))
+                );
+            System.IO.File.WriteAllText(fileName, csv);
         }
         public void build_hss_file(string path,hssFile hss, List<cellData> files)
         {

@@ -67,6 +67,11 @@ namespace stomp_extrap_modflow.gui
                 srf.h1 = string_to_int(tb_h1_row.Text);
                 srf.h2 = string_to_int(tb_h2_row.Text);
                 srf.process_header(openfiledialog1.FileName, delim);
+                if (srf.line_header1 == null)
+                {
+                    files = null;
+                    return;
+                }
                 if (srf.h1.ToString() != tb_h1_row.Text)
                 {
                     tb_h1_row.Text = srf.h1.ToString();
@@ -143,6 +148,17 @@ namespace stomp_extrap_modflow.gui
         }
         private void data_by_year(object sender, RoutedEventArgs e)
         {
+            if (files == null || files.Length < 1)
+            {
+                // Initializes the variables to pass to the MessageBox.Show method.
+                string message = "No files are selected.";
+                string caption = "Error Detected in Input";
+                MessageBoxButton buttons = MessageBoxButton.OK;
+
+                // Displays the MessageBox.
+                MessageBox.Show(message, caption, buttons);
+                return;
+            }
             interpolate_data interp = new interpolate_data();
             string units = "[1/year]";
             if (ckbx_ci_pci.IsChecked == true)
@@ -178,13 +194,15 @@ namespace stomp_extrap_modflow.gui
                 //outfile.build_yearly_csv_by_def(interp.year_data, path, "\t");
                 if (ckbx_Consolidate_file.IsChecked == false)
                 {
-                    outfile.build_yearly_csv_by_def(interp.year_data, path, ",");
+                    outfile.build_yearly_csv_by_def(interp.year_data, path, ",",fileName);
+                    outfile.build_cum_csv_by_def(interp.c_data, path, fileName);
                 }
                 else
                 {
                     outfile.build_yearly_csv_single_file(interp.year_data, path, ",", fileName);
+                    outfile.build_cum_csv_by_single_file(interp.c_data, path,fileName);
                 }
-                outfile.build_cum_csv_by_def(interp.c_data, path);
+                
             }
         }
 
