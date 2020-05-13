@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# ca-getmodsurfs.pl
+# ca-getmod_srf.pl
 #
 # Created by MDWilliams, INTERA 11-14-2018
 #      This program reads the surface fluxes from a vadose zone run
@@ -54,7 +54,7 @@
 use Scalar::Util qw(looks_like_number);
 $dtstamp = localtime();
 
-$vers = "ca-getmodsurfs.pl Version 7.2, MDWilliams, Intera Inc, 5-5-2020, generated on $dtstamp";
+$vers = "ca-getmod_srf.pl, Intera Inc, generated on $dtstamp";
 
 $ifile = shift @ARGV;
 $kw = shift @ARGV;
@@ -70,7 +70,7 @@ if (($torb ne "top") && ($torb ne "bot")) {
 }
 
 $dfile = $prefix."-$keyword-$torb.csv";
-$cfile = $prefix."-$keyword-cummulative-$torb.csv";
+$cfile = $prefix."-$keyword-cumulative-$torb.csv";
 
 open(FI,"<$ifile") ||  die "Can't open $ifile file $!\n";
 open(FD,">$dfile") ||  die "Can't open $dfile file $!\n";
@@ -175,13 +175,13 @@ if ((lc($conc) eq "ci") || (lc($conc) eq "kg") || (lc($conc) eq "g")) {
 	printf("Error - unrecognized Units on command line = ($conc)\n");
 	exit(1);
 }
-printf(FD "#### \n# Created by ca-getmodsurfs.pl\n");
+printf(FD "#### \n# Created by ca-getmod_srf.pl\n");
 printf(FD "# $vers \n####\n");
 printf(FD "# Keyword = $keyword\n# \n");
-#printf(FM "#### \n# Created by ca-getmodsurfs.pl\n");
+#printf(FM "#### \n# Created by ca-getmod_srf.pl\n");
 #printf(FM "# $vers \n####\n");
 #printf(FM "# Keyword = $keyword\n# \n");
-printf(FC "#### \n# Created by ca-getmodsurfs.pl\n");
+printf(FC "#### \n# Created by ca-getmod_srf.pl\n");
 printf(FC "# $vers \n####\n");
 printf(FC "# Keyword = $keyword\n# Cumulative Summary\n");
 
