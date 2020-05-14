@@ -154,6 +154,12 @@
 
 		"name":"12070 STOMP Input File Generator Tool", "command":"xprt_12070_input_gen_linux-intel-64.exe", "description":"qualified on 05.06.2020; This tool generates the 2018 (or RTD year if the model has RTD) - 12070 STOMP transport input file"
 
+		},
+
+		{
+
+		"name":"STOMP Surface File Merge Tool", "command":"ca-merge_srf.pl", "description":"qualified on 05.14.2020; This tool merges STOMP Surface File data from two consecutive STOMP simulations (e.g., Surface Files for the 2018 to RTD year simulation and for the RTD year to 12070 simulation)"
+
 		}
 	],
 	"LOGGER":{
