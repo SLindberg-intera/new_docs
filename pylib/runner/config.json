@@ -160,6 +160,12 @@
 
 		"name":"STOMP Surface File Merge Tool", "command":"ca-merge_srf.pl", "description":"qualified on 05.14.2020; This tool merges STOMP Surface File data from two consecutive STOMP simulations (e.g., Surface Files for the 2018 to RTD year simulation and for the RTD year to 12070 simulation)"
 
+		},
+
+		{
+
+		"name":"STOMP Surface File to P2R Tool", "command":"ca-getmod_srf.pl", "description":"qualified on 05.15.2020; This tool combines STOMP Surface File data for a selected solute from each P2R cell that intersects the model domain as listed in the model input file"
+
 		}
 	],
 	"LOGGER":{
