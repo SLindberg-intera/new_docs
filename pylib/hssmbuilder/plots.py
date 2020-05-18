@@ -5,12 +5,14 @@ import matplotlib
 import matplotlib.ticker as mtick
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
                                AutoMinorLocator)
-import pylib.gwreducer.constants as c
-from pylib.gwreducer.config import config
-import numpy as np
-import pylib.timeseries.timeseries_math as tsmath
-from pylib.timeseries.timeseries import TimeSeries
 import os.path
+import numpy as np
+#custom libraries
+#import pylib.hssmbuilder.gwreducer.constants as c
+#from pylib.hssmbuilder.gwreducer.config import config
+import pylib.hssmbuilder.timeseries.timeseries_math as tsmath
+from pylib.hssmbuilder.timeseries.timeseries import TimeSeries
+
 #-------------------------------------------------------------------------------
 #-create plots
 #def make_title(residual):

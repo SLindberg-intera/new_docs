@@ -11,12 +11,14 @@ from multiprocessing import get_context as context
 from multiprocessing import cpu_count
 from decimal import *
 import datetime as dt
-import pylib.gwreducer.reduce_groundwater_timeseries as rgt
-from pylib.timeseries.timeseries import TimeSeries
-import pylib.timeseries.timeseries_math as tsmath
-from pylib.datareduction.reduction_result import ReductionResult
-import pylib.hssmbuilder.plots as plt
 import scipy.signal as sig
+#custom libraries
+import pylib.hssmbuilder.gwreducer.reduce_groundwater_timeseries as rgt
+from pylib.hssmbuilder.timeseries.timeseries import TimeSeries
+import pylib.hssmbuilder.timeseries.timeseries_math as tsmath
+from pylib.hssmbuilder.datareduction.reduction_result import ReductionResult
+import pylib.hssmbuilder.plots as plt
+
 #---------------------------------------------------------------------------
 #
 def setup_logger(name, log_file, formatter, level=logging.INFO):

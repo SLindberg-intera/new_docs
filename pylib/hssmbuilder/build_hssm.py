@@ -10,11 +10,6 @@ Usage:          process MT3D Head and associated files to get cell saturation,
 #import numpy as np
 from pathlib import Path
 import sys, os
-sys.path.append(
-        os.path.join(os.path.dirname(__file__), '..','..'))
-from pylib.hssmbuilder.hssm_pkg import hssm_obj
-from pylib.hssmbuilder.build_saturation import sat_obj
-from pylib.hssmbuilder.preprocess_mass import mass_obj
 import argparse
 import datetime as dt
 import numpy as np
@@ -22,6 +17,14 @@ import pandas as pd
 import os.path
 import logging
 import json
+
+sys.path.append(
+        os.path.join(os.path.dirname(__file__), '..','..'))
+#custom libraries
+from pylib.hssmbuilder.hssm_pkg import hssm_obj
+from pylib.hssmbuilder.build_saturation import sat_obj
+from pylib.hssmbuilder.preprocess_mass import mass_obj
+
 
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
