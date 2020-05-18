@@ -240,8 +240,8 @@ class sat_obj:
             start_time = dt.datetime.now()
             for i in range (self.cols_i):
                 i_ind = i+1
-                if i == 35:
-                    cell_sat.to_csv(os.path.join(r'output_tc-99/misc',r'yearly_saturation_under35.csv'), header=True)
+                #if i == 35:
+                #    cell_sat.to_csv(os.path.join(r'output_tc-99/misc',r'yearly_saturation_under35.csv'), header=True)
                 #self.logger.debug("{0}: finished row i-{1}".format(dt.datetime.now(),i_ind))
                 for j in range (self.cols_j):
                     j_ind = j+1
