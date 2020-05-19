@@ -1,5 +1,7 @@
-import matplotlib.pyplot as plt
 import matplotlib
+import matplotlib.pyplot as plt
+plt.switch_backend('Agg')
+
 #from matplotlib.ticker import EngFormatter
 #from matplotlib.ticker import ScalarFormatter
 import matplotlib.ticker as mtick

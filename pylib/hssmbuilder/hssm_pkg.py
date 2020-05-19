@@ -811,7 +811,9 @@ class hssm_obj:
                     days = np.array(segs).astype(float)[:,0]
                     vals = [float(i[1]) for i in segs]
                     vals = np.array(segs).astype(float)[:,1]
-
+                    if 0 not in days:
+                        days = np.insert(days,0, 0)
+                        vals = np.insert(vals,0, 0)
                     #pre_ind = np.where(o_ts.times == pre_data)
                     #post_ind = np.where(o_ts.times == post_data)
                     #days_tmp = np.array([o_ts.times[0],o_ts.times[pre_ind],o_ts.times[post_ind],o_ts.times[-1]])
@@ -829,8 +831,9 @@ class hssm_obj:
                         r_ts = TimeSeries(np.array(days),np.array(vals),None,None)
                         r_ts = tsmath.interpolated(r_ts,o_ts)
                     except:
-                        #print('{} failed.  start: {}; end: {};'.format(ij,r_ts.times[0],r_ts.times[-1]))
-                        #print('{} failed.  start: {}; end: {};'.format(ij,o_ts.times[0],o_ts.times[-1]))
+                        print(r_ts.times)
+                        print('{} failed.  start: {}; end: {};'.format(ij,r_ts.times[0],r_ts.times[-1]))
+                        print('{} failed.  start: {}; end: {};'.format(ij,o_ts.times[0],o_ts.times[-1]))
                         raise
                     cur_rec[1] = segs
                     cur_rec[6] = r_ts
