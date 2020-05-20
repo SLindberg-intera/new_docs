@@ -1,0 +1,50 @@
+﻿<Page x:Class="stomp_extrap_modflow.gui.buildHSS"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:stomp_extrap_modflow.gui"
+      mc:Ignorable="d" 
+      Title="buildHSS">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50"></ColumnDefinition>
+            <ColumnDefinition Width="50"></ColumnDefinition>
+            <ColumnDefinition Width="50"></ColumnDefinition>
+            <ColumnDefinition Width="50"></ColumnDefinition>
+            <ColumnDefinition Width="50"></ColumnDefinition>
+            <ColumnDefinition Width="50"></ColumnDefinition>
+            <ColumnDefinition Width="50"></ColumnDefinition>
+            <ColumnDefinition Width="50"></ColumnDefinition>
+            <ColumnDefinition Width="50"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="5"></RowDefinition>
+            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition MinHeight="50" Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Label  Grid.ColumnSpan="1" Grid.Column="1" Grid.Row="2" Grid.RowSpan="2" x:Name="label" Content="file(s):" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch"/>
+        <Button Grid.Row="2" Grid.RowSpan="2"  Grid.Column="0" x:Name="btn_files" Width="50" Height="24" Content="browse" Click="load_file" VerticalAlignment="Center" />
+        <TextBox Grid.ColumnSpan="8" Grid.RowSpan="2" Grid.Column="2" Grid.Row="2" x:Name="tb_fileName" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Text="" VerticalAlignment="Stretch" />
+        <Label  Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="5" Grid.RowSpan="1" x:Name="label1" Content="out dir:" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch"/>
+        <Button Grid.Column="0" Grid.Row="5" Grid.RowSpan="1" x:Name="btn_outDir" Width="50" Height="25" Content="browse" Click="btn_outDir_Click"/>
+        <TextBox Grid.ColumnSpan="8" Grid.RowSpan="1" Grid.Column="2" Grid.Row="5" x:Name="tb_outdir" HorizontalAlignment="Stretch" TextWrapping="Wrap" Text="" VerticalAlignment="Stretch" TextChanged="tb_outdir_TextChanged" />
+        <Label  Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="7" Grid.RowSpan="1" x:Name="label2" Content="template:" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch"/>
+        <Button Grid.Column="0" Grid.Row="7" Grid.RowSpan="1" x:Name="btn_templateDir" Width="50" Height="25" Content="browse" Click="btn_templateDir_Click"/>
+        <TextBox Grid.ColumnSpan="8" Grid.RowSpan="1" Grid.Column="2" Grid.Row="7" x:Name="tb_templatedir" HorizontalAlignment="Stretch" TextWrapping="Wrap" Text="" VerticalAlignment="Stretch" TextChanged="tb_templatedir_TextChanged" />
+        <CheckBox  Grid.ColumnSpan="2" Grid.Column="1" Grid.Row="1" x:Name="cb_consolidated" Content="Consolidated file" Checked="cb_consolidated_check" Unchecked="cb_consolidated_check"/>
+        <Frame Grid.ColumnSpan="10" Grid.RowSpan="2" Grid.Row="9" Grid.Column="0" x:Name="winFrame" NavigationUIVisibility="Hidden"></Frame>
+        <Button Grid.ColumnSpan="2" Grid.RowSpan="1" Grid.Row="8" Grid.Column="4" x:Name="btn_buildHSS"  Content="Build package" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Click="btn_buildHSS_Click"/>
+
+    </Grid>
+</Page>
