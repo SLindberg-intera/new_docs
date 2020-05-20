@@ -166,6 +166,12 @@
 
 		"name":"STOMP Surface File to P2R Tool", "command":"ca-getmod_srf.pl", "description":"qualified on 05.15.2020; This tool combines STOMP Surface File data for a selected solute from each P2R cell that intersects the model domain as listed in the model input file"
 
+		},
+
+		{
+
+		"name":"Surface Rate Interpolator", "command":"surf_rate_interp_win_intel_64.exe", "description":"qualified on 05.20.2020; This tool takes STOMP output or other time series data with similar format and extrapolates the time series into a uniform yearly format"
+
 		}
 	],
 	"LOGGER":{
