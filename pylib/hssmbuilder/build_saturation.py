@@ -64,9 +64,15 @@ class sat_obj:
         self.logger.info("Finished reading layer depths: end_time: {0}; elapsed:{1}".format(cur_time, dt.datetime.now()-cur_time))
         if pkl:
             cur_time = dt.datetime.now()
-            self.logger.info("Read in saturation pkl file: {0} start_time: {1}".format(self.sat_f,cur_time))
-            self.sat_obj = self.read_pickle(self.sat_f)
-            self.logger.info("Finished reading saturation pkl file: end_time: {0}; elapsed:{1}".format(cur_time, dt.datetime.now()-cur_time))
+
+            if self.check_file_exists(self.pkl_dir,self.sat_f):
+                self.logger.info("Read in saturation pkl file: {0} start_time: {1}".format(self.sat_f,cur_time))
+                self.sat_obj = self.read_pickle(self.sat_f)
+            else:
+                self.logger.info("building Saturation pkl file: start_time: {0}".format(cur_time))
+                self.pickle_data(self.sat_f,self.sat_obj)
+                self.create_meta_data(self.sat_f)
+            self.logger.info("Finished loading saturation data: end_time: {0}; elapsed:{1}".format(cur_time, dt.datetime.now()-cur_time))
             cur_time = dt.datetime.now()
             if self.check_file_exists(self.pkl_dir,self.flow_f):
                 self.logger.info("Reading Flow pkl file: {0} start_time: {1}".format(self.flow_f,cur_time))
@@ -326,7 +332,9 @@ class sat_obj:
 
                             #t_step_prev = t_step
                             #prev_calc = calc_txt
-        self.pickle_data(yearly_sat_file,cell_sat)
+            #tabbed line in once so saves the file if its being generated
+            #and not when being loaded.
+            self.pickle_data(yearly_sat_file,cell_sat)
         self.year_sat = cell_sat
         self.logger.info("Finished build saturation data: end_time: {0}; elapsed:{1}".format(cur_time, dt.datetime.now()-cur_time))
     #---------------------------------------------------------------------------
