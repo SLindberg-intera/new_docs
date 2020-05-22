@@ -88,6 +88,14 @@ class mass_obj:
     def write_cell_map(self):
         self.cell_map.to_csv(os.path.join(self.misc_path,r'cell_map.csv'),header = True)
     #-------------------------------------------------------------------------------
+    # find if a string can be converted to float
+    def is_number(self,s):
+        try:
+            float(s)
+            return True
+        except:
+            return False
+    #-------------------------------------------------------------------------------
     # build_cell_concentration
     def build_cell_concentration(self):
         self.logger.info("build cell Concentrations")
@@ -99,6 +107,7 @@ class mass_obj:
 
         for filename in os.listdir(self.input_dir):
             size = 0
+            skip = 0
             if filename.endswith(".csv"):
                 self.logger.info("loading file:  {}".format(filename))
                 dir_file = self.input_dir+filename
@@ -106,14 +115,19 @@ class mass_obj:
                 head_row = -1
                 with open(dir_file,"r") as d:
                     datafile = d.read()
-                    for line in datafile.splitlines():
+                    d_lines = datafile.splitlines()
+                    for line in d_lines:
                         head_row += 1
                         if line[0] != "#":
                             tmp = line.strip().split(",") ##line.strip().replace("  "," ")
                             if tmp[0].lower() == "time" or tmp[0].lower() == "year":
                                 break
-
-                df = pd.read_csv(dir_file,index_col=0,header=head_row, skiprows=[head_row+1])
+                    if self.is_number(d_lines[head_row+1].strip().split(",")[0]) == False:
+                        skip = head_row+1
+                if skip == 0:
+                    df = pd.read_csv(dir_file,index_col=0,header=head_row)#, skiprows=[skip])
+                else:
+                    df = pd.read_csv(dir_file,index_col=0,header=head_row, skiprows=[skip])
                 df.rename(str.lower, axis='columns')
                 columns = df.columns
                 for col in columns:
