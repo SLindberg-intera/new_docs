@@ -378,7 +378,10 @@ class hssm_obj:
         self.logger = logging.getLogger(log)
         self.flux_floor = params["flux_floor"]/365.25
         self.max_tm_error =params["max_tm_error"]
-        self.min_reduction_steps = min_steps
+        if "min_steps" in params.keys():
+            self.min_reduction_steps = params["min_steps"]
+        else:
+            self.min_reduction_steps = min_steps
         self.units = params["units"]
         self.data_reduction = params["data_reduction"]
         self.graph_name = params["graph_name"]
@@ -402,6 +405,7 @@ class hssm_obj:
             k = 0
             k_df = pd.DataFrame()
             try:
+
                 i_ind = int(self.head[i][0:str_ind])
                 j_ind = int(self.head[i][str_ind+1:])
                 try:
@@ -418,7 +422,7 @@ class hssm_obj:
                 #print('{0}-{1}:{2} ({3})'.format(i_ind, j_ind,k,self.saturation.loc[(i_ind-1,j_ind-1),'k']))
                 #list.append('{0}-{1}'.format(i_ind, j_ind))
             except:
-                #self.logger.critical("Invalid header format {0}".format(self.head[i]))
+                self.logger.critical("Invalid header format {0}".format(self.head[i]))
                 raise
             if k_df.size > 0:
                 k_used = []

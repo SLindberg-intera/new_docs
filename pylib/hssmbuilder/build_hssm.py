@@ -136,10 +136,7 @@ def main():
     formatter = logging.Formatter('%(asctime)-9s: %(levelname)-8s: %(message)s','%H:%M:%S')
     lvl = logging.INFO
     logger = setup_logger('logger', log, formatter, lvl)
-    if 'mass_shift' not in params.keys():
-        params['mass_shift'] = False
-    if 'data_reduction' not in params.keys():
-        params['mass_shift'] = True
+
     logger.info("inputs:")
     logger.info("   use pickle files: {0}".format(params["isPickled"]))
     logger.info("   pickle file Directory: {0}".format(params["pickleDir"]))
