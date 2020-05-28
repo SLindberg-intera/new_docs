@@ -70,6 +70,7 @@ class sat_obj:
                 self.sat_obj = self.read_pickle(self.sat_f)
             else:
                 self.logger.info("building Saturation pkl file: start_time: {0}".format(cur_time))
+                self.sat_obj = self.build_end_year_saturation()
                 self.pickle_data(self.sat_f,self.sat_obj)
                 self.create_meta_data(self.sat_f)
             self.logger.info("Finished loading saturation data: end_time: {0}; elapsed:{1}".format(cur_time, dt.datetime.now()-cur_time))
