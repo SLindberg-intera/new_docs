@@ -28,13 +28,13 @@ class sat_obj:
     #   k = number of lyaers in grid
     #   msl = minimum Saturation for a layers
 
-    def __init__(self, pkl, pkl_d, sat_f, flow_f, bin_f, top_r, bot_r, i, j, k, msl,log):
+    def __init__(self, pkl, pkl_d, sat_f, flow_f, bin_f, top_r, bot_r,i_cond, i, j, k, msl,log):
         start_time = dt.datetime.now()
         cur_time = dt.datetime.now()
         self.logger = logging.getLogger(log)
         self.hds_file = bin_f
         self.pkl_dir = pkl_d
-
+        self.init_cond = i_cond
         self.sat_f = sat_f
         self.flow_f = flow_f
         self.top_ref = top_r
@@ -48,13 +48,32 @@ class sat_obj:
         self.flow_cols = ['i','j','time_step','faces']
         self.f_types = {'i' : int,'j': int,'time_step': float}
         self.index = ['i','j']
-
+        self.index_year = ['i','j','time_step']
         self.check_output_dir(self.pkl_dir)
+        cur_time = dt.datetime.now()
+        self.logger.info("reading HDS file: {0} start_time: {1}".format(self.hds_file,cur_time))
+        self.binary_obj = self.read_hds_file()
+        self.logger.info("Finished reading HDS file: end_time: {0}; elapsed:{1}".format(cur_time, dt.datetime.now()-cur_time))
+        cur_time = dt.datetime.now()
+        self.logger.info("Finding time steps, start_time: {0}".format(cur_time))
+        self.sp_times = self.get_sp_times()
+        self.logger.info("Finished finding time steps: end_time: {0}; elapsed:{1}".format(cur_time, dt.datetime.now()-cur_time))
+        cur_time = dt.datetime.now()
+        self.logger.info("Reading layer depths: {0},{1} start_time: {2}".format(self.top_ref,self.bot_ref,cur_time))
+        self.layer_depths = self.get_layers()
+        self.logger.info("Finished reading layer depths: end_time: {0}; elapsed:{1}".format(cur_time, dt.datetime.now()-cur_time))
         if pkl:
             cur_time = dt.datetime.now()
-            self.logger.info("Read in saturation pkl file: {0} start_time: {1}".format(self.sat_f,cur_time))
-            self.sat_obj = self.read_pickle(self.sat_f)
-            self.logger.info("Finished reading saturation pkl file: end_time: {0}; elapsed:{1}".format(cur_time, dt.datetime.now()-cur_time))
+
+            if self.check_file_exists(self.pkl_dir,self.sat_f):
+                self.logger.info("Read in saturation pkl file: {0} start_time: {1}".format(self.sat_f,cur_time))
+                self.sat_obj = self.read_pickle(self.sat_f)
+            else:
+                self.logger.info("building Saturation pkl file: start_time: {0}".format(cur_time))
+                self.sat_obj = self.build_end_year_saturation()
+                self.pickle_data(self.sat_f,self.sat_obj)
+                self.create_meta_data(self.sat_f)
+            self.logger.info("Finished loading saturation data: end_time: {0}; elapsed:{1}".format(cur_time, dt.datetime.now()-cur_time))
             cur_time = dt.datetime.now()
             if self.check_file_exists(self.pkl_dir,self.flow_f):
                 self.logger.info("Reading Flow pkl file: {0} start_time: {1}".format(self.flow_f,cur_time))
@@ -65,21 +84,10 @@ class sat_obj:
                 self.pickle_data(self.flow_f,self.flow_obj)
             self.logger.info("Finished loading flow data: end_time: {0}; elapsed:{1}".format(cur_time, dt.datetime.now()-cur_time))
         else:
-            cur_time = dt.datetime.now()
-            self.logger.info("reading HDS file: {0} start_time: {1}".format(self.hds_file,cur_time))
-            self.binary_obj = self.read_hds_file()
-            self.logger.info("Finished reading HDS file: end_time: {0}; elapsed:{1}".format(cur_time, dt.datetime.now()-cur_time))
-            cur_time = dt.datetime.now()
-            self.logger.info("Finding time steps, start_time: {0}".format(cur_time))
-            self.sp_times = self.get_sp_times()
-            self.logger.info("Finished finding time steps: end_time: {0}; elapsed:{1}".format(cur_time, dt.datetime.now()-cur_time))
-            cur_time = dt.datetime.now()
-            self.logger.info("Reading layer depths: {0},{1} start_time: {2}".format(self.top_ref,self.bot_ref,cur_time))
-            self.layer_depths = self.get_layers()
-            self.logger.info("Finished reading layer depths: end_time: {0}; elapsed:{1}".format(cur_time, dt.datetime.now()-cur_time))
+
             cur_time = dt.datetime.now()
             self.logger.info("Build saturation data, start_time: {0}".format(cur_time))
-            self.sat_obj = self.build_saturation()
+            self.sat_obj = self.build_end_year_saturation()
             self.logger.info("Finished build saturation data: end_time: {0}; elapsed:{1}".format(cur_time, dt.datetime.now()-cur_time))
             cur_time = dt.datetime.now()
             self.logger.info("Pickling data: start_time: {0}".format(cur_time))
@@ -113,13 +121,14 @@ class sat_obj:
     #To find all the rows belonging to a single i:
     #   divide the total j columns by 10, and add 1 if there is a remainder to
     #   find how many rows there are for each i
-    def get_j_ref_rows(self):
-        return int(math.ceil(self.cols_j/10))
+
     def parse_ref_line(self,file):
+        def get_j_ref_rows():
+            return int(math.ceil(self.cols_j/10))
         ref_array = []
         i = 0
         row = 0
-        l_per_rec = self.get_j_ref_rows()
+        l_per_rec = get_j_ref_rows()
         t_line = ""
 
         for line in file:
@@ -129,7 +138,7 @@ class sat_obj:
             #the end of a row in the grid. add it to the array as a single rows
             # the row represents i, the columns being added represent j
             if i % l_per_rec == 0:
-                t_line = t_line.strip().replace("  "," ")
+                t_line = t_line.replace("-9.9900000e+002"," -9.9900000e+002").replace("  "," ").strip()
                 ref_array.append(t_line.split(" "))
                 t_line = ""
                 row = row + 1
@@ -185,8 +194,153 @@ class sat_obj:
         else:
             return 0
     #---------------------------------------------------------------------------
+    #check cell to see if it has any active layers.
+    #inactive layers have a depth of zero
+    def check_cell_has_depth(self,i,j):
+        for k in range(self.cols_k):
+            k_ind = k+1
+            t_depth = float(self.layer_depths[k][i][j])
+            b_depth = float(self.layer_depths[k_ind][i][j])
+            if b_depth > 0 and ( t_depth - b_depth ) > 0 :
+                return True
+                break
+        self.logger.info("i-j({0}-{1}): Cell is inactive".format(i+1,j+1))
+        return False
+    #---------------------------------------------------------------------------
+    # as there are multiple bottom layers you will need to lop through each files
+    # and add file to the array in order from layer 1 to layer x.
+    def build_initial_conditions(self):
+        #make sure layer_files are in ascending order
+        self.init_cond.sort()
+        # Layer files are 10 columns accross so if there is more than 10 j columns for
+        #each i then it will wrap to the next line.
+
+        hds = []
+        for file in self.init_cond:
+            #bot.append([])
+            with open(file, "r") as file:
+                hds.append(self.parse_ref_line(file))
+
+        return hds
+    #---------------------------------------------------------------------------
+    # build a saturation object that has the time period for each layer that is
+    # above minumum saturation layer
+    def build_saturation_by_year(self,pkl, yearly_sat_file):
+        cur_time = dt.datetime.now()
+        self.logger.info("Build saturation data, start_time: {0}".format(cur_time))
+        data_loaded = False
+        cell_sat = pd.DataFrame(columns=self.sat_cols)
+        cell_sat = cell_sat.astype(self.types)
+        cell_sat = cell_sat.set_index(self.index_year)
+        calc = "({0} - {1})/({2}-{1})={3}"
+        init_cond = self.build_initial_conditions()
+        #load from pkl file if directed
+        if pkl:
+            if self.check_file_exists(self.pkl_dir,yearly_sat_file):
+                cur_time = dt.datetime.now()
+                self.logger.info("Reading yearly saturation pkl file: {0} start_time: {1}".format(yearly_sat_file,cur_time))
+                cell_sat = self.read_pickle(yearly_sat_file)
+                self.logger.info("finished Reading yearly saturation pkl file: {0}".format(cur_time))
+                data_loaded = True
+        #check to see if data was loaded (pkl file not found then rebuild file)
+        if data_loaded == False:
+            start_time = dt.datetime.now()
+            for i in range (self.cols_i):
+                i_ind = i+1
+                #if i == 35:
+                #    cell_sat.to_csv(os.path.join(r'output_tc-99/misc',r'yearly_saturation_under35.csv'), header=True)
+                #self.logger.debug("{0}: finished row i-{1}".format(dt.datetime.now(),i_ind))
+                for j in range (self.cols_j):
+                    j_ind = j+1
+                    # starting from the last time step
+                    last_t_step = False
+                    cell_has_depth = False
+
+                    #Check if cell actally has layers or if its an inactive cell
+                    if self.check_cell_has_depth(i,j):
+                        current_layer = -1
+                        #find initial saturation of cells from initial conditions
+                        for k in range(self.cols_k):
+                            k_ind = k+1
+
+                            hds = float(init_cond[k][i][j])
+                            t_depth = float(self.layer_depths[k][i][j])
+                            b_depth = float(self.layer_depths[k_ind][i][j])
+
+                            lvl = self.calc_sat(hds,t_depth,b_depth)
+                            calc_txt = calc.format(hds,b_depth,t_depth,lvl)
+
+                            if lvl > self.min_sat_lvl:
+                                current_layer = k_ind
+                                temp = pd.DataFrame([[i_ind,j_ind,current_layer,0,last_t_step,hds,t_depth,b_depth,lvl]],columns=self.sat_cols)
+                                temp = temp.set_index(self.index_year)
+                                cell_sat = cell_sat.append(temp,sort=False)
+                                self.logger.info("K,i-j,day({0},{1}-{2},{3}): (Initial layer){4} ".format(k_ind,i_ind,j_ind,0,calc_txt))
+                                break
+                        t_step_prev = self.sp_times[0]
+                        prev_calc = ""
+                        max_step = len(self.sp_times)
+                        for x in range(max_step):
+                            t_step = self.sp_times[x]
+                            if x == max_step-1:
+                                last_t_step = True
+                            head = self.binary_obj.get_data(totim=t_step)
+                            #Find the first layer with a saturation > min_sat_lvl
+                            for k in range(self.cols_k):
+                                k_ind = k+1
+                                # Calculate cell Saturation
+                                # k=bottom of previous layer
+                                # k_ind = bottom of current layer
+
+                                hds = float(head[k][i][j])
+                                t_depth = float(self.layer_depths[k][i][j])
+                                b_depth = float(self.layer_depths[k_ind][i][j])
+
+                                lvl = self.calc_sat(hds,t_depth,b_depth)
+                                calc_txt = calc.format(hds,b_depth,t_depth,lvl)
+                                if lvl > self.min_sat_lvl:
+                                    if current_layer == -1:
+                                        #set initial layer
+                                        current_layer = k_ind
+                                        self.logger.info("K,i-j,day({0},{1}-{2},{3}): (Initial layer){4} ".format(k_ind,i_ind,j_ind,t_step,calc_txt))
+                                        temp = pd.DataFrame([[i_ind,j_ind,current_layer,t_step,last_t_step,hds,t_depth,b_depth,lvl]],columns=self.sat_cols)
+                                        temp = temp.set_index(self.index_year)
+                                        cell_sat = cell_sat.append(temp,sort=False)
+                                        #last_calc = last_calc.set_index(self.index_year)
+                                        #cell_sat = cell_sat.append(last_calc,sort=False)
+
+                                        #self.logger.info("K,i-j,day({0},{1}-{2},{3}): {4} ".format(k+1,i+1,j+1,t_step,calc_txt))
+                                    elif current_layer != k_ind:# or last_t_step:
+                                        #if saturation layer changes add the
+                                        #previous year as the last year for the
+                                        #old layer and thenset current_layer
+                                        current_layer = k_ind
+                                        temp = pd.DataFrame([[i_ind,j_ind,current_layer,t_step,last_t_step,hds,t_depth,b_depth,lvl]],columns=self.sat_cols)
+                                        temp = temp.set_index(self.index_year)
+                                        cell_sat = cell_sat.append(temp,sort=False)
+                                        #if last_t_step:
+                                        #    last_calc = pd.DataFrame([[i_ind,j_ind,current_layer,t_step,last_t_step,hds,t_depth,b_depth,lvl]],columns=self.sat_cols)
+                                        #    self.logger.info("K,i-j,day({0},{1}-{2},{3}): {4} ".format(k+1,i+1,j+1,t_step,calc_txt))
+                                        #else:
+                                        self.logger.info("K,i-j,day({0},{1}-{2},{3}): {4} ".format(k_ind,i_ind,j_ind,t_step,calc_txt))
+
+                                        #last_calc = last_calc.set_index(self.index_year)
+                                        #cell_sat = cell_sat.append(last_calc,sort=False)
+
+
+                                    #last_calc = pd.DataFrame([[i_ind,j_ind,current_layer,t_step_prev,last_t_step,hds,t_depth,b_depth,lvl]],columns=self.sat_cols)
+                                    break
+
+                            #t_step_prev = t_step
+                            #prev_calc = calc_txt
+            #tabbed line in once so saves the file if its being generated
+            #and not when being loaded.
+            self.pickle_data(yearly_sat_file,cell_sat)
+        self.year_sat = cell_sat
+        self.logger.info("Finished build saturation data: end_time: {0}; elapsed:{1}".format(cur_time, dt.datetime.now()-cur_time))
+    #---------------------------------------------------------------------------
     #
-    def build_saturation(self):
+    def build_end_year_saturation(self):
         #self.sp_times
         #self.bad_sp_list
 
@@ -213,16 +367,16 @@ class sat_obj:
                 j_ind = j+1
                 # starting from the last time step
                 last_t_step = True
-                cell_has_depth = False
+                #cell_has_depth = False
                 #Check if cell actally has layers or if its an inactive cell
-                for k in range(self.cols_k):
-                    k_ind = k+1
-                    t_depth = float(self.layer_depths[k][i][j])
-                    b_depth = float(self.layer_depths[k_ind][i][j])
-                    if b_depth > 0 and ( t_depth - b_depth ) > 0 :
-                        cell_has_depth = True
-                        break
-                if cell_has_depth:
+                #for k in range(self.cols_k):
+                #    k_ind = k+1
+                #    t_depth = float(self.layer_depths[k][i][j])
+                #    b_depth = float(self.layer_depths[k_ind][i][j])
+                #    if b_depth > 0 and ( t_depth - b_depth ) > 0 :
+                #        cell_has_depth = True
+                #        break
+                if self.check_cell_has_depth(i,j):
                     for x in reversed(range(len(self.sp_times))):
                         t_step = self.sp_times[x-1]
                         head = self.binary_obj.get_data(totim=t_step)
@@ -255,6 +409,11 @@ class sat_obj:
 
             self.logger.info("{0}: finished row elapsed time: {1}".format(dt.datetime.now(),dt.datetime.now()-start_time))
             start_time = dt.datetime.now()
+            cur_time = dt.datetime.now()
+            self.logger.info("Pickling data: start_time: {0}".format(cur_time))
+            self.pickle_data(self.sat_f,cell_sat)
+            self.create_meta_data(self.sat_f)
+            self.logger.info("Finished pickling: end_time: {0}; elapsed:{1}".format(cur_time, dt.datetime.now()-cur_time))
         return cell_sat
     #---------------------------------------------------------------------------
     # If I,J exists and time step is greater than original time step and hds is
@@ -307,7 +466,7 @@ class sat_obj:
         i = index[0]
         j = index[1]
 
-        #              N    S    E    W
+        #    faces array( North, South, East, West)
         faces = []
         temp = self.sat_obj.loc[i,j]
         c_hds = temp['hds']
@@ -320,6 +479,7 @@ class sat_obj:
             self.logger.info("fixing sink at {0}-{1}".format(i,j))
             faces = self.fix_sink(i,j,faces)
         return faces
+
     #---------------------------------------------------------------------------
     # loop through all i,j addresses and define flow for addresses that are not
     # in the last time step.
@@ -330,6 +490,7 @@ class sat_obj:
         cell_flow = cell_flow.set_index(self.index)
         count = 0
         for index, row in self.sat_obj.iterrows():
+
             if row['last_time_step'] == False:
                 count += 1
                 indexes = self.get_flow(index,row['time_step'])
