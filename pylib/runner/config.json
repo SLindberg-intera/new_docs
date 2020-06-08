@@ -172,6 +172,12 @@
 
 		"name":"Surface Rate Interpolator", "command":"surf_rate_interp_win_intel_64.exe", "description":"qualified on 05.20.2020; This tool takes STOMP output or other time series data with similar format and extrapolates the time series into a uniform yearly format"
 
+		},
+
+		{
+
+		"name":"HSSM Builder", "command":"hssm_build.py", "description":"qualified on 06.05.2020; This tool builds a Hydrocarbon Spill Screening Model (HSSM) package for MT3D modeling purposes"
+
 		}
 	],
 	"LOGGER":{

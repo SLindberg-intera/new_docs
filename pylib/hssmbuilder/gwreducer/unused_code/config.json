@@ -1,0 +1,40 @@
+{
+	"Name":"GW Data Reducer",
+	"LOGGER":{
+		"format":"%(levelname)s--%(asctime)s--%(message)s",
+		"datefmt":"%m/%d/%Y %I:%M:%S %p"
+	},
+	"ARGPARSE_SECTION":{
+		"description":"Data reducer for groundwater models",
+		"ARGUMENTS":[
+			{
+				"ARG":"inputFile",
+				"help":"Path to input file"
+			},
+			{
+				"ARG":"outputFolder",
+				"help":"Path to output folder"
+			},
+			{
+			  "ARG":"--loglevel",
+			  "help":"verbosity of log: (I)nfo, (D)ebug; default=I",
+			  "default":"I",
+			  "choices":["I","D"]
+			},
+			{
+			  "ARG":"--logfile",
+			  "help":"Path to a log file (default is stdout)"
+			},
+			{
+			  "ARG":"--logfilemode",
+			  "help":"Log file mode: (a)ppend or (w)rite; default=w",
+			  "default":"w",
+			  "choices":["a","w"]
+			}
+		]
+	},
+	"SMOOTHING":{
+		"BUTTERWORTH_FACTOR":2,
+		"CUTOFF_FREQUENCY":0.1
+	}
+}

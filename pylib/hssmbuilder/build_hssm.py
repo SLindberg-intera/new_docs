@@ -10,17 +10,21 @@ Usage:          process MT3D Head and associated files to get cell saturation,
 #import numpy as np
 from pathlib import Path
 import sys, os
-sys.path.append(
-        os.path.join(os.path.dirname(__file__), '..','..'))
-from pylib.hssmbuilder.hssm_pkg import hssm_obj
-from pylib.hssmbuilder.build_saturation import sat_obj
-from pylib.hssmbuilder.preprocess_mass import mass_obj
 import argparse
 import datetime as dt
+import numpy as np
 import pandas as pd
 import os.path
 import logging
 import json
+
+sys.path.append(
+        os.path.join(os.path.dirname(__file__), '..','..'))
+#custom libraries
+from pylib.hssmbuilder.hssm_pkg import hssm_obj
+from pylib.hssmbuilder.build_saturation import sat_obj
+from pylib.hssmbuilder.preprocess_mass import mass_obj
+
 
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
@@ -132,10 +136,7 @@ def main():
     formatter = logging.Formatter('%(asctime)-9s: %(levelname)-8s: %(message)s','%H:%M:%S')
     lvl = logging.INFO
     logger = setup_logger('logger', log, formatter, lvl)
-    if 'mass_shift' not in params.keys():
-        params['mass_shift'] = False
-    if 'data_reduction' not in params.keys():
-        params['mass_shift'] = True
+
     logger.info("inputs:")
     logger.info("   use pickle files: {0}".format(params["isPickled"]))
     logger.info("   pickle file Directory: {0}".format(params["pickleDir"]))
@@ -157,8 +158,11 @@ def main():
     #load saturation data
     sat = sat_obj(params["isPickled"],params["pickleDir"],params["satFile"],
             params["flowFile"],params['hds'],params['top_ref'],params['bot_ref'],
-            params['max_i'],params['max_j'],params['max_k'],
+            params["hds_init_conditions"],params['max_i'],params['max_j'],params['max_k'],
             params["sat_lvl"],'sat_obj')
+
+
+    sat.sat_obj.to_csv(os.path.join(misc_dir,r'saturation.csv'), header=True)
     #load mass/flux data
     mass = mass_obj(params["input"],'mass_obj',misc_dir)
     mass.cells.to_csv(os.path.join(misc_dir,r'01_all_cells_after_cell_merge.csv'), header=True)
@@ -170,8 +174,16 @@ def main():
     if params['mass_shift']:
         mass.process_dry_cells(sat.flow_obj, True)
         mass.cells.to_csv(os.path.join(misc_dir,r'03_all_cell_by_day_dry_cell_shifted.csv'), header=True)
-    #create object to process data into HSSM package
-    hssm = hssm_obj(sat.sat_obj,mass.cells,params,'hssm_obj',log_dir,misc_dir)
+    #create object to process data into HSSM package.
+    if params["find_sat_layer_by_year"]:
+        sat.build_saturation_by_year(params["isPickled"],params["yearlySatFile"])
+        sat.year_sat.to_csv(os.path.join(misc_dir,r'yearly_saturation.csv'), header=True)
+        hssm = hssm_obj(sat.year_sat,mass.cells,params,'hssm_obj',log_dir,misc_dir)
+    else:
+        hssm = hssm_obj(sat.sat_obj,mass.cells,params,'hssm_obj',log_dir,misc_dir)
+    #clean memory space up a bit.
+    sat = None
+    mass = None
     #Create HSSM packages
     hssm.write_data()
     logger.info("\n\n Application Completed Normally.")

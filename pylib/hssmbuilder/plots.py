@@ -1,16 +1,20 @@
-import matplotlib.pyplot as plt
 import matplotlib
+import matplotlib.pyplot as plt
+plt.switch_backend('Agg')
+
 #from matplotlib.ticker import EngFormatter
 #from matplotlib.ticker import ScalarFormatter
 import matplotlib.ticker as mtick
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
                                AutoMinorLocator)
-import pylib.gwreducer.constants as c
-from pylib.gwreducer.config import config
-import numpy as np
-import pylib.timeseries.timeseries_math as tsmath
-from pylib.timeseries.timeseries import TimeSeries
 import os.path
+import numpy as np
+#custom libraries
+#import pylib.hssmbuilder.gwreducer.constants as c
+#from pylib.hssmbuilder.gwreducer.config import config
+import pylib.hssmbuilder.timeseries.timeseries_math as tsmath
+from pylib.hssmbuilder.timeseries.timeseries import TimeSeries
+
 #-------------------------------------------------------------------------------
 #-create plots
 #def make_title(residual):
@@ -24,6 +28,7 @@ FORMATTER = mtick.FormatStrFormatter('%.1e')
 def unit_conversion(ts,units,start_year):
     x = ts.times
     y = ts.values
+
     x = (x/365.25)+start_year
     y = y * 365.25
     new_unit = ['Ci/year','Ci']
@@ -64,9 +69,9 @@ def reduced_timeseries_plot(o_flux,r_flux,i,j,unit,start_year,copc,summary_plot)
         o_label = "unreduced"
         r_label = "reduced"
     ax1.plot(o_flux.times, o_flux.values, 'b',    label=o_label)
-    ax1.plot(r_flux.times, r_flux.values, r_line, label=r_label)
+    ax1.plot(r_flux.times, r_flux.values, r_line, label=r_label,markersize=4)
     ax2.plot(mass.times, mass.values, 'b')
-    ax2.plot(r_mass.times, r_mass.values, r_line)
+    ax2.plot(r_mass.times, r_mass.values, r_line,markersize=4)
 
     ax1.yaxis.set_major_formatter(FORMATTER)
     ax2.yaxis.set_major_formatter(FORMATTER)
@@ -96,5 +101,7 @@ def summary_plot(o_time,o_flux,r_time,r_flux,i,j, output_folder,units,start_year
     file_name = "{}_{}-{}.png".format(graph_name,i, j)
     if summary_plot:
         file_name = "{}.png".format(graph_name)
+
     plt.savefig(os.path.join(output_folder, file_name),bbox_inches='tight',dpi=1200)
-    plt.close(f)
+    plt.close('all')
+    plt.clf()

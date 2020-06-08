@@ -32,6 +32,7 @@ class mass_obj:
         start_year = int(self.cells.index[self.cells.index.size - 1]) + 1
         for year in range(start_year, stop_year,1):
             self.cells = self.cells.append(pd.Series(name=year))
+        print(self.cells.index)
         self.cells = self.cells.sort_index()
     #---------------------------------------------------------------------------
     # Convert all values to unit/day, and add days column 0 to last year by
@@ -87,6 +88,14 @@ class mass_obj:
     def write_cell_map(self):
         self.cell_map.to_csv(os.path.join(self.misc_path,r'cell_map.csv'),header = True)
     #-------------------------------------------------------------------------------
+    # find if a string can be converted to float
+    def is_number(self,s):
+        try:
+            float(s)
+            return True
+        except:
+            return False
+    #-------------------------------------------------------------------------------
     # build_cell_concentration
     def build_cell_concentration(self):
         self.logger.info("build cell Concentrations")
@@ -98,6 +107,7 @@ class mass_obj:
 
         for filename in os.listdir(self.input_dir):
             size = 0
+            skip = 0
             if filename.endswith(".csv"):
                 self.logger.info("loading file:  {}".format(filename))
                 dir_file = self.input_dir+filename
@@ -105,14 +115,19 @@ class mass_obj:
                 head_row = -1
                 with open(dir_file,"r") as d:
                     datafile = d.read()
-                    for line in datafile.splitlines():
+                    d_lines = datafile.splitlines()
+                    for line in d_lines:
                         head_row += 1
                         if line[0] != "#":
                             tmp = line.strip().split(",") ##line.strip().replace("  "," ")
                             if tmp[0].lower() == "time" or tmp[0].lower() == "year":
                                 break
-
-                df = pd.read_csv(dir_file,index_col=0,header=head_row, skiprows=[head_row+1])
+                    if self.is_number(d_lines[head_row+1].strip().split(",")[0]) == False:
+                        skip = head_row+1
+                if skip == 0:
+                    df = pd.read_csv(dir_file,index_col=0,header=head_row)#, skiprows=[skip])
+                else:
+                    df = pd.read_csv(dir_file,index_col=0,header=head_row, skiprows=[skip])
                 df.rename(str.lower, axis='columns')
                 columns = df.columns
                 for col in columns:
@@ -126,7 +141,7 @@ class mass_obj:
                     elif "modflow_" in col:
                         temp = col.replace("modflow_","")
                         self.logger.info("     -renaming column {0} to {1}".format(col,temp))
-                        df.rename(index=str,columns={col:temp})
+                        df.rename(index=str,columns={col:temp},inplace=True)
                         self.build_cell_map(filename,col,df[temp].sum())
                     elif "-" in col:
                         self.build_cell_map(filename,col,df[col].sum())
@@ -214,6 +229,7 @@ class mass_obj:
                     t_rows = self.cells.loc[:,'days'] > time_step
                     if t_rows[t_rows].index.size > 0:
                         first_dry_ind = min(t_rows[t_rows].index)
+
                         self.logger.info ("      index of first dry time step: {0}, {1}".format(first_dry_ind,self.cells.loc[first_dry_ind,"days"]))
                         #make copy of the rows to be distributed
                         cell_loss = self.cells.loc[first_dry_ind:,i_j].copy()
@@ -256,4 +272,7 @@ class mass_obj:
             if intrmdt_flag:
                 self.cells.to_csv(os.path.join(self.misc_path,r'dry_cell_flux_shift_itteration_{0}.csv'.format(iteration)),header = True)
             self.cells = self.cells.groupby(lambda x:x, axis=1).sum()
+        #order index and columns of move_log
+        move_log.sort_index(axis=0,inplace=True)
+        move_log.sort_index(axis=1,inplace=True)
         move_log.to_csv(os.path.join(self.misc_path,r'flux_mass_shift_mapping.csv'.format(iteration)),header = True)

@@ -3,13 +3,11 @@
 
 """
 import numpy as np
-from pylib.timeseries.timeseries import TimeSeries
-from pylib.gwreducer import gwreduce_flux as red_flux
-from pylib.datareduction.reduction_result import ReductionResult
-##test
-from pylib.datareduction import rdp as rdp
-#from pylib.gwreducer import rdp as rdp
-import pylib.timeseries.timeseries_math as tsmath
+from pylib.hssmbuilder.timeseries.timeseries import TimeSeries
+from pylib.hssmbuilder.gwreducer import gwreduce_flux as red_flux
+from pylib.hssmbuilder.datareduction.reduction_result import ReductionResult
+from pylib.hssmbuilder.datareduction import rdp as rdp
+import pylib.hssmbuilder.timeseries.timeseries_math as tsmath
 ##
 SMOOTH = 'SMOOTH'
 RAW = 'RAW'
