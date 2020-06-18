@@ -401,63 +401,66 @@ class hssm_obj:
 
         for i in range(self.head.size):
             #get I and J indexes from head
-            str_ind = self.head[i].find('-')
-            k = 0
-            k_df = pd.DataFrame()
-            try:
-
-                i_ind = int(self.head[i][0:str_ind])
-                j_ind = int(self.head[i][str_ind+1:])
+            if self.cells.loc[:,self.head[i]].values.sum() > 0:
+                str_ind = self.head[i].find('-')
+                k = 0
+                k_df = pd.DataFrame()
                 try:
 
-                    if self.saturation.loc[(i_ind,j_ind),'k'].size > 1:
-                        k_df = self.saturation.loc[(i_ind,j_ind),['k']].sort_values(by=['time_step'])
-                    else:
-                        k = int(self.saturation.loc[(i_ind,j_ind),'k'])
-                except Exception as e:
-                    k = 0
-                    self.logger.info("{} Error: could not find saturation layer".format(self.head[i]))
-                    print("{} Error: could not find saturation layer".format(self.head[i]))
-                    print(e)
-                #print('{0}-{1}:{2} ({3})'.format(i_ind, j_ind,k,self.saturation.loc[(i_ind-1,j_ind-1),'k']))
-                #list.append('{0}-{1}'.format(i_ind, j_ind))
-            except:
-                self.logger.critical("Invalid header format {0}".format(self.head[i]))
-                raise
-            if k_df.size > 0:
-                k_used = []
-                for ind in range(k_df.size):
-                    k = int(k_df.iloc[ind]['k'])
-                    if not k in k_used:
-                        k_used.append(k)
-                        lay_days, lay_vals = self.build_time_val_series(k,k_df,self.head[i])
-                        #start_day = k_df.index.values[ind]
-                        #end_day = days[-1]+1
+                    i_ind = int(self.head[i][0:str_ind])
+                    j_ind = int(self.head[i][str_ind+1:])
+                    try:
+                        if self.saturation.loc[(i_ind,j_ind),'k'].size > 1:
+                            k_df = self.saturation.loc[(i_ind,j_ind),['k']].sort_values(by=['time_step'])
+                        else:
+                            k = int(self.saturation.loc[(i_ind,j_ind),'k'])
+                    except Exception as e:
+                        k = 0
+                        self.logger.info("{} Error: could not find saturation layer".format(self.head[i]))
+                        print("{} Error: could not find saturation layer".format(self.head[i]))
+                        print(e)
+                    #print('{0}-{1}:{2} ({3})'.format(i_ind, j_ind,k,self.saturation.loc[(i_ind-1,j_ind-1),'k']))
+                    #list.append('{0}-{1}'.format(i_ind, j_ind))
+                except:
+                    self.logger.critical("Invalid header format {0}".format(self.head[i]))
+                    raise
+                if k_df.size > 0:
+                    k_used = []
+                    for ind in range(k_df.size):
+                        k = int(k_df.iloc[ind]['k'])
+                        if not k in k_used:
+                            k_used.append(k)
+                            lay_days, lay_vals = self.build_time_val_series(k,k_df,self.head[i])
+                            #start_day = k_df.index.values[ind]
+                            #end_day = days[-1]+1
 
 
-                        out_fileName = "{0}i{1}j{2}k{3}_hss.dat".format(self.path,i_ind,j_ind,k)
-                        HSSFileName = "{0}i{1}j{2}k{3}_hss.dat".format(self.HSSpath,i_ind,j_ind,k)
-                        rec = hss_file(out_fileName,HSSFileName,k,i_ind,j_ind,1,self.head[i],
-                                        self.tolerance,self.start_year,self.log_path,
-                                        self.min_reduction_steps,self.flux_floor,
-                                        self.max_tm_error,self.units,self.graph_name,self.copc,self.data_reduction)
+                            out_fileName = "{0}i{1}j{2}k{3}_hss.dat".format(self.path,i_ind,j_ind,k)
+                            HSSFileName = "{0}i{1}j{2}k{3}_hss.dat".format(self.HSSpath,i_ind,j_ind,k)
+                            rec = hss_file(out_fileName,HSSFileName,k,i_ind,j_ind,1,self.head[i],
+                                            self.tolerance,self.start_year,self.log_path,
+                                            self.min_reduction_steps,self.flux_floor,
+                                            self.max_tm_error,self.units,self.graph_name,self.copc,self.data_reduction)
 
 
-                        rec.build_array_fill_empty(days[0],days[-1],lay_days.tolist(), lay_vals.tolist())
-                        data.append(rec)
+                            rec.build_array_fill_empty(days[0],days[-1],lay_days.tolist(), lay_vals.tolist())
+                            data.append(rec)
 
+                else:
+                    out_fileName = "{0}i{1}j{2}k{3}_hss.dat".format(self.path,i_ind,j_ind,k)
+                    HSSFileName = "{0}i{1}j{2}k{3}_hss.dat".format(self.HSSpath,i_ind,j_ind,k)
+                    values = self.cells.loc[:,self.head[i]].values
+                    rec = hss_file(out_fileName,HSSFileName,k,i_ind,j_ind,1,self.head[i],
+                                    self.tolerance,self.start_year,self.log_path,
+                                    self.min_reduction_steps,self.flux_floor,
+                                    self.max_tm_error,self.units,self.graph_name,self.copc,self.data_reduction)
+
+                    rec.build_array(days,values)
+                    data.append(rec)
             else:
-                out_fileName = "{0}i{1}j{2}k{3}_hss.dat".format(self.path,i_ind,j_ind,k)
-                HSSFileName = "{0}i{1}j{2}k{3}_hss.dat".format(self.HSSpath,i_ind,j_ind,k)
-                values = self.cells.loc[:,self.head[i]].values
-                rec = hss_file(out_fileName,HSSFileName,k,i_ind,j_ind,1,self.head[i],
-                                self.tolerance,self.start_year,self.log_path,
-                                self.min_reduction_steps,self.flux_floor,
-                                self.max_tm_error,self.units,self.graph_name,self.copc,self.data_reduction)
-
-                rec.build_array(days,values)
-                data.append(rec)
-
+                msg_str = ("Skipping Cell {0}; total mass for entire cell is {1};".format(self.head[i],self.cells.loc[:,self.head[i]].values.sum()))
+                self.logger.info(msg_str)
+                print(msg_str)
         return data
     #---------------------------------------------------------------------------
     #
