@@ -5,7 +5,8 @@ Company:        Intera Inc.
 Project:        This script was funded in support of the "Composite Analysis (CA), Vadose Zone Facet"
 Usage:          Intended for internal use at Intera Inc. to extract soil indices and write a CSV of soils for P2R grid
 '''
-import pandas as pd
+
+
 import os
 import argparse
 import geopandas as gp
