@@ -158,7 +158,22 @@ class mass_obj:
         cells[cells < 0] = 0
         #Sum together any duplicate columns
         cells = cells.groupby(lambda x:x, axis=1).sum()
+        cells = self.drop_empty_cells(cells)
         return cells
+    #---------------------------------------------------------------------------
+    # drop cells with no mass from source data
+    def drop_empty_cells(self,cells):
+        summed_cells = cells.sum(axis=0)
+        summed_cells = pd.DataFrame(summed_cells).transpose()
+        drop_cells = summed_cells.columns[(summed_cells == 0).iloc[0]]
+        #drop_cells = (summed_cells == 0).columns
+
+        if len(drop_cells) > 0:
+            print("Dropping cells with no mass from loaded data: {0}".format(drop_cells))
+            self.logger.info("Dropping cells with no mass from loaded data: {0}".format(drop_cells.to_list()))
+            return cells.drop(drop_cells, axis=1)
+        else:
+            return cells
     #-----------------------------------------------------------------------
     #
     def find_proportion(self,data,ind):

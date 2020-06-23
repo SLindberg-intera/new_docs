@@ -199,7 +199,16 @@ class sat_obj:
     def check_cell_has_depth(self,i,j):
         for k in range(self.cols_k):
             k_ind = k+1
-            t_depth = float(self.layer_depths[k][i][j])
+
+            try:
+                t_depth = float(self.layer_depths[k][i][j])
+            except:
+                print(k)
+                print(i)
+                print(j)
+                print(len(self.layer_depths[k][i]))
+                print(self.layer_depths[k][i])
+                raise
             b_depth = float(self.layer_depths[k_ind][i][j])
             if b_depth > 0 and ( t_depth - b_depth ) > 0 :
                 return True
@@ -259,7 +268,15 @@ class sat_obj:
                     #Check if cell actally has layers or if its an inactive cell
                     if self.check_cell_has_depth(i,j):
                         current_layer = -1
+
                         #find initial saturation of cells from initial conditions
+                        last_min_sat=-999.0
+                        last_min_sat_k=-999.0
+                        last_min_sat_step= -999.0
+                        last_min_sat_t_depth = -999.0
+                        last_min_sat_b_depth = -999.0
+                        last_min_sat_hds=-999.0
+
                         for k in range(self.cols_k):
                             k_ind = k+1
 
@@ -272,11 +289,39 @@ class sat_obj:
 
                             if lvl > self.min_sat_lvl:
                                 current_layer = k_ind
+                                last_min_sat=lvl
                                 temp = pd.DataFrame([[i_ind,j_ind,current_layer,0,last_t_step,hds,t_depth,b_depth,lvl]],columns=self.sat_cols)
                                 temp = temp.set_index(self.index_year)
                                 cell_sat = cell_sat.append(temp,sort=False)
                                 self.logger.info("K,i-j,day({0},{1}-{2},{3}): (Initial layer){4} ".format(k_ind,i_ind,j_ind,0,calc_txt))
                                 break
+                            #if saturation never gets above min_sat_lvl for any year/layer
+                            #then check if year 0 has atleast 10 percent
+                            elif lvl >= .1:
+                                last_min_sat=lvl
+                                last_min_sat_k=k_ind
+                                last_min_sat_step= 0
+                                last_min_sat_t_depth = t_depth
+                                last_min_sat_b_depth = b_depth
+                                last_min_sat_hds=hds
+                                last_min_calc_text = calc_txt
+                            elif last_min_sat <= 0 and b_depth > 0 and hds > 0:
+                                last_min_sat_k=k_ind
+                                last_min_sat_t_depth = t_depth
+                                last_min_sat_b_depth = b_depth
+                                last_min_sat_hds=hds
+                                last_min_calc_text = calc_txt
+                        if last_min_sat < self.min_sat_lvl:
+                            if last_min_sat >= .1:
+                                self.logger.info("K,i-j,day({0},{1}-{2},0): minimal saturation before inactive: {3} ".format(last_min_sat_k,i+1,j+1,last_min_calc_text))
+                            else:
+                                self.logger.info("K,i-j,day({0},{1}-{2},0): INACTIVE last calc before inactive:({0},{1}-{2}): {3} ".format(last_min_sat_k,i+1,j+1,last_min_calc_text))
+                            temp = pd.DataFrame([[i_ind,j_ind,last_min_sat_k,last_min_sat_step,
+                                                  False,last_min_sat_hds,last_min_sat_t_depth,
+                                                  last_min_sat_b_depth,last_min_sat]],
+                                                  columns=self.sat_cols)
+                            temp = temp.set_index(self.index_year)
+                            cell_sat = cell_sat.append(temp,sort=False)
                         t_step_prev = self.sp_times[0]
                         prev_calc = ""
                         max_step = len(self.sp_times)
@@ -331,6 +376,8 @@ class sat_obj:
                                     #last_calc = pd.DataFrame([[i_ind,j_ind,current_layer,t_step_prev,last_t_step,hds,t_depth,b_depth,lvl]],columns=self.sat_cols)
                                     break
 
+
+                
                             #t_step_prev = t_step
                             #prev_calc = calc_txt
             #tabbed line in once so saves the file if its being generated
@@ -359,6 +406,7 @@ class sat_obj:
         calc = "({0} - {1})/({2}-{1})={3}"
         #loop through i and j
         start_time = dt.datetime.now()
+        init_cond = self.build_initial_conditions()
         for i in range (self.cols_i):
             i_ind = i+1
 
@@ -377,6 +425,13 @@ class sat_obj:
                 #        cell_has_depth = True
                 #        break
                 if self.check_cell_has_depth(i,j):
+                    last_min_sat=-999.0
+                    last_min_sat_k=-999.0
+                    last_min_sat_step= 0.0
+                    last_min_sat_t_depth = -999.0
+                    last_min_sat_b_depth = -999.0
+                    last_min_sat_hds=-999.0
+
                     for x in reversed(range(len(self.sp_times))):
                         t_step = self.sp_times[x-1]
                         head = self.binary_obj.get_data(totim=t_step)
@@ -391,12 +446,20 @@ class sat_obj:
                             lvl = self.calc_sat(hds,t_depth,b_depth)
                             calc_txt = calc.format(hds,b_depth,t_depth,lvl)
                             if lvl > self.min_sat_lvl:
-                                self.logger.info("K,i-j({0},{1}-{2}): {3} ".format(k+1,i+1,j+1,calc_txt))
+                                self.logger.info("K,i-j,day({0},{1}-{2},{4}): {3} ".format(k+1,i+1,j+1,calc_txt,t_step))
                                 #logger.info(("K,i-j({0},{1}-{2}): {3} ".format(k+1,i+1,j+1,calc_txt)))
                                 if lvl > 1:
                                     lvl = 1
                                 k_ind = k+1
                                 break
+                            #elif lvl >= .1:
+                            #    last_min_sat=lvl
+                            #    last_min_sat_k=k_ind
+                            #    last_min_sat_step= t_step
+                            #    last_min_sat_t_depth = t_depth
+                            #    last_min_sat_b_depth = b_depth
+                            #    last_min_sat_hds=hds
+                            #    last_min_calc_text = calc_txt
                         if lvl > self.min_sat_lvl:
                             break
                         else:
@@ -406,7 +469,55 @@ class sat_obj:
                         temp = temp.set_index(self.index)
                         cell_sat = cell_sat.append(temp,sort=False)
                         #logger.info (cell_sat.loc[i_ind,j_ind])
+                    else:
+                        #if saturation > min_sat_lvl not found process the Initial
+                        #conditions; IE year 0 which is not contained in HDS binary file.
+                        t_step = 0.0
+                        for k in range(self.cols_k):
+                            k_ind = k+1
 
+                            hds = float(init_cond[k][i][j])
+                            t_depth = float(self.layer_depths[k][i][j])
+                            b_depth = float(self.layer_depths[k_ind][i][j])
+
+                            lvl = self.calc_sat(hds,t_depth,b_depth)
+                            calc_txt = calc.format(hds,b_depth,t_depth,lvl)
+
+                            if lvl > self.min_sat_lvl:
+                                current_layer = k_ind
+                                temp = pd.DataFrame([[i_ind,j_ind,current_layer,t_step,False,hds,t_depth,b_depth,lvl]],columns=self.sat_cols)
+                                temp = temp.set_index(self.index_year)
+                                cell_sat = cell_sat.append(temp,sort=False)
+                                self.logger.info("K,i-j,day({0},{1}-{2},{3}): {4} ".format(k_ind,i_ind,j_ind,t_step,calc_txt))
+                                break
+                            #if saturation never gets above min_sat_lvl for any year/layer
+                            #then check if year 0 has atleast 10 percent
+                            elif lvl >= .1:
+                                last_min_sat=lvl
+                                last_min_sat_k=k_ind
+                                last_min_sat_step= t_step
+                                last_min_sat_t_depth = t_depth
+                                last_min_sat_b_depth = b_depth
+                                last_min_sat_hds=hds
+                                last_min_calc_text = calc_txt
+                            elif last_min_sat <= 0 and b_depth > 0 and hds > 0:
+                                last_min_sat_k=k_ind
+                                last_min_sat_step= -999.0
+                                last_min_sat_t_depth = t_depth
+                                last_min_sat_b_depth = b_depth
+                                last_min_sat_hds=hds
+                                last_min_calc_text = calc_txt
+                        if lvl < self.min_sat_lvl:
+                            if last_min_sat >= .1:
+                                self.logger.info("K,i-j,day({0},{1}-{2},0): minimal saturation before inactive: {3} ".format(last_min_sat_k,i+1,j+1,last_min_calc_text))
+                            else:
+                                self.logger.info("K,i-j,day({0},{1}-{2},0): INACTIVE last calc before inactive:({0},{1}-{2}): {3} ".format(last_min_sat_k,i+1,j+1,last_min_calc_text))
+                            temp = pd.DataFrame([[i_ind,j_ind,last_min_sat_k,last_min_sat_step,
+                                                  False,last_min_sat_hds,last_min_sat_t_depth,
+                                                  last_min_sat_b_depth,last_min_sat]],
+                                                  columns=self.sat_cols)
+                            temp = temp.set_index(self.index)
+                            cell_sat = cell_sat.append(temp,sort=False)
             self.logger.info("{0}: finished row elapsed time: {1}".format(dt.datetime.now(),dt.datetime.now()-start_time))
             start_time = dt.datetime.now()
             cur_time = dt.datetime.now()
@@ -470,7 +581,13 @@ class sat_obj:
         faces = []
         temp = self.sat_obj.loc[i,j]
         c_hds = temp['hds']
-        self.logger.info("Cell flow for {0}-{1}: (hds = {2}; Last_time_step = {3} ({4}))".format(i,j, temp['hds'],temp['time_step'],int(temp['time_step']/365.25)+2018))
+        year = temp['time_step']
+        if year == 0:
+            year = int(temp['time_step'])
+        elif year > 0:
+            year = int(temp['time_step']/365.25)
+
+        self.logger.info("Cell flow for {0}-{1}: (hds = {2}; Last_time_step = {3} ({4}))".format(i,j, temp['hds'],temp['time_step'],year))
         faces.append(self.get_recieving_cell(i+1,j,temp['hds'],temp['time_step'])) #north
         faces.append(self.get_recieving_cell(i-1,j,temp['hds'],temp['time_step'])) #South
         faces.append(self.get_recieving_cell(i,j+1,temp['hds'],temp['time_step'])) #east
