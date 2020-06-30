@@ -42,6 +42,7 @@ COMMENT ON COLUMN public.concentrations.elapsed_tm
 
 COMMENT ON COLUMN public.concentrations.concentration
     IS 'The concentration of the copc.';
+
 -- Index: idx_concentrations
 
 -- DROP INDEX public.idx_concentrations;

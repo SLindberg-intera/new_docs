@@ -41,7 +41,7 @@ COMMENT ON COLUMN public.soil_types.soil_desc
     IS 'A description of the soil.';
 
 COMMENT ON COLUMN public.soil_types.soil_density
-    IS 'This is the Dry Bulk Density of the soil measured in g/cmÂ³.';
+    IS 'This is the Dry Bulk Density of the soil measured in g/cm³.';
 
 COMMENT ON COLUMN public.soil_types.soil_moisture
     IS 'This is the percent of moisture in the soil.';

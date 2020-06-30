@@ -46,6 +46,7 @@ COMMENT ON COLUMN public.copc.mcl
 
 COMMENT ON COLUMN public.copc.unit_id
     IS 'The measurement unit of the analyte.';
+
 -- Index: fkidx_cells_mdl_id
 
 -- DROP INDEX public.fkidx_cells_mdl_id;

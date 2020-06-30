@@ -58,6 +58,7 @@ COMMENT ON COLUMN public.cells.del_y
 
 COMMENT ON COLUMN public.cells.del_z
     IS 'The height of the grid cell.';
+
 -- Index: gisidx_cells_geom
 
 -- DROP INDEX public.gisidx_cells_geom;
@@ -66,6 +67,8 @@ CREATE INDEX gisidx_cells_geom
     ON public.cells USING gist
     (geom)
     TABLESPACE pg_default;
+
+
 -- Index: idx_cells_mdl_id
 
 -- DROP INDEX public.idx_cells_mdl_id;

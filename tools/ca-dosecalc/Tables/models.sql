@@ -1,6 +1,6 @@
 -- Table: public.models
 
-DROP TABLE if exists public.models;
+-- DROP TABLE public.models;
 
 CREATE TABLE public.models
 (
@@ -49,12 +49,12 @@ COMMENT ON COLUMN public.models.mdl_lrc_offset
 
 COMMENT ON COLUMN public.models.mdl_scenario
     IS 'The modeling scenario for the model.';
+
 -- Index: idx_models
 
 -- DROP INDEX public.idx_models;
-/*
+
 CREATE UNIQUE INDEX idx_models
     ON public.models USING btree
     (mdl_nm COLLATE pg_catalog."default" ASC NULLS LAST, mdl_ver ASC NULLS LAST, mdl_sub_ver ASC NULLS LAST, mdl_scenario COLLATE pg_catalog."default" ASC NULLS LAST)
     TABLESPACE pg_default;
-*/

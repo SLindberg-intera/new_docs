@@ -29,6 +29,7 @@ COMMENT ON COLUMN public.cell_soils.cell_id
 
 COMMENT ON COLUMN public.cell_soils.soil_id
     IS 'A reference to the soil type identifier.';
+
 -- Index: fkidx_cell_soils_cells
 
 -- DROP INDEX public.fkidx_cell_soils_cells;
@@ -37,6 +38,8 @@ CREATE INDEX fkidx_cell_soils_cells
     ON public.cell_soils USING btree
     (cell_id ASC NULLS LAST)
     TABLESPACE pg_default;
+
+
 -- Index: fkidx_cell_soils_soils
 
 -- DROP INDEX public.fkidx_cell_soils_soils;
