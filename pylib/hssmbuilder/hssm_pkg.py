@@ -781,6 +781,7 @@ class hssm_obj:
                                 #cell = pd.concat([cell,temp],axis=1,sort=False)
 
                                 #original
+
                                 for yrec in y[1]:
 
                                     found = False
@@ -799,10 +800,13 @@ class hssm_obj:
                                         # is greater then yrec is likely where the mass ends
                                         # for that layer. which means the next layer will have
                                         # the correct value for this day
-                                        if yrec[1] == 0:
+                                        #exception if its the last time period then add it.
+                                        if yrec[1] == 0 and yrec[0] != o_ts.times[-1]:
+                                        #if yrec[1] == 0:
                                             ind = np.where(o_ts.times == yrec[0])[0]
                                             if o_ts.values[ind] < self.flux_floor:
                                                 segs.append(yrec)
+
                                         else:
                                             segs.append(yrec)
                                     #end of original
@@ -811,7 +815,6 @@ class hssm_obj:
                                     #    r_ts = y[6]
                                     #else:
                                     #    r_ts.values = np.add(r_ts.values,y[6].values)
-
                     segs.sort(key = sort_first_field)
                     ###u, c =
                     days = [float(i[0]) for i in segs]
