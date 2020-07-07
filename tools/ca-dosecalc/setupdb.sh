@@ -68,3 +68,6 @@ psql $db -f $DIR/Functions/icf_util_map_shapes_load.sql >> $rep
 psql $db -f $DIR/Functions/icf_util_shp_to_mview.sql >> $rep
 psql $db -f $DIR/Functions/icf_ucn_get.sql >> $rep
 psql $db -f $DIR/Functions/icf_ucn_load.sql >> $rep
+
+# POSTGIS 
+psql $db -f $DIR/epsg_102749.sql >> $rep
