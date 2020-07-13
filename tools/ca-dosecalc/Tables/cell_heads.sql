@@ -2,7 +2,7 @@
 
 -- DROP TABLE public.cell_heads;
 
-CREATE TABLE public.cell_heads
+CREATE unlogged TABLE public.cell_heads
 (
     cell_id integer NOT NULL,
     stress_period integer NOT NULL,
@@ -19,8 +19,6 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE public.cell_heads
-    OWNER to postgres;
 
 COMMENT ON COLUMN public.cell_heads.cell_id
     IS 'A reference to the grid identifier.';

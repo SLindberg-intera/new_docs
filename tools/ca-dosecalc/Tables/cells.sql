@@ -2,7 +2,7 @@
 
 -- DROP TABLE public.cells;
 
-CREATE TABLE public.cells
+CREATE unlogged TABLE public.cells
 (
     cell_id bigint NOT NULL DEFAULT nextval('grid_grid_id_seq'::regclass),
     mdl_id integer NOT NULL,

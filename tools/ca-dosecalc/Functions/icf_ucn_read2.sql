@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION public.icf_ucn_read2(
 
     COST 100
     VOLATILE 
-    ROWS 1000
+    ROWS 1000000
 AS $BODY$
 	import os
 	import numpy as np

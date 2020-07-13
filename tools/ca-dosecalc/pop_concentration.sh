@@ -51,7 +51,7 @@ mcl=-1  # placeholder; unused in dose calc
 
 echo "Loading $copcm from $fname into $dbase:"
 d=$(date)
-echo "$d: START"
+echo "$d: START loading concentrations"
 
 # obtain the model id for the given model name
 mdlid=$(psql -d "$dbase" -qtA -c "select mdl_id from public.models where mdl_nm='$model';")
@@ -60,7 +60,7 @@ mdlid=$(psql -d "$dbase" -qtA -c "select mdl_id from public.models where mdl_nm=
 unitid=$(psql -d "$dbase" -qtA -c "select unit_id from public.units where unit_in='$unit';")
 
 # obtain the layer indicies
-layersArr=$(psql -d "$dbase" -qtA -c "select array_agg(lay) from (select distinct lay from cells where mdl_id=$mdlid) a;")
+layersArr=$(psql -d "$dbase" -qtA -c "select array_agg(lay - 1) from (select distinct lay from cells where mdl_id=$mdlid) a;")
 layers=$(echo "$layersArr" | sed 's/,/ /g' | sed 's/{//g' | sed 's/}//g')
 
 # remove elements in the copc table (cascades to concentrations)
@@ -83,6 +83,7 @@ done
 # load all ucn data into the concentrations table
 rval=$(psql -d "$dbase" -qtA -c "select icf_ucn_load();")
 
+rval=$(psql -d "dbase" -qtA -c "vacuum analyze;")
 d=$(date)
 echo "$d: END; Loaded concentration table for $fname into $dbase."
 

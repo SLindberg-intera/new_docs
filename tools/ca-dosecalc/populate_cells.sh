@@ -5,8 +5,6 @@
 usage="
 $(basename "$0") [-h] -l maxlay -d database -m model
 
-
-
 where :
      -h  show this help message
      -l  the number of layers (eg 3 means there are lay=1,2,3 layers)
@@ -50,4 +48,4 @@ do
 rval=$(psql -d "$dbase" -qtA -c "insert into cells (lay, mdl_id, row, col, geom, del_x, del_y) (select $layid, new_mdl_id as mdl_id, "row", "col", geom, del_x, del_y from stg_cells where new_mdl_id=$mdlid);")
 echo "updated cells: added layer $layid"
 done
-
+rval=$(psql -d "$dbase" -qtA -c "vacuum analyze;")

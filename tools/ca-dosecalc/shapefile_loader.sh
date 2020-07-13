@@ -21,6 +21,8 @@ where :
      -d  the name of the target database
      -m  the model name to associate the shapefile to
 "
+d=$(date)
+echo "$d: START loading grid shapefile"
 
 # Check if machine has the shp2pgsql tool installed
 shpxsts=$(shp2pgsql | grep RELEASE)
@@ -54,7 +56,6 @@ while getopts 'hpf:d:s:m:' opt; do
 done
 shift $((OPTIND - 1))
 
-echo "Staging shapefile ....."
 
 # Get name and path from filename argument
 # Replace \ folder delims with /
@@ -104,19 +105,20 @@ echo "mdlid ----  $mdlid"
 # Import shapefile
 tname=$(echo "stg_shp_"$fname | sed '$s/\.shp//')
 srid=32149
-shp2pgsql -s "$srid" -c "$fpath"/"$fname" public."$tname"_geom | psql -q -d "$dbase"
+shp2pgsql -s "$srid" -c "$fpath"/"$fname" public."$tname"_geom | psql -qtA -d "$dbase"
 
 #shp2pgsql -s "$srid" -G -c "$fpath"/"$fname" public."$tname"_geog | psql -q -d "$dbase"
 
 # Combine staging tables and rename
-psql -d "$dbase" -c "alter table public."$tname"_geom add column geog geography;"
+res=$(psql -d "$dbase" -qtA -c "alter table public."$tname"_geom add column geog geography;")
 #psql -d "$dbase" -c "update public."$tname"_geom d set geog = s.geog from public."$tname"_geog s where d.gid = s.gid;"
 #psql -d "$dbase" -c "drop table public."$tname"_geog;"
-psql -d "$dbase" -c "alter table public."$tname"_geom rename to "$tname";"
+res=$(psql -d "$dbase" -qtA -c "alter table public."$tname"_geom rename to "$tname";")
 
 
 # Create a record in the shapefiles table
-echo "Importing shapefile ..."
+d=$(date)
+echo "$d: Importing shapefile ..."
 sfid=-1
 sfid=$(psql -d "$dbase" -qtA -c "insert into public.shapefiles (shp_file_nm, shp_file_url, shp_srid) values ('"$fname"', '"$fpath"/"$fname"', $srid) returning shp_file_id;")
 #echo "$sfid"
@@ -166,10 +168,10 @@ if [[ "$rval" == -1 ]]; then
 fi
 
 # Drop or Persist shapefile table
-echo "Cleaning up ..........."
 if [[ "$tkeep" == 1 ]]; then
-  cln=$(psql -d "$dbase" -c "drop table public."$tname" cascade;")
+  cln=$(psql -d "$dbase" -qtA -c "drop table public."$tname" cascade;")
 fi
 
-echo "Finished .............."
+d=$(date)
+echo "$d: Finished loading grid shapefile"
 

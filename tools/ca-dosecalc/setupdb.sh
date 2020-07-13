@@ -9,26 +9,29 @@
 echo "START setupdb"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 db=$1 rep=$2
+d=$(date)
+echo "$d: START setup database"
 dropdb $db
 createdb $db
-psql $db -f $DIR/setup.sql >> $rep
+res=$(psql $db -f $DIR/setup.sql)
 echo "Created Postgres Database with PostGIS extensions"
 #psql $db -f $DIR/setup.sql > $rep
 #    Sequences (used as primary keys) 
-psql $db -f $DIR/Sequences/model_mdl_id_seq.sql >> $rep
-psql $db -f $DIR/Sequences/concentration_bucket_bkt_id_seq.sql >> $rep
-psql $db -f $DIR/Sequences/grid_grid_id_seq.sql >> $rep
-psql $db -f $DIR/Sequences/map_shape_shp_id_seq.sql >> $rep
-psql $db -f $DIR/Sequences/map_shapes_properties_prp_id_seq.sql >> $rep
-psql $db -f $DIR/Sequences/map_image_img_id_seq.sql >> $rep
-psql $db -f $DIR/Sequences/shapefiles_shp_file_id_seq.sql >> $rep
-psql $db -f $DIR/Sequences/soil_type_soil_id_seq.sql >> $rep
-psql $db -f $DIR/Sequences/stg_hds_rid_seq.sql >> $rep
-psql $db -f $DIR/Sequences/stg_ucn_rid_seq.sql >> $rep
-psql $db -f $DIR/Sequences/stomp2gw_graphs_rid_seq.sql >> $rep
-psql $db -f $DIR/Sequences/stomp2gw_rid_seq.sql >> $rep
-psql $db -f $DIR/Sequences/units_unit_id_seq.sql >> $rep
-echo "Created Sequences" 
+res=$(psql -d $db -qtA -f $DIR/Sequences/model_mdl_id_seq.sql)
+res=$(psql -d $db -qtA -f $DIR/Sequences/concentration_bucket_bkt_id_seq.sql)
+res=$(psql $db -f $DIR/Sequences/grid_grid_id_seq.sql)
+res=$(psql $db -f $DIR/Sequences/map_shape_shp_id_seq.sql)
+res=$(psql $db -f $DIR/Sequences/map_shapes_properties_prp_id_seq.sql)
+res=$(psql $db -f $DIR/Sequences/map_image_img_id_seq.sql)
+res=$(psql $db -f $DIR/Sequences/shapefiles_shp_file_id_seq.sql)
+res=$(psql $db -f $DIR/Sequences/soil_type_soil_id_seq.sql)
+res=$(psql $db -f $DIR/Sequences/stg_hds_rid_seq.sql)
+res=$(psql $db -f $DIR/Sequences/stg_ucn_rid_seq.sql)
+res=$(psql $db -f $DIR/Sequences/stomp2gw_graphs_rid_seq.sql)
+res=$(psql $db -f $DIR/Sequences/stomp2gw_rid_seq.sql)
+res=$(psql $db -f $DIR/Sequences/units_unit_id_seq.sql)
+d=$(date)
+echo "$d: Created Sequences" 
 
 #    Tables
 psql $db -f $DIR/Tables/models.sql >> $rep
@@ -66,8 +69,12 @@ psql $db -f $DIR/Functions/icf_util_map_shapes_attributes_load.sql >> $rep
 psql $db -f $DIR/Functions/'icf_util_map_shapes_load(integer).sql' >> $rep
 psql $db -f $DIR/Functions/icf_util_map_shapes_load.sql >> $rep
 psql $db -f $DIR/Functions/icf_util_shp_to_mview.sql >> $rep
-psql $db -f $DIR/Functions/icf_ucn_get.sql >> $rep
-psql $db -f $DIR/Functions/icf_ucn_load.sql >> $rep
+psql $db -qtA -f $DIR/Functions/icf_ucn_get.sql >> $rep
+psql $db -qtA -f $DIR/Functions/icf_ucn_load.sql >> $rep
 
 # POSTGIS 
-psql $db -f $DIR/epsg_102749.sql >> $rep
+psql -d $db -qtA -f $DIR/epsg_102749.sql >> $rep
+
+psql -d $db -qtA -c "vacuum analyze;"
+d=$(date)
+echo "$d: END loading datase"

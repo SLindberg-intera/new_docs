@@ -2,7 +2,7 @@
 
 -- DROP TABLE public.cell_soils;
 
-CREATE TABLE public.cell_soils
+CREATE unlogged TABLE public.cell_soils
 (
     cell_id integer NOT NULL,
     soil_id integer NOT NULL,

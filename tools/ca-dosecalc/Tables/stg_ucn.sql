@@ -2,7 +2,7 @@
 
 -- DROP TABLE public.stg_ucn;
 
-CREATE TABLE public.stg_ucn
+CREATE unlogged TABLE public.stg_ucn
 (
     rid bigint NOT NULL DEFAULT nextval('stg_ucn_rid_seq'::regclass),
     model_nm character varying(255) COLLATE pg_catalog."default",

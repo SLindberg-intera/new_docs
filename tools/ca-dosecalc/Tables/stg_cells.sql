@@ -2,7 +2,7 @@
 
 -- DROP TABLE public.stg_cells;
 
-CREATE TABLE public.stg_cells
+CREATE unlogged TABLE public.stg_cells
 (
     new_mdl_id integer,
     new_cell_id bigint,

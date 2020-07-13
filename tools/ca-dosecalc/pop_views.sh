@@ -1,10 +1,12 @@
-dbase='testcapython'
+dbase=$1
 
-echo "START loading views"
+d=$(date)
+echo "$d: START computing dose"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"'/Views'
 res=$(psql $dbase -f $DIR/mv_analytes.sql)
 res=$(psql $dbase -f $DIR/mv_concentrations.sql)
+res=$(psql $dbase -c "vacuum analyze;")
 res=$(psql $dbase -f $DIR/mv_dose.sql)
-
-echo "END loading views"
+d=$(date)
+echo "$d: END computing dose"
 

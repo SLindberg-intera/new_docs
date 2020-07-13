@@ -2,7 +2,7 @@
 
 -- DROP TABLE public.concentrations;
 
-CREATE TABLE public.concentrations
+CREATE unlogged TABLE public.concentrations
 (
     cell_id integer NOT NULL,
     mdl_id integer NOT NULL,
