@@ -87,7 +87,7 @@ fprj=$(echo "$fname" | sed 's/.shp/.prj/')
 fcnt=$(find / -type f -name "$fpath"/*.prj 2>&1 | grep -v "Permission denied" | wc -l)
 if [[ $fcnt == 1 ]]; then
   prj=$(head -c 100 "$fpath"/"$fprj")
-  echo "Prj $prj"
+  #echo "Prj $prj"
   srid=$(psql -d "$dbase" -qtA -c "select srid from spatial_ref_sys where srtext like '$prj%';")
 fi
 
@@ -101,7 +101,7 @@ if [[ $mdlid == -1 ]]; then
   exit 1
 fi
 
-echo "mdlid ----  $mdlid"
+#echo "mdlid ----  $mdlid"
 # Import shapefile
 tname=$(echo "stg_shp_"$fname | sed '$s/\.shp//')
 srid=32149

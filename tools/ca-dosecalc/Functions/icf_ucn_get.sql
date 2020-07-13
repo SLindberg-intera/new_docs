@@ -2,6 +2,8 @@
 
 -- DROP FUNCTION public.icf_ucn_get(character varying, integer, character varying, integer);
 
+--- NOTE layerin is zero-indexed but returned layers are 1-indexed
+
 CREATE OR REPLACE FUNCTION public.icf_ucn_get(
 	fname character varying,
 	mdlidin integer,
@@ -33,7 +35,7 @@ BEGIN
 	SELECT COUNT(*) 
 	INTO stgchk
 	FROM public.stg_ucn
-	WHERE (mdl_id, contam, layer) = (mdlidin, copcin, layerin);
+	WHERE (mdl_id, contam, layer) = (mdlidin, copcin, layerin+1);
 
 	IF stgchk > 0 THEN
 		RAISE INFO '%', 'Duplicate staging records found, empty the public.stg_ucn before trying again.';

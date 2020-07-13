@@ -12,7 +12,7 @@
 
 # Set help/usage message
 usage="
-$(basename "$0") [-h] -d database -m model -f ucnfile -c copc -u unit -t threshold
+$(basename "$0") [-h] -d database -m model -f ucnfile -c copc -u unit
 
 where :
      -h  show this help message
@@ -21,11 +21,10 @@ where :
      -f  the full path to the .UCN file to load
      -c  the name of hte copc ('Tc99')
      -u  the unit (usually pCi/m^3 )
-     -t  the threshold of 'Zero'
 "
 # Get command line arguments
 tkeep=1
-while getopts 'h:f:d:m:c:u:t:' opt; do
+while getopts 'h:f:d:m:c:u:' opt; do
   case "${opt}" in
     h)  echo "$usage" >&2
         exit;;
@@ -33,7 +32,6 @@ while getopts 'h:f:d:m:c:u:t:' opt; do
     f)  fname=$OPTARG;;
     d)  dbase=$OPTARG;;
     c)  copcnm=$OPTARG;;
-    t)  minthresh=$OPTARG;;
     u)  unit=$OPTARG;;
     :)  printf "missing argument for -%s\n" "$OPTARG" >&2
         echo "$usage" >&2
@@ -63,12 +61,6 @@ unitid=$(psql -d "$dbase" -qtA -c "select unit_id from public.units where unit_i
 layersArr=$(psql -d "$dbase" -qtA -c "select array_agg(lay - 1) from (select distinct lay from cells where mdl_id=$mdlid) a;")
 layers=$(echo "$layersArr" | sed 's/,/ /g' | sed 's/{//g' | sed 's/}//g')
 
-# remove elements in the copc table (cascades to concentrations)
-#rval=$(psql -d "$dbase" -qtA -c "delete from copc where contam_nm='$copcnm' and mdl_id=$mdlid;")
-
-# add the COPC
-#rval=$(psql -d "$dbase" -qtA -c "insert into copc (mdl_id, contam_nm, mcl, unit_id, min_thresh, contam_type)  values ($mdlid, '$copcnm', $mcl, $unitid, $minthresh, '$contamtype');")
-
 # remove elements in the ucn staging table
 rval=$(psql -d "$dbase" -qtA -c "truncate stg_ucn;")
 
@@ -76,14 +68,14 @@ for lay in $layers
 do
   # load UCN file into ucn staging table one layer at a time
   rval=$(psql -d "$dbase" -qtA -c "select icf_ucn_get('$fname', $mdlid, '$copcnm', $lay);")
-  d=$(date)
-  echo "$d: moved layer $lay into staging."
 done
+d=$(date)
+echo "$d: moved data from ucn into staging table"
 
 # load all ucn data into the concentrations table
 rval=$(psql -d "$dbase" -qtA -c "select icf_ucn_load();")
 
-rval=$(psql -d "dbase" -qtA -c "vacuum analyze;")
+rval=$(psql -d "$dbase" -qtA -c "vacuum analyze;")
 d=$(date)
 echo "$d: END; Loaded concentration table for $fname into $dbase."
 
