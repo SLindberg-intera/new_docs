@@ -1,21 +1,47 @@
 #!/bin/bash
-NLay=7
-gridShapefile='/home/ca/dosecalc/source/MFGRID/v8.3/data/grid_274_geo.shp'
-soilFile='/home/ca/dosecalc/source/SOILIND/v1.0/data/mfgrid_soil_indices.csv'
-ucnFile='/home/ca/dosecalc/source/testConc/u235/P2RGWM.ucn'
-copc='U235'
-unitsin='pCi/m^3'
-unitsout='pCi/L'
-conversion='1'
-startyear='1944'
-modeldate='2020-07-13'
-outputFormat='9.99999999EEEE'
 
-doseFiles='/home/ca/dosecalc/dev/fakeDoseFactorData/'
-pathways=$doseFiles'pathways.csv'
-copcFile=$doseFiles'tempcopc.csv'
-dosefactsFile=$doseFiles'tempdose.csv'
-outputFile=$doseFiles'output/'$copc'.csv'
+# Set help/usage message
+usage="
+$(basename "$0") [-h] copc NLay gridShapefile ucnFile soilFile dosefactsFile copcFile pathwaysFile unitsin unitsout conversion startyear outputFormat modelDate outputFile
+
+Program that computes the dose for every node in a UCN file
+
+where :
+   -h  show this help message
+   1. copc  the target copc in copcFile that corresponds to the ucnFile
+   2. NLay  the number of layers in the UCN file
+   3. gridShapefile   path to the shapefile containing the MODFLOW grid
+   4. ucnFile    path to the UCN (concentrations) file
+   5. soilFile   path to csv that relates soil types to row, col    
+   6. dosefactsFile   path to the csv containing the dose factors
+   7. copcFile  path to a csv defining the copcs
+   8. pathwaysFile  path to csv containing the pathways
+   9. unitsin   typically 'piCi/m^3'; units of the concentration in ucnFile
+   10. unitsout  typically 'piCi/L'; units needed to multiply the dose factor
+   11. conversion   defined as: unitsout = conversion * unitsin
+   12. startyear   the beginning year of the first timestep in the model
+   13. outputFormat  defines the precision of the output.  '9.99999999
+   14. modeldate   (not used) today's date in format 'yyyy-mm-dd'
+
+   15. outputFile   path to file to write results
+
+"
+
+NLay=$2
+gridShapefile=$3
+soilFile=$5
+ucnFile=$4
+copc=$1
+unitsin=$9
+unitsout=${10}
+conversion=${11}
+startyear=${12}
+modeldate=${14}
+outputFormat=${13}
+pathwaysFile=$8
+copcFile=$7
+dosefactsFile=$6
+outputFile=${15}
 
 
 # this constitutes a model run
@@ -28,7 +54,7 @@ $toolsdir/load_units.sh $dbase $conversion $unitsin $unitsout
 $toolsdir/shapefile_loader.sh -d $dbase -f $gridShapefile -m $mdl
 $toolsdir/populate_cells.sh -m $mdl -l $NLay -d $dbase
 $toolsdir/load_soils.sh -f $soilFile -d "$dbase" -m $mdl
-$toolsdir/pop_dose_factors.sh $dbase $pathways $copcFile $dosefactsFile
+$toolsdir/pop_dose_factors.sh $dbase $pathwaysFile $copcFile $dosefactsFile
 $toolsdir/pop_concentration.sh -f $ucnFile -c $copc -m $mdl -d $dbase -u $unitsin 
 $toolsdir/pop_views.sh $dbase
 $toolsdir/output_dose.sh $dbase $copc $outputFormat $outputFile
