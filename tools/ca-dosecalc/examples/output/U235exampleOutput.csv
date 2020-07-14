@@ -1,0 +1,10 @@
+model_date,soil,pathway,cell_row,cell_column,cell_layer,concentration,dose_factor,dose
+1944-01-01,Burbank Loamy Sand,Beef,54,55,3, 2.77849068e-06,1, 2.77849068e-06
+1944-01-01,Burbank Loamy Sand,Beef,54,56,3, 7.39802270e-06,1, 7.39802270e-06
+1944-01-01,Burbank Loamy Sand,Beef,55,55,3, 1.11429116e-05,1, 1.11429116e-05
+1944-01-01,Burbank Loamy Sand,Beef,55,56,3, 1.28265055e-05,1, 1.28265055e-05
+1944-01-01,Burbank Loamy Sand,Beef,56,55,3, 5.96702758e-06,1, 5.96702758e-06
+1944-01-01,Burbank Loamy Sand,Beef,56,133,4, 1.56592895e-05,1, 1.56592895e-05
+1944-01-01,Burbank Loamy Sand,Beef,56,134,4, 1.31043129e-05,1, 1.31043129e-05
+1944-01-01,Burbank Loamy Sand,Beef,57,58,3, 1.17017061e-05,1, 1.17017061e-05
+1944-01-01,Burbank Loamy Sand,Beef,57,59,3, 7.73644525e-06,1, 7.73644525e-06
