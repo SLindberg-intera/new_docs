@@ -26,6 +26,15 @@ where :
    15. outputFile   path to file to write results
 
 "
+# Get command line arguments
+tkeep=1
+while getopts 'h' opt; do
+  case "${opt}" in
+    h)  echo "$usage" >&2
+        exit;;
+  esac
+done
+shift $((OPTIND - 1))
 
 NLay=$2
 gridShapefile=$3
