@@ -71,8 +71,6 @@ def build_pkg(file):
                 new_data = ["i{}j{}k{}".format(file.iSource,file.jSource,file.kSource),o_ts]
             else:
                 #check if allowing any steps greater than flux_floor yearly is below min_reduction_steps
-                #non_zero_ind = file.remove_zero_flux()
-                #non_zero_ind = rgt.remove_zero_flux(file.days,file.vals,file.flux_floor,file.min_reduction_steps)
                 non_zero_ind, min_zero_years = rgt.remove_begin_end_zero_flux(file.days,file.vals,file.flux_floor,file.min_reduction_steps)
 
                 ix = 0
@@ -84,32 +82,10 @@ def build_pkg(file):
                     days = file.days[non_zero_ind]
                     vals = file.vals[non_zero_ind]
 
-    #                    segs, error = file.build_hssm_data(days,vals)
-    #                    num_peaks, _ = sig.find_peaks(vals,width=3,rel_height=1)
-    #                    if num_peaks.size == 0:
-    #                        num_peaks, _ = sig.find_peaks(vals,width=2,rel_height=1)
-    #                        if num_peaks.size == 0:
-    #                            num_peaks, _ = sig.find_peaks(vals,width=1,rel_height=1)
-    #                    num_peaks = num_peaks.size
-    #                    r_ts = TimeSeries(days,vals,None,None)
-                #if (flux never rises above flux_floor and there are more than min_reduction_steps) or o_mass == 0 skip.
-                #  This is due to splitting cells into layers you may have less than 200 years in a single layer, and removing
-                #  the layer can have adverse consequences to the overall cell error if removed.
-                #elif file.has_data == False:
-                #    msg_str = ("Skipping Cell i{0}-j{1}; k{4}: total mass={5}; flux never exceeds {2} {3}/day".format(file.iSource,file.jSource,file.flux_floor, file.units,file.kSource,file.vals.sum()*365.25))
-                #    file.logger.info(msg_str)
-                #    print(msg_str)
-                #    return ["i{}j{}k{}".format(file.iSource,file.jSource,file.kSource),o_ts]
                 elif len(file.data) > file.min_reduction_steps and file.reduce_data:
                     days, vals,error,num_peaks,ix = rgt.reduce_dataset(file.days, file.vals, file.flux_floor, file.max_tm_error, file.min_reduction_steps)
-                    #if file.days[min_zero_years[0]] not in days or file.days[min_zero_years[1]] not in days or file.days[min_zero_years[2]] not in days or file.days[min_zero_years[3]] not in days:
-                        #print(file.HSSFileName)
-                        #print(file.days[min_zero_years])
-                    #segs, _ = file.build_hssm_data(days,vals)
-                    #r_ts = TimeSeries(days,vals,None,None)
-    #                else:
-    #                    num_peaks=None
-    #                    segs, error = file.build_hssm_data(file.days,file.vals)
+
+
                 segs, error = file.build_hssm_data(days,vals)
                 if num_peaks == None:
                     num_peaks, _ = sig.find_peaks(vals,width=3,rel_height=1)
@@ -507,7 +483,7 @@ class hssm_obj:
     #-------------------------------------------------------------------------------
     # process each cell object (reduce data), then create a HSSM package from the
     #  reduced cells and cell meta data
-    def write_data(self):
+    def write_data(self,layered=True):
 
         time_arr = []
         new_data = []
@@ -539,7 +515,8 @@ class hssm_obj:
             outfile.write(output)
 
         #self.misc_files()
-        self.misc_files(self.reduced_data,'cell_error_by_layer.csv',True)
+        if layered:
+            self.misc_files(self.reduced_data,'cell_error_by_layer.csv',True)
         self.consolidate_multi_layer_cells()
         self.misc_file_generation()
         self.misc_files(self.reduced_data_c,'cell_error.csv')

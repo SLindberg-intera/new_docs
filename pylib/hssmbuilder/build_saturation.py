@@ -377,7 +377,7 @@ class sat_obj:
                                     break
 
 
-                
+
                             #t_step_prev = t_step
                             #prev_calc = calc_txt
             #tabbed line in once so saves the file if its being generated
@@ -431,7 +431,7 @@ class sat_obj:
                     last_min_sat_t_depth = -999.0
                     last_min_sat_b_depth = -999.0
                     last_min_sat_hds=-999.0
-
+                    last_min_calc_text=""
                     for x in reversed(range(len(self.sp_times))):
                         t_step = self.sp_times[x-1]
                         head = self.binary_obj.get_data(totim=t_step)

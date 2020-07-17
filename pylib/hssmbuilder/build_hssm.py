@@ -185,7 +185,7 @@ def main():
     sat = None
     mass = None
     #Create HSSM packages
-    hssm.write_data()
+    hssm.write_data(params["find_sat_layer_by_year"])
     logger.info("\n\n Application Completed Normally.")
     logger.info("----------------------------------------------------")
     logger.info("----------------------------------------------------")

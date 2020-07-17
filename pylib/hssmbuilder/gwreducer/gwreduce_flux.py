@@ -336,16 +336,19 @@ def reduce_flux(flux, threshold_area, threshold_peak, solve_type,
             reduced_mass=reduced_mass)
     return result
 def insert_point(times, values,time,value):
-    times = np.append(times,time)
-    times.sort(kind='mergesort')
-    ind = np.where(times == time)[0][0]
-    values2 = np.insert(values,ind,value)
-
+    if not np.any(times==time):
+        times = np.append(times,time)
+        times.sort(kind='mergesort')
+        ind = np.where(times == time)[0][0]
+        values2 = np.insert(values,ind,value)
+    else:
+        return times, values
     return times, values2
 #-------------------------------------------------------------------------------
 # add extra points in areas of greatest error until you run out of points or
 #  you reach less than .01% relative error.
 def rebalance_extra_points(reduction_result,num_points=10):
+
     #----------------------
     #
     def find_mean_dif_day():
