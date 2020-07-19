@@ -73,7 +73,7 @@ psql $db -qtA -f $DIR/Functions/icf_ucn_get.sql
 psql $db -qtA -f $DIR/Functions/icf_ucn_load.sql
 
 # POSTGIS 
-psql -d $db -qtA -f $DIR/epsg_102749.sql
+#psql -d $db -qtA -f $DIR/epsg_102749.sql
 
 psql -d $db -qtA -c "vacuum analyze;"
 d=$(date)

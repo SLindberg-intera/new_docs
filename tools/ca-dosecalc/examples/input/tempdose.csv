@@ -1,1344 +1,1233 @@
-0,1,External Gamma,C14,1,1
-0,1,Inhalation,C14,1,1
-0,1,Inhalation Vapor,C14,1,1
-0,1,Soil,C14,1,1
-0,1,Drinking Water,C14,1,1
-0,1,Produce,C14,1,1
-0,1,Beef,C14,1,1
-0,1,Milk,C14,1,1
-0,1,Poultry,C14,1,1
-0,1,Egg,C14,1,1
-0,1,Fish,C14,1,1
-0,1,Total,C14,1,1
-1,1,External Gamma,C14,1,1
-1,1,Inhalation,C14,1,1
-1,1,Inhalation Vapor,C14,1,1
-1,1,Soil,C14,1,1
-1,1,Drinking Water,C14,1,1
-1,1,Produce,C14,1,1
-1,1,Beef,C14,1,1
-1,1,Milk,C14,1,1
-1,1,Poultry,C14,1,1
-1,1,Egg,C14,1,1
-1,1,Fish,C14,1,1
-1,1,Total,C14,1,1
-2,1,External Gamma,C14,1,1
-2,1,Inhalation,C14,1,1
-2,1,Inhalation Vapor,C14,1,1
-2,1,Soil,C14,1,1
-2,1,Drinking Water,C14,1,1
-2,1,Produce,C14,1,1
-2,1,Beef,C14,1,1
-2,1,Milk,C14,1,1
-2,1,Poultry,C14,1,1
-2,1,Egg,C14,1,1
-2,1,Fish,C14,1,1
-2,1,Total,C14,1,1
-3,1,External Gamma,C14,1,1
-3,1,Inhalation,C14,1,1
-3,1,Inhalation Vapor,C14,1,1
-3,1,Soil,C14,1,1
-3,1,Drinking Water,C14,1,1
-3,1,Produce,C14,1,1
-3,1,Beef,C14,1,1
-3,1,Milk,C14,1,1
-3,1,Poultry,C14,1,1
-3,1,Egg,C14,1,1
-3,1,Fish,C14,1,1
-3,1,Total,C14,1,1
-4,1,External Gamma,C14,1,1
-4,1,Inhalation,C14,1,1
-4,1,Inhalation Vapor,C14,1,1
-4,1,Soil,C14,1,1
-4,1,Drinking Water,C14,1,1
-4,1,Produce,C14,1,1
-4,1,Beef,C14,1,1
-4,1,Milk,C14,1,1
-4,1,Poultry,C14,1,1
-4,1,Egg,C14,1,1
-4,1,Fish,C14,1,1
-4,1,Total,C14,1,1
-5,1,External Gamma,C14,1,1
-5,1,Inhalation,C14,1,1
-5,1,Inhalation Vapor,C14,1,1
-5,1,Soil,C14,1,1
-5,1,Drinking Water,C14,1,1
-5,1,Produce,C14,1,1
-5,1,Beef,C14,1,1
-5,1,Milk,C14,1,1
-5,1,Poultry,C14,1,1
-5,1,Egg,C14,1,1
-5,1,Fish,C14,1,1
-5,1,Total,C14,1,1
-6,1,External Gamma,C14,1,1
-6,1,Inhalation,C14,1,1
-6,1,Inhalation Vapor,C14,1,1
-6,1,Soil,C14,1,1
-6,1,Drinking Water,C14,1,1
-6,1,Produce,C14,1,1
-6,1,Beef,C14,1,1
-6,1,Milk,C14,1,1
-6,1,Poultry,C14,1,1
-6,1,Egg,C14,1,1
-6,1,Fish,C14,1,1
-6,1,Total,C14,1,1
-0,1,External Gamma,Cl36,1,1
-0,1,Inhalation,Cl36,1,1
-0,1,Inhalation Vapor,Cl36,1,1
-0,1,Soil,Cl36,1,1
-0,1,Drinking Water,Cl36,1,1
-0,1,Produce,Cl36,1,1
-0,1,Beef,Cl36,1,1
-0,1,Milk,Cl36,1,1
-0,1,Poultry,Cl36,1,1
-0,1,Egg,Cl36,1,1
-0,1,Fish,Cl36,1,1
-0,1,Total,Cl36,1,1
-1,1,External Gamma,Cl36,1,1
-1,1,Inhalation,Cl36,1,1
-1,1,Inhalation Vapor,Cl36,1,1
-1,1,Soil,Cl36,1,1
-1,1,Drinking Water,Cl36,1,1
-1,1,Produce,Cl36,1,1
-1,1,Beef,Cl36,1,1
-1,1,Milk,Cl36,1,1
-1,1,Poultry,Cl36,1,1
-1,1,Egg,Cl36,1,1
-1,1,Fish,Cl36,1,1
-1,1,Total,Cl36,1,1
-2,1,External Gamma,Cl36,1,1
-2,1,Inhalation,Cl36,1,1
-2,1,Inhalation Vapor,Cl36,1,1
-2,1,Soil,Cl36,1,1
-2,1,Drinking Water,Cl36,1,1
-2,1,Produce,Cl36,1,1
-2,1,Beef,Cl36,1,1
-2,1,Milk,Cl36,1,1
-2,1,Poultry,Cl36,1,1
-2,1,Egg,Cl36,1,1
-2,1,Fish,Cl36,1,1
-2,1,Total,Cl36,1,1
-3,1,External Gamma,Cl36,1,1
-3,1,Inhalation,Cl36,1,1
-3,1,Inhalation Vapor,Cl36,1,1
-3,1,Soil,Cl36,1,1
-3,1,Drinking Water,Cl36,1,1
-3,1,Produce,Cl36,1,1
-3,1,Beef,Cl36,1,1
-3,1,Milk,Cl36,1,1
-3,1,Poultry,Cl36,1,1
-3,1,Egg,Cl36,1,1
-3,1,Fish,Cl36,1,1
-3,1,Total,Cl36,1,1
-4,1,External Gamma,Cl36,1,1
-4,1,Inhalation,Cl36,1,1
-4,1,Inhalation Vapor,Cl36,1,1
-4,1,Soil,Cl36,1,1
-4,1,Drinking Water,Cl36,1,1
-4,1,Produce,Cl36,1,1
-4,1,Beef,Cl36,1,1
-4,1,Milk,Cl36,1,1
-4,1,Poultry,Cl36,1,1
-4,1,Egg,Cl36,1,1
-4,1,Fish,Cl36,1,1
-4,1,Total,Cl36,1,1
-5,1,External Gamma,Cl36,1,1
-5,1,Inhalation,Cl36,1,1
-5,1,Inhalation Vapor,Cl36,1,1
-5,1,Soil,Cl36,1,1
-5,1,Drinking Water,Cl36,1,1
-5,1,Produce,Cl36,1,1
-5,1,Beef,Cl36,1,1
-5,1,Milk,Cl36,1,1
-5,1,Poultry,Cl36,1,1
-5,1,Egg,Cl36,1,1
-5,1,Fish,Cl36,1,1
-5,1,Total,Cl36,1,1
-6,1,External Gamma,Cl36,1,1
-6,1,Inhalation,Cl36,1,1
-6,1,Inhalation Vapor,Cl36,1,1
-6,1,Soil,Cl36,1,1
-6,1,Drinking Water,Cl36,1,1
-6,1,Produce,Cl36,1,1
-6,1,Beef,Cl36,1,1
-6,1,Milk,Cl36,1,1
-6,1,Poultry,Cl36,1,1
-6,1,Egg,Cl36,1,1
-6,1,Fish,Cl36,1,1
-6,1,Total,Cl36,1,1
-0,1,External Gamma,H3,1,1
-0,1,Inhalation,H3,1,1
-0,1,Inhalation Vapor,H3,1,1
-0,1,Soil,H3,1,1
-0,1,Drinking Water,H3,1,1
-0,1,Produce,H3,1,1
-0,1,Beef,H3,1,1
-0,1,Milk,H3,1,1
-0,1,Poultry,H3,1,1
-0,1,Egg,H3,1,1
-0,1,Fish,H3,1,1
-0,1,Total,H3,1,1
-1,1,External Gamma,H3,1,1
-1,1,Inhalation,H3,1,1
-1,1,Inhalation Vapor,H3,1,1
-1,1,Soil,H3,1,1
-1,1,Drinking Water,H3,1,1
-1,1,Produce,H3,1,1
-1,1,Beef,H3,1,1
-1,1,Milk,H3,1,1
-1,1,Poultry,H3,1,1
-1,1,Egg,H3,1,1
-1,1,Fish,H3,1,1
-1,1,Total,H3,1,1
-2,1,External Gamma,H3,1,1
-2,1,Inhalation,H3,1,1
-2,1,Inhalation Vapor,H3,1,1
-2,1,Soil,H3,1,1
-2,1,Drinking Water,H3,1,1
-2,1,Produce,H3,1,1
-2,1,Beef,H3,1,1
-2,1,Milk,H3,1,1
-2,1,Poultry,H3,1,1
-2,1,Egg,H3,1,1
-2,1,Fish,H3,1,1
-2,1,Total,H3,1,1
-3,1,External Gamma,H3,1,1
-3,1,Inhalation,H3,1,1
-3,1,Inhalation Vapor,H3,1,1
-3,1,Soil,H3,1,1
-3,1,Drinking Water,H3,1,1
-3,1,Produce,H3,1,1
-3,1,Beef,H3,1,1
-3,1,Milk,H3,1,1
-3,1,Poultry,H3,1,1
-3,1,Egg,H3,1,1
-3,1,Fish,H3,1,1
-3,1,Total,H3,1,1
-4,1,External Gamma,H3,1,1
-4,1,Inhalation,H3,1,1
-4,1,Inhalation Vapor,H3,1,1
-4,1,Soil,H3,1,1
-4,1,Drinking Water,H3,1,1
-4,1,Produce,H3,1,1
-4,1,Beef,H3,1,1
-4,1,Milk,H3,1,1
-4,1,Poultry,H3,1,1
-4,1,Egg,H3,1,1
-4,1,Fish,H3,1,1
-4,1,Total,H3,1,1
-5,1,External Gamma,H3,1,1
-5,1,Inhalation,H3,1,1
-5,1,Inhalation Vapor,H3,1,1
-5,1,Soil,H3,1,1
-5,1,Drinking Water,H3,1,1
-5,1,Produce,H3,1,1
-5,1,Beef,H3,1,1
-5,1,Milk,H3,1,1
-5,1,Poultry,H3,1,1
-5,1,Egg,H3,1,1
-5,1,Fish,H3,1,1
-5,1,Total,H3,1,1
-6,1,External Gamma,H3,1,1
-6,1,Inhalation,H3,1,1
-6,1,Inhalation Vapor,H3,1,1
-6,1,Soil,H3,1,1
-6,1,Drinking Water,H3,1,1
-6,1,Produce,H3,1,1
-6,1,Beef,H3,1,1
-6,1,Milk,H3,1,1
-6,1,Poultry,H3,1,1
-6,1,Egg,H3,1,1
-6,1,Fish,H3,1,1
-6,1,Total,H3,1,1
-0,1,External Gamma,I129,1,1
-0,1,Inhalation,I129,1,1
-0,1,Inhalation Vapor,I129,1,1
-0,1,Soil,I129,1,1
-0,1,Drinking Water,I129,1,1
-0,1,Produce,I129,1,1
-0,1,Beef,I129,1,1
-0,1,Milk,I129,1,1
-0,1,Poultry,I129,1,1
-0,1,Egg,I129,1,1
-0,1,Fish,I129,1,1
-0,1,Total,I129,1,1
-1,1,External Gamma,I129,1,1
-1,1,Inhalation,I129,1,1
-1,1,Inhalation Vapor,I129,1,1
-1,1,Soil,I129,1,1
-1,1,Drinking Water,I129,1,1
-1,1,Produce,I129,1,1
-1,1,Beef,I129,1,1
-1,1,Milk,I129,1,1
-1,1,Poultry,I129,1,1
-1,1,Egg,I129,1,1
-1,1,Fish,I129,1,1
-1,1,Total,I129,1,1
-2,1,External Gamma,I129,1,1
-2,1,Inhalation,I129,1,1
-2,1,Inhalation Vapor,I129,1,1
-2,1,Soil,I129,1,1
-2,1,Drinking Water,I129,1,1
-2,1,Produce,I129,1,1
-2,1,Beef,I129,1,1
-2,1,Milk,I129,1,1
-2,1,Poultry,I129,1,1
-2,1,Egg,I129,1,1
-2,1,Fish,I129,1,1
-2,1,Total,I129,1,1
-3,1,External Gamma,I129,1,1
-3,1,Inhalation,I129,1,1
-3,1,Inhalation Vapor,I129,1,1
-3,1,Soil,I129,1,1
-3,1,Drinking Water,I129,1,1
-3,1,Produce,I129,1,1
-3,1,Beef,I129,1,1
-3,1,Milk,I129,1,1
-3,1,Poultry,I129,1,1
-3,1,Egg,I129,1,1
-3,1,Fish,I129,1,1
-3,1,Total,I129,1,1
-4,1,External Gamma,I129,1,1
-4,1,Inhalation,I129,1,1
-4,1,Inhalation Vapor,I129,1,1
-4,1,Soil,I129,1,1
-4,1,Drinking Water,I129,1,1
-4,1,Produce,I129,1,1
-4,1,Beef,I129,1,1
-4,1,Milk,I129,1,1
-4,1,Poultry,I129,1,1
-4,1,Egg,I129,1,1
-4,1,Fish,I129,1,1
-4,1,Total,I129,1,1
-5,1,External Gamma,I129,1,1
-5,1,Inhalation,I129,1,1
-5,1,Inhalation Vapor,I129,1,1
-5,1,Soil,I129,1,1
-5,1,Drinking Water,I129,1,1
-5,1,Produce,I129,1,1
-5,1,Beef,I129,1,1
-5,1,Milk,I129,1,1
-5,1,Poultry,I129,1,1
-5,1,Egg,I129,1,1
-5,1,Fish,I129,1,1
-5,1,Total,I129,1,1
-6,1,External Gamma,I129,1,1
-6,1,Inhalation,I129,1,1
-6,1,Inhalation Vapor,I129,1,1
-6,1,Soil,I129,1,1
-6,1,Drinking Water,I129,1,1
-6,1,Produce,I129,1,1
-6,1,Beef,I129,1,1
-6,1,Milk,I129,1,1
-6,1,Poultry,I129,1,1
-6,1,Egg,I129,1,1
-6,1,Fish,I129,1,1
-6,1,Total,I129,1,1
-0,1,External Gamma,Np237,1,1
-0,1,Inhalation,Np237,1,1
-0,1,Inhalation Vapor,Np237,1,1
-0,1,Soil,Np237,1,1
-0,1,Drinking Water,Np237,1,1
-0,1,Produce,Np237,1,1
-0,1,Beef,Np237,1,1
-0,1,Milk,Np237,1,1
-0,1,Poultry,Np237,1,1
-0,1,Egg,Np237,1,1
-0,1,Fish,Np237,1,1
-0,1,Total,Np237,1,1
-1,1,External Gamma,Np237,1,1
-1,1,Inhalation,Np237,1,1
-1,1,Inhalation Vapor,Np237,1,1
-1,1,Soil,Np237,1,1
-1,1,Drinking Water,Np237,1,1
-1,1,Produce,Np237,1,1
-1,1,Beef,Np237,1,1
-1,1,Milk,Np237,1,1
-1,1,Poultry,Np237,1,1
-1,1,Egg,Np237,1,1
-1,1,Fish,Np237,1,1
-1,1,Total,Np237,1,1
-2,1,External Gamma,Np237,1,1
-2,1,Inhalation,Np237,1,1
-2,1,Inhalation Vapor,Np237,1,1
-2,1,Soil,Np237,1,1
-2,1,Drinking Water,Np237,1,1
-2,1,Produce,Np237,1,1
-2,1,Beef,Np237,1,1
-2,1,Milk,Np237,1,1
-2,1,Poultry,Np237,1,1
-2,1,Egg,Np237,1,1
-2,1,Fish,Np237,1,1
-2,1,Total,Np237,1,1
-3,1,External Gamma,Np237,1,1
-3,1,Inhalation,Np237,1,1
-3,1,Inhalation Vapor,Np237,1,1
-3,1,Soil,Np237,1,1
-3,1,Drinking Water,Np237,1,1
-3,1,Produce,Np237,1,1
-3,1,Beef,Np237,1,1
-3,1,Milk,Np237,1,1
-3,1,Poultry,Np237,1,1
-3,1,Egg,Np237,1,1
-3,1,Fish,Np237,1,1
-3,1,Total,Np237,1,1
-4,1,External Gamma,Np237,1,1
-4,1,Inhalation,Np237,1,1
-4,1,Inhalation Vapor,Np237,1,1
-4,1,Soil,Np237,1,1
-4,1,Drinking Water,Np237,1,1
-4,1,Produce,Np237,1,1
-4,1,Beef,Np237,1,1
-4,1,Milk,Np237,1,1
-4,1,Poultry,Np237,1,1
-4,1,Egg,Np237,1,1
-4,1,Fish,Np237,1,1
-4,1,Total,Np237,1,1
-5,1,External Gamma,Np237,1,1
-5,1,Inhalation,Np237,1,1
-5,1,Inhalation Vapor,Np237,1,1
-5,1,Soil,Np237,1,1
-5,1,Drinking Water,Np237,1,1
-5,1,Produce,Np237,1,1
-5,1,Beef,Np237,1,1
-5,1,Milk,Np237,1,1
-5,1,Poultry,Np237,1,1
-5,1,Egg,Np237,1,1
-5,1,Fish,Np237,1,1
-5,1,Total,Np237,1,1
-6,1,External Gamma,Np237,1,1
-6,1,Inhalation,Np237,1,1
-6,1,Inhalation Vapor,Np237,1,1
-6,1,Soil,Np237,1,1
-6,1,Drinking Water,Np237,1,1
-6,1,Produce,Np237,1,1
-6,1,Beef,Np237,1,1
-6,1,Milk,Np237,1,1
-6,1,Poultry,Np237,1,1
-6,1,Egg,Np237,1,1
-6,1,Fish,Np237,1,1
-6,1,Total,Np237,1,1
-0,1,External Gamma,Ra226,1,1
-0,1,Inhalation,Ra226,1,1
-0,1,Inhalation Vapor,Ra226,1,1
-0,1,Soil,Ra226,1,1
-0,1,Drinking Water,Ra226,1,1
-0,1,Produce,Ra226,1,1
-0,1,Beef,Ra226,1,1
-0,1,Milk,Ra226,1,1
-0,1,Poultry,Ra226,1,1
-0,1,Egg,Ra226,1,1
-0,1,Fish,Ra226,1,1
-0,1,Total,Ra226,1,1
-1,1,External Gamma,Ra226,1,1
-1,1,Inhalation,Ra226,1,1
-1,1,Inhalation Vapor,Ra226,1,1
-1,1,Soil,Ra226,1,1
-1,1,Drinking Water,Ra226,1,1
-1,1,Produce,Ra226,1,1
-1,1,Beef,Ra226,1,1
-1,1,Milk,Ra226,1,1
-1,1,Poultry,Ra226,1,1
-1,1,Egg,Ra226,1,1
-1,1,Fish,Ra226,1,1
-1,1,Total,Ra226,1,1
-2,1,External Gamma,Ra226,1,1
-2,1,Inhalation,Ra226,1,1
-2,1,Inhalation Vapor,Ra226,1,1
-2,1,Soil,Ra226,1,1
-2,1,Drinking Water,Ra226,1,1
-2,1,Produce,Ra226,1,1
-2,1,Beef,Ra226,1,1
-2,1,Milk,Ra226,1,1
-2,1,Poultry,Ra226,1,1
-2,1,Egg,Ra226,1,1
-2,1,Fish,Ra226,1,1
-2,1,Total,Ra226,1,1
-3,1,External Gamma,Ra226,1,1
-3,1,Inhalation,Ra226,1,1
-3,1,Inhalation Vapor,Ra226,1,1
-3,1,Soil,Ra226,1,1
-3,1,Drinking Water,Ra226,1,1
-3,1,Produce,Ra226,1,1
-3,1,Beef,Ra226,1,1
-3,1,Milk,Ra226,1,1
-3,1,Poultry,Ra226,1,1
-3,1,Egg,Ra226,1,1
-3,1,Fish,Ra226,1,1
-3,1,Total,Ra226,1,1
-4,1,External Gamma,Ra226,1,1
-4,1,Inhalation,Ra226,1,1
-4,1,Inhalation Vapor,Ra226,1,1
-4,1,Soil,Ra226,1,1
-4,1,Drinking Water,Ra226,1,1
-4,1,Produce,Ra226,1,1
-4,1,Beef,Ra226,1,1
-4,1,Milk,Ra226,1,1
-4,1,Poultry,Ra226,1,1
-4,1,Egg,Ra226,1,1
-4,1,Fish,Ra226,1,1
-4,1,Total,Ra226,1,1
-5,1,External Gamma,Ra226,1,1
-5,1,Inhalation,Ra226,1,1
-5,1,Inhalation Vapor,Ra226,1,1
-5,1,Soil,Ra226,1,1
-5,1,Drinking Water,Ra226,1,1
-5,1,Produce,Ra226,1,1
-5,1,Beef,Ra226,1,1
-5,1,Milk,Ra226,1,1
-5,1,Poultry,Ra226,1,1
-5,1,Egg,Ra226,1,1
-5,1,Fish,Ra226,1,1
-5,1,Total,Ra226,1,1
-6,1,External Gamma,Ra226,1,1
-6,1,Inhalation,Ra226,1,1
-6,1,Inhalation Vapor,Ra226,1,1
-6,1,Soil,Ra226,1,1
-6,1,Drinking Water,Ra226,1,1
-6,1,Produce,Ra226,1,1
-6,1,Beef,Ra226,1,1
-6,1,Milk,Ra226,1,1
-6,1,Poultry,Ra226,1,1
-6,1,Egg,Ra226,1,1
-6,1,Fish,Ra226,1,1
-6,1,Total,Ra226,1,1
-0,1,External Gamma,Re187,1,1
-0,1,Inhalation,Re187,1,1
-0,1,Inhalation Vapor,Re187,1,1
-0,1,Soil,Re187,1,1
-0,1,Drinking Water,Re187,1,1
-0,1,Produce,Re187,1,1
-0,1,Beef,Re187,1,1
-0,1,Milk,Re187,1,1
-0,1,Poultry,Re187,1,1
-0,1,Egg,Re187,1,1
-0,1,Fish,Re187,1,1
-0,1,Total,Re187,1,1
-1,1,External Gamma,Re187,1,1
-1,1,Inhalation,Re187,1,1
-1,1,Inhalation Vapor,Re187,1,1
-1,1,Soil,Re187,1,1
-1,1,Drinking Water,Re187,1,1
-1,1,Produce,Re187,1,1
-1,1,Beef,Re187,1,1
-1,1,Milk,Re187,1,1
-1,1,Poultry,Re187,1,1
-1,1,Egg,Re187,1,1
-1,1,Fish,Re187,1,1
-1,1,Total,Re187,1,1
-2,1,External Gamma,Re187,1,1
-2,1,Inhalation,Re187,1,1
-2,1,Inhalation Vapor,Re187,1,1
-2,1,Soil,Re187,1,1
-2,1,Drinking Water,Re187,1,1
-2,1,Produce,Re187,1,1
-2,1,Beef,Re187,1,1
-2,1,Milk,Re187,1,1
-2,1,Poultry,Re187,1,1
-2,1,Egg,Re187,1,1
-2,1,Fish,Re187,1,1
-2,1,Total,Re187,1,1
-3,1,External Gamma,Re187,1,1
-3,1,Inhalation,Re187,1,1
-3,1,Inhalation Vapor,Re187,1,1
-3,1,Soil,Re187,1,1
-3,1,Drinking Water,Re187,1,1
-3,1,Produce,Re187,1,1
-3,1,Beef,Re187,1,1
-3,1,Milk,Re187,1,1
-3,1,Poultry,Re187,1,1
-3,1,Egg,Re187,1,1
-3,1,Fish,Re187,1,1
-3,1,Total,Re187,1,1
-4,1,External Gamma,Re187,1,1
-4,1,Inhalation,Re187,1,1
-4,1,Inhalation Vapor,Re187,1,1
-4,1,Soil,Re187,1,1
-4,1,Drinking Water,Re187,1,1
-4,1,Produce,Re187,1,1
-4,1,Beef,Re187,1,1
-4,1,Milk,Re187,1,1
-4,1,Poultry,Re187,1,1
-4,1,Egg,Re187,1,1
-4,1,Fish,Re187,1,1
-4,1,Total,Re187,1,1
-5,1,External Gamma,Re187,1,1
-5,1,Inhalation,Re187,1,1
-5,1,Inhalation Vapor,Re187,1,1
-5,1,Soil,Re187,1,1
-5,1,Drinking Water,Re187,1,1
-5,1,Produce,Re187,1,1
-5,1,Beef,Re187,1,1
-5,1,Milk,Re187,1,1
-5,1,Poultry,Re187,1,1
-5,1,Egg,Re187,1,1
-5,1,Fish,Re187,1,1
-5,1,Total,Re187,1,1
-6,1,External Gamma,Re187,1,1
-6,1,Inhalation,Re187,1,1
-6,1,Inhalation Vapor,Re187,1,1
-6,1,Soil,Re187,1,1
-6,1,Drinking Water,Re187,1,1
-6,1,Produce,Re187,1,1
-6,1,Beef,Re187,1,1
-6,1,Milk,Re187,1,1
-6,1,Poultry,Re187,1,1
-6,1,Egg,Re187,1,1
-6,1,Fish,Re187,1,1
-6,1,Total,Re187,1,1
-0,1,External Gamma,Sr90,1,1
-0,1,Inhalation,Sr90,1,1
-0,1,Inhalation Vapor,Sr90,1,1
-0,1,Soil,Sr90,1,1
-0,1,Drinking Water,Sr90,1,1
-0,1,Produce,Sr90,1,1
-0,1,Beef,Sr90,1,1
-0,1,Milk,Sr90,1,1
-0,1,Poultry,Sr90,1,1
-0,1,Egg,Sr90,1,1
-0,1,Fish,Sr90,1,1
-0,1,Total,Sr90,1,1
-1,1,External Gamma,Sr90,1,1
-1,1,Inhalation,Sr90,1,1
-1,1,Inhalation Vapor,Sr90,1,1
-1,1,Soil,Sr90,1,1
-1,1,Drinking Water,Sr90,1,1
-1,1,Produce,Sr90,1,1
-1,1,Beef,Sr90,1,1
-1,1,Milk,Sr90,1,1
-1,1,Poultry,Sr90,1,1
-1,1,Egg,Sr90,1,1
-1,1,Fish,Sr90,1,1
-1,1,Total,Sr90,1,1
-2,1,External Gamma,Sr90,1,1
-2,1,Inhalation,Sr90,1,1
-2,1,Inhalation Vapor,Sr90,1,1
-2,1,Soil,Sr90,1,1
-2,1,Drinking Water,Sr90,1,1
-2,1,Produce,Sr90,1,1
-2,1,Beef,Sr90,1,1
-2,1,Milk,Sr90,1,1
-2,1,Poultry,Sr90,1,1
-2,1,Egg,Sr90,1,1
-2,1,Fish,Sr90,1,1
-2,1,Total,Sr90,1,1
-3,1,External Gamma,Sr90,1,1
-3,1,Inhalation,Sr90,1,1
-3,1,Inhalation Vapor,Sr90,1,1
-3,1,Soil,Sr90,1,1
-3,1,Drinking Water,Sr90,1,1
-3,1,Produce,Sr90,1,1
-3,1,Beef,Sr90,1,1
-3,1,Milk,Sr90,1,1
-3,1,Poultry,Sr90,1,1
-3,1,Egg,Sr90,1,1
-3,1,Fish,Sr90,1,1
-3,1,Total,Sr90,1,1
-4,1,External Gamma,Sr90,1,1
-4,1,Inhalation,Sr90,1,1
-4,1,Inhalation Vapor,Sr90,1,1
-4,1,Soil,Sr90,1,1
-4,1,Drinking Water,Sr90,1,1
-4,1,Produce,Sr90,1,1
-4,1,Beef,Sr90,1,1
-4,1,Milk,Sr90,1,1
-4,1,Poultry,Sr90,1,1
-4,1,Egg,Sr90,1,1
-4,1,Fish,Sr90,1,1
-4,1,Total,Sr90,1,1
-5,1,External Gamma,Sr90,1,1
-5,1,Inhalation,Sr90,1,1
-5,1,Inhalation Vapor,Sr90,1,1
-5,1,Soil,Sr90,1,1
-5,1,Drinking Water,Sr90,1,1
-5,1,Produce,Sr90,1,1
-5,1,Beef,Sr90,1,1
-5,1,Milk,Sr90,1,1
-5,1,Poultry,Sr90,1,1
-5,1,Egg,Sr90,1,1
-5,1,Fish,Sr90,1,1
-5,1,Total,Sr90,1,1
-6,1,External Gamma,Sr90,1,1
-6,1,Inhalation,Sr90,1,1
-6,1,Inhalation Vapor,Sr90,1,1
-6,1,Soil,Sr90,1,1
-6,1,Drinking Water,Sr90,1,1
-6,1,Produce,Sr90,1,1
-6,1,Beef,Sr90,1,1
-6,1,Milk,Sr90,1,1
-6,1,Poultry,Sr90,1,1
-6,1,Egg,Sr90,1,1
-6,1,Fish,Sr90,1,1
-6,1,Total,Sr90,1,1
-0,1,External Gamma,Tc99,1,1
-0,1,Inhalation,Tc99,1,1
-0,1,Inhalation Vapor,Tc99,1,1
-0,1,Soil,Tc99,1,1
-0,1,Drinking Water,Tc99,1,1
-0,1,Produce,Tc99,1,1
-0,1,Beef,Tc99,1,1
-0,1,Milk,Tc99,1,1
-0,1,Poultry,Tc99,1,1
-0,1,Egg,Tc99,1,1
-0,1,Fish,Tc99,1,1
-0,1,Total,Tc99,1,1
-1,1,External Gamma,Tc99,1,1
-1,1,Inhalation,Tc99,1,1
-1,1,Inhalation Vapor,Tc99,1,1
-1,1,Soil,Tc99,1,1
-1,1,Drinking Water,Tc99,1,1
-1,1,Produce,Tc99,1,1
-1,1,Beef,Tc99,1,1
-1,1,Milk,Tc99,1,1
-1,1,Poultry,Tc99,1,1
-1,1,Egg,Tc99,1,1
-1,1,Fish,Tc99,1,1
-1,1,Total,Tc99,1,1
-2,1,External Gamma,Tc99,1,1
-2,1,Inhalation,Tc99,1,1
-2,1,Inhalation Vapor,Tc99,1,1
-2,1,Soil,Tc99,1,1
-2,1,Drinking Water,Tc99,1,1
-2,1,Produce,Tc99,1,1
-2,1,Beef,Tc99,1,1
-2,1,Milk,Tc99,1,1
-2,1,Poultry,Tc99,1,1
-2,1,Egg,Tc99,1,1
-2,1,Fish,Tc99,1,1
-2,1,Total,Tc99,1,1
-3,1,External Gamma,Tc99,1,1
-3,1,Inhalation,Tc99,1,1
-3,1,Inhalation Vapor,Tc99,1,1
-3,1,Soil,Tc99,1,1
-3,1,Drinking Water,Tc99,1,1
-3,1,Produce,Tc99,1,1
-3,1,Beef,Tc99,1,1
-3,1,Milk,Tc99,1,1
-3,1,Poultry,Tc99,1,1
-3,1,Egg,Tc99,1,1
-3,1,Fish,Tc99,1,1
-3,1,Total,Tc99,1,1
-4,1,External Gamma,Tc99,1,1
-4,1,Inhalation,Tc99,1,1
-4,1,Inhalation Vapor,Tc99,1,1
-4,1,Soil,Tc99,1,1
-4,1,Drinking Water,Tc99,1,1
-4,1,Produce,Tc99,1,1
-4,1,Beef,Tc99,1,1
-4,1,Milk,Tc99,1,1
-4,1,Poultry,Tc99,1,1
-4,1,Egg,Tc99,1,1
-4,1,Fish,Tc99,1,1
-4,1,Total,Tc99,1,1
-5,1,External Gamma,Tc99,1,1
-5,1,Inhalation,Tc99,1,1
-5,1,Inhalation Vapor,Tc99,1,1
-5,1,Soil,Tc99,1,1
-5,1,Drinking Water,Tc99,1,1
-5,1,Produce,Tc99,1,1
-5,1,Beef,Tc99,1,1
-5,1,Milk,Tc99,1,1
-5,1,Poultry,Tc99,1,1
-5,1,Egg,Tc99,1,1
-5,1,Fish,Tc99,1,1
-5,1,Total,Tc99,1,1
-6,1,External Gamma,Tc99,1,1
-6,1,Inhalation,Tc99,1,1
-6,1,Inhalation Vapor,Tc99,1,1
-6,1,Soil,Tc99,1,1
-6,1,Drinking Water,Tc99,1,1
-6,1,Produce,Tc99,1,1
-6,1,Beef,Tc99,1,1
-6,1,Milk,Tc99,1,1
-6,1,Poultry,Tc99,1,1
-6,1,Egg,Tc99,1,1
-6,1,Fish,Tc99,1,1
-6,1,Total,Tc99,1,1
-0,1,External Gamma,Th230,1,1
-0,1,Inhalation,Th230,1,1
-0,1,Inhalation Vapor,Th230,1,1
-0,1,Soil,Th230,1,1
-0,1,Drinking Water,Th230,1,1
-0,1,Produce,Th230,1,1
-0,1,Beef,Th230,1,1
-0,1,Milk,Th230,1,1
-0,1,Poultry,Th230,1,1
-0,1,Egg,Th230,1,1
-0,1,Fish,Th230,1,1
-0,1,Total,Th230,1,1
-1,1,External Gamma,Th230,1,1
-1,1,Inhalation,Th230,1,1
-1,1,Inhalation Vapor,Th230,1,1
-1,1,Soil,Th230,1,1
-1,1,Drinking Water,Th230,1,1
-1,1,Produce,Th230,1,1
-1,1,Beef,Th230,1,1
-1,1,Milk,Th230,1,1
-1,1,Poultry,Th230,1,1
-1,1,Egg,Th230,1,1
-1,1,Fish,Th230,1,1
-1,1,Total,Th230,1,1
-2,1,External Gamma,Th230,1,1
-2,1,Inhalation,Th230,1,1
-2,1,Inhalation Vapor,Th230,1,1
-2,1,Soil,Th230,1,1
-2,1,Drinking Water,Th230,1,1
-2,1,Produce,Th230,1,1
-2,1,Beef,Th230,1,1
-2,1,Milk,Th230,1,1
-2,1,Poultry,Th230,1,1
-2,1,Egg,Th230,1,1
-2,1,Fish,Th230,1,1
-2,1,Total,Th230,1,1
-3,1,External Gamma,Th230,1,1
-3,1,Inhalation,Th230,1,1
-3,1,Inhalation Vapor,Th230,1,1
-3,1,Soil,Th230,1,1
-3,1,Drinking Water,Th230,1,1
-3,1,Produce,Th230,1,1
-3,1,Beef,Th230,1,1
-3,1,Milk,Th230,1,1
-3,1,Poultry,Th230,1,1
-3,1,Egg,Th230,1,1
-3,1,Fish,Th230,1,1
-3,1,Total,Th230,1,1
-4,1,External Gamma,Th230,1,1
-4,1,Inhalation,Th230,1,1
-4,1,Inhalation Vapor,Th230,1,1
-4,1,Soil,Th230,1,1
-4,1,Drinking Water,Th230,1,1
-4,1,Produce,Th230,1,1
-4,1,Beef,Th230,1,1
-4,1,Milk,Th230,1,1
-4,1,Poultry,Th230,1,1
-4,1,Egg,Th230,1,1
-4,1,Fish,Th230,1,1
-4,1,Total,Th230,1,1
-5,1,External Gamma,Th230,1,1
-5,1,Inhalation,Th230,1,1
-5,1,Inhalation Vapor,Th230,1,1
-5,1,Soil,Th230,1,1
-5,1,Drinking Water,Th230,1,1
-5,1,Produce,Th230,1,1
-5,1,Beef,Th230,1,1
-5,1,Milk,Th230,1,1
-5,1,Poultry,Th230,1,1
-5,1,Egg,Th230,1,1
-5,1,Fish,Th230,1,1
-5,1,Total,Th230,1,1
-6,1,External Gamma,Th230,1,1
-6,1,Inhalation,Th230,1,1
-6,1,Inhalation Vapor,Th230,1,1
-6,1,Soil,Th230,1,1
-6,1,Drinking Water,Th230,1,1
-6,1,Produce,Th230,1,1
-6,1,Beef,Th230,1,1
-6,1,Milk,Th230,1,1
-6,1,Poultry,Th230,1,1
-6,1,Egg,Th230,1,1
-6,1,Fish,Th230,1,1
-6,1,Total,Th230,1,1
-0,1,External Gamma,U232,1,1
-0,1,Inhalation,U232,1,1
-0,1,Inhalation Vapor,U232,1,1
-0,1,Soil,U232,1,1
-0,1,Drinking Water,U232,1,1
-0,1,Produce,U232,1,1
-0,1,Beef,U232,1,1
-0,1,Milk,U232,1,1
-0,1,Poultry,U232,1,1
-0,1,Egg,U232,1,1
-0,1,Fish,U232,1,1
-0,1,Total,U232,1,1
-1,1,External Gamma,U232,1,1
-1,1,Inhalation,U232,1,1
-1,1,Inhalation Vapor,U232,1,1
-1,1,Soil,U232,1,1
-1,1,Drinking Water,U232,1,1
-1,1,Produce,U232,1,1
-1,1,Beef,U232,1,1
-1,1,Milk,U232,1,1
-1,1,Poultry,U232,1,1
-1,1,Egg,U232,1,1
-1,1,Fish,U232,1,1
-1,1,Total,U232,1,1
-2,1,External Gamma,U232,1,1
-2,1,Inhalation,U232,1,1
-2,1,Inhalation Vapor,U232,1,1
-2,1,Soil,U232,1,1
-2,1,Drinking Water,U232,1,1
-2,1,Produce,U232,1,1
-2,1,Beef,U232,1,1
-2,1,Milk,U232,1,1
-2,1,Poultry,U232,1,1
-2,1,Egg,U232,1,1
-2,1,Fish,U232,1,1
-2,1,Total,U232,1,1
-3,1,External Gamma,U232,1,1
-3,1,Inhalation,U232,1,1
-3,1,Inhalation Vapor,U232,1,1
-3,1,Soil,U232,1,1
-3,1,Drinking Water,U232,1,1
-3,1,Produce,U232,1,1
-3,1,Beef,U232,1,1
-3,1,Milk,U232,1,1
-3,1,Poultry,U232,1,1
-3,1,Egg,U232,1,1
-3,1,Fish,U232,1,1
-3,1,Total,U232,1,1
-4,1,External Gamma,U232,1,1
-4,1,Inhalation,U232,1,1
-4,1,Inhalation Vapor,U232,1,1
-4,1,Soil,U232,1,1
-4,1,Drinking Water,U232,1,1
-4,1,Produce,U232,1,1
-4,1,Beef,U232,1,1
-4,1,Milk,U232,1,1
-4,1,Poultry,U232,1,1
-4,1,Egg,U232,1,1
-4,1,Fish,U232,1,1
-4,1,Total,U232,1,1
-5,1,External Gamma,U232,1,1
-5,1,Inhalation,U232,1,1
-5,1,Inhalation Vapor,U232,1,1
-5,1,Soil,U232,1,1
-5,1,Drinking Water,U232,1,1
-5,1,Produce,U232,1,1
-5,1,Beef,U232,1,1
-5,1,Milk,U232,1,1
-5,1,Poultry,U232,1,1
-5,1,Egg,U232,1,1
-5,1,Fish,U232,1,1
-5,1,Total,U232,1,1
-6,1,External Gamma,U232,1,1
-6,1,Inhalation,U232,1,1
-6,1,Inhalation Vapor,U232,1,1
-6,1,Soil,U232,1,1
-6,1,Drinking Water,U232,1,1
-6,1,Produce,U232,1,1
-6,1,Beef,U232,1,1
-6,1,Milk,U232,1,1
-6,1,Poultry,U232,1,1
-6,1,Egg,U232,1,1
-6,1,Fish,U232,1,1
-6,1,Total,U232,1,1
-0,1,External Gamma,U233,1,1
-0,1,Inhalation,U233,1,1
-0,1,Inhalation Vapor,U233,1,1
-0,1,Soil,U233,1,1
-0,1,Drinking Water,U233,1,1
-0,1,Produce,U233,1,1
-0,1,Beef,U233,1,1
-0,1,Milk,U233,1,1
-0,1,Poultry,U233,1,1
-0,1,Egg,U233,1,1
-0,1,Fish,U233,1,1
-0,1,Total,U233,1,1
-1,1,External Gamma,U233,1,1
-1,1,Inhalation,U233,1,1
-1,1,Inhalation Vapor,U233,1,1
-1,1,Soil,U233,1,1
-1,1,Drinking Water,U233,1,1
-1,1,Produce,U233,1,1
-1,1,Beef,U233,1,1
-1,1,Milk,U233,1,1
-1,1,Poultry,U233,1,1
-1,1,Egg,U233,1,1
-1,1,Fish,U233,1,1
-1,1,Total,U233,1,1
-2,1,External Gamma,U233,1,1
-2,1,Inhalation,U233,1,1
-2,1,Inhalation Vapor,U233,1,1
-2,1,Soil,U233,1,1
-2,1,Drinking Water,U233,1,1
-2,1,Produce,U233,1,1
-2,1,Beef,U233,1,1
-2,1,Milk,U233,1,1
-2,1,Poultry,U233,1,1
-2,1,Egg,U233,1,1
-2,1,Fish,U233,1,1
-2,1,Total,U233,1,1
-3,1,External Gamma,U233,1,1
-3,1,Inhalation,U233,1,1
-3,1,Inhalation Vapor,U233,1,1
-3,1,Soil,U233,1,1
-3,1,Drinking Water,U233,1,1
-3,1,Produce,U233,1,1
-3,1,Beef,U233,1,1
-3,1,Milk,U233,1,1
-3,1,Poultry,U233,1,1
-3,1,Egg,U233,1,1
-3,1,Fish,U233,1,1
-3,1,Total,U233,1,1
-4,1,External Gamma,U233,1,1
-4,1,Inhalation,U233,1,1
-4,1,Inhalation Vapor,U233,1,1
-4,1,Soil,U233,1,1
-4,1,Drinking Water,U233,1,1
-4,1,Produce,U233,1,1
-4,1,Beef,U233,1,1
-4,1,Milk,U233,1,1
-4,1,Poultry,U233,1,1
-4,1,Egg,U233,1,1
-4,1,Fish,U233,1,1
-4,1,Total,U233,1,1
-5,1,External Gamma,U233,1,1
-5,1,Inhalation,U233,1,1
-5,1,Inhalation Vapor,U233,1,1
-5,1,Soil,U233,1,1
-5,1,Drinking Water,U233,1,1
-5,1,Produce,U233,1,1
-5,1,Beef,U233,1,1
-5,1,Milk,U233,1,1
-5,1,Poultry,U233,1,1
-5,1,Egg,U233,1,1
-5,1,Fish,U233,1,1
-5,1,Total,U233,1,1
-6,1,External Gamma,U233,1,1
-6,1,Inhalation,U233,1,1
-6,1,Inhalation Vapor,U233,1,1
-6,1,Soil,U233,1,1
-6,1,Drinking Water,U233,1,1
-6,1,Produce,U233,1,1
-6,1,Beef,U233,1,1
-6,1,Milk,U233,1,1
-6,1,Poultry,U233,1,1
-6,1,Egg,U233,1,1
-6,1,Fish,U233,1,1
-6,1,Total,U233,1,1
-0,1,External Gamma,U234,1,1
-0,1,Inhalation,U234,1,1
-0,1,Inhalation Vapor,U234,1,1
-0,1,Soil,U234,1,1
-0,1,Drinking Water,U234,1,1
-0,1,Produce,U234,1,1
-0,1,Beef,U234,1,1
-0,1,Milk,U234,1,1
-0,1,Poultry,U234,1,1
-0,1,Egg,U234,1,1
-0,1,Fish,U234,1,1
-0,1,Total,U234,1,1
-1,1,External Gamma,U234,1,1
-1,1,Inhalation,U234,1,1
-1,1,Inhalation Vapor,U234,1,1
-1,1,Soil,U234,1,1
-1,1,Drinking Water,U234,1,1
-1,1,Produce,U234,1,1
-1,1,Beef,U234,1,1
-1,1,Milk,U234,1,1
-1,1,Poultry,U234,1,1
-1,1,Egg,U234,1,1
-1,1,Fish,U234,1,1
-1,1,Total,U234,1,1
-2,1,External Gamma,U234,1,1
-2,1,Inhalation,U234,1,1
-2,1,Inhalation Vapor,U234,1,1
-2,1,Soil,U234,1,1
-2,1,Drinking Water,U234,1,1
-2,1,Produce,U234,1,1
-2,1,Beef,U234,1,1
-2,1,Milk,U234,1,1
-2,1,Poultry,U234,1,1
-2,1,Egg,U234,1,1
-2,1,Fish,U234,1,1
-2,1,Total,U234,1,1
-3,1,External Gamma,U234,1,1
-3,1,Inhalation,U234,1,1
-3,1,Inhalation Vapor,U234,1,1
-3,1,Soil,U234,1,1
-3,1,Drinking Water,U234,1,1
-3,1,Produce,U234,1,1
-3,1,Beef,U234,1,1
-3,1,Milk,U234,1,1
-3,1,Poultry,U234,1,1
-3,1,Egg,U234,1,1
-3,1,Fish,U234,1,1
-3,1,Total,U234,1,1
-4,1,External Gamma,U234,1,1
-4,1,Inhalation,U234,1,1
-4,1,Inhalation Vapor,U234,1,1
-4,1,Soil,U234,1,1
-4,1,Drinking Water,U234,1,1
-4,1,Produce,U234,1,1
-4,1,Beef,U234,1,1
-4,1,Milk,U234,1,1
-4,1,Poultry,U234,1,1
-4,1,Egg,U234,1,1
-4,1,Fish,U234,1,1
-4,1,Total,U234,1,1
-5,1,External Gamma,U234,1,1
-5,1,Inhalation,U234,1,1
-5,1,Inhalation Vapor,U234,1,1
-5,1,Soil,U234,1,1
-5,1,Drinking Water,U234,1,1
-5,1,Produce,U234,1,1
-5,1,Beef,U234,1,1
-5,1,Milk,U234,1,1
-5,1,Poultry,U234,1,1
-5,1,Egg,U234,1,1
-5,1,Fish,U234,1,1
-5,1,Total,U234,1,1
-6,1,External Gamma,U234,1,1
-6,1,Inhalation,U234,1,1
-6,1,Inhalation Vapor,U234,1,1
-6,1,Soil,U234,1,1
-6,1,Drinking Water,U234,1,1
-6,1,Produce,U234,1,1
-6,1,Beef,U234,1,1
-6,1,Milk,U234,1,1
-6,1,Poultry,U234,1,1
-6,1,Egg,U234,1,1
-6,1,Fish,U234,1,1
-6,1,Total,U234,1,1
-0,1,External Gamma,U235,1,1
-0,1,Inhalation,U235,1,1
-0,1,Inhalation Vapor,U235,1,1
-0,1,Soil,U235,1,1
-0,1,Drinking Water,U235,1,1
-0,1,Produce,U235,1,1
-0,1,Beef,U235,1,1
-0,1,Milk,U235,1,1
-0,1,Poultry,U235,1,1
-0,1,Egg,U235,1,1
-0,1,Fish,U235,1,1
-0,1,Total,U235,1,1
-1,1,External Gamma,U235,1,1
-1,1,Inhalation,U235,1,1
-1,1,Inhalation Vapor,U235,1,1
-1,1,Soil,U235,1,1
-1,1,Drinking Water,U235,1,1
-1,1,Produce,U235,1,1
-1,1,Beef,U235,1,1
-1,1,Milk,U235,1,1
-1,1,Poultry,U235,1,1
-1,1,Egg,U235,1,1
-1,1,Fish,U235,1,1
-1,1,Total,U235,1,1
-2,1,External Gamma,U235,1,1
-2,1,Inhalation,U235,1,1
-2,1,Inhalation Vapor,U235,1,1
-2,1,Soil,U235,1,1
-2,1,Drinking Water,U235,1,1
-2,1,Produce,U235,1,1
-2,1,Beef,U235,1,1
-2,1,Milk,U235,1,1
-2,1,Poultry,U235,1,1
-2,1,Egg,U235,1,1
-2,1,Fish,U235,1,1
-2,1,Total,U235,1,1
-3,1,External Gamma,U235,1,1
-3,1,Inhalation,U235,1,1
-3,1,Inhalation Vapor,U235,1,1
-3,1,Soil,U235,1,1
-3,1,Drinking Water,U235,1,1
-3,1,Produce,U235,1,1
-3,1,Beef,U235,1,1
-3,1,Milk,U235,1,1
-3,1,Poultry,U235,1,1
-3,1,Egg,U235,1,1
-3,1,Fish,U235,1,1
-3,1,Total,U235,1,1
-4,1,External Gamma,U235,1,1
-4,1,Inhalation,U235,1,1
-4,1,Inhalation Vapor,U235,1,1
-4,1,Soil,U235,1,1
-4,1,Drinking Water,U235,1,1
-4,1,Produce,U235,1,1
-4,1,Beef,U235,1,1
-4,1,Milk,U235,1,1
-4,1,Poultry,U235,1,1
-4,1,Egg,U235,1,1
-4,1,Fish,U235,1,1
-4,1,Total,U235,1,1
-5,1,External Gamma,U235,1,1
-5,1,Inhalation,U235,1,1
-5,1,Inhalation Vapor,U235,1,1
-5,1,Soil,U235,1,1
-5,1,Drinking Water,U235,1,1
-5,1,Produce,U235,1,1
-5,1,Beef,U235,1,1
-5,1,Milk,U235,1,1
-5,1,Poultry,U235,1,1
-5,1,Egg,U235,1,1
-5,1,Fish,U235,1,1
-5,1,Total,U235,1,1
-6,1,External Gamma,U235,1,1
-6,1,Inhalation,U235,1,1
-6,1,Inhalation Vapor,U235,1,1
-6,1,Soil,U235,1,1
-6,1,Drinking Water,U235,1,1
-6,1,Produce,U235,1,1
-6,1,Beef,U235,1,1
-6,1,Milk,U235,1,1
-6,1,Poultry,U235,1,1
-6,1,Egg,U235,1,1
-6,1,Fish,U235,1,1
-6,1,Total,U235,1,1
-0,1,External Gamma,U236,1,1
-0,1,Inhalation,U236,1,1
-0,1,Inhalation Vapor,U236,1,1
-0,1,Soil,U236,1,1
-0,1,Drinking Water,U236,1,1
-0,1,Produce,U236,1,1
-0,1,Beef,U236,1,1
-0,1,Milk,U236,1,1
-0,1,Poultry,U236,1,1
-0,1,Egg,U236,1,1
-0,1,Fish,U236,1,1
-0,1,Total,U236,1,1
-1,1,External Gamma,U236,1,1
-1,1,Inhalation,U236,1,1
-1,1,Inhalation Vapor,U236,1,1
-1,1,Soil,U236,1,1
-1,1,Drinking Water,U236,1,1
-1,1,Produce,U236,1,1
-1,1,Beef,U236,1,1
-1,1,Milk,U236,1,1
-1,1,Poultry,U236,1,1
-1,1,Egg,U236,1,1
-1,1,Fish,U236,1,1
-1,1,Total,U236,1,1
-2,1,External Gamma,U236,1,1
-2,1,Inhalation,U236,1,1
-2,1,Inhalation Vapor,U236,1,1
-2,1,Soil,U236,1,1
-2,1,Drinking Water,U236,1,1
-2,1,Produce,U236,1,1
-2,1,Beef,U236,1,1
-2,1,Milk,U236,1,1
-2,1,Poultry,U236,1,1
-2,1,Egg,U236,1,1
-2,1,Fish,U236,1,1
-2,1,Total,U236,1,1
-3,1,External Gamma,U236,1,1
-3,1,Inhalation,U236,1,1
-3,1,Inhalation Vapor,U236,1,1
-3,1,Soil,U236,1,1
-3,1,Drinking Water,U236,1,1
-3,1,Produce,U236,1,1
-3,1,Beef,U236,1,1
-3,1,Milk,U236,1,1
-3,1,Poultry,U236,1,1
-3,1,Egg,U236,1,1
-3,1,Fish,U236,1,1
-3,1,Total,U236,1,1
-4,1,External Gamma,U236,1,1
-4,1,Inhalation,U236,1,1
-4,1,Inhalation Vapor,U236,1,1
-4,1,Soil,U236,1,1
-4,1,Drinking Water,U236,1,1
-4,1,Produce,U236,1,1
-4,1,Beef,U236,1,1
-4,1,Milk,U236,1,1
-4,1,Poultry,U236,1,1
-4,1,Egg,U236,1,1
-4,1,Fish,U236,1,1
-4,1,Total,U236,1,1
-5,1,External Gamma,U236,1,1
-5,1,Inhalation,U236,1,1
-5,1,Inhalation Vapor,U236,1,1
-5,1,Soil,U236,1,1
-5,1,Drinking Water,U236,1,1
-5,1,Produce,U236,1,1
-5,1,Beef,U236,1,1
-5,1,Milk,U236,1,1
-5,1,Poultry,U236,1,1
-5,1,Egg,U236,1,1
-5,1,Fish,U236,1,1
-5,1,Total,U236,1,1
-6,1,External Gamma,U236,1,1
-6,1,Inhalation,U236,1,1
-6,1,Inhalation Vapor,U236,1,1
-6,1,Soil,U236,1,1
-6,1,Drinking Water,U236,1,1
-6,1,Produce,U236,1,1
-6,1,Beef,U236,1,1
-6,1,Milk,U236,1,1
-6,1,Poultry,U236,1,1
-6,1,Egg,U236,1,1
-6,1,Fish,U236,1,1
-6,1,Total,U236,1,1
-0,1,External Gamma,U238,1,1
-0,1,Inhalation,U238,1,1
-0,1,Inhalation Vapor,U238,1,1
-0,1,Soil,U238,1,1
-0,1,Drinking Water,U238,1,1
-0,1,Produce,U238,1,1
-0,1,Beef,U238,1,1
-0,1,Milk,U238,1,1
-0,1,Poultry,U238,1,1
-0,1,Egg,U238,1,1
-0,1,Fish,U238,1,1
-0,1,Total,U238,1,1
-1,1,External Gamma,U238,1,1
-1,1,Inhalation,U238,1,1
-1,1,Inhalation Vapor,U238,1,1
-1,1,Soil,U238,1,1
-1,1,Drinking Water,U238,1,1
-1,1,Produce,U238,1,1
-1,1,Beef,U238,1,1
-1,1,Milk,U238,1,1
-1,1,Poultry,U238,1,1
-1,1,Egg,U238,1,1
-1,1,Fish,U238,1,1
-1,1,Total,U238,1,1
-2,1,External Gamma,U238,1,1
-2,1,Inhalation,U238,1,1
-2,1,Inhalation Vapor,U238,1,1
-2,1,Soil,U238,1,1
-2,1,Drinking Water,U238,1,1
-2,1,Produce,U238,1,1
-2,1,Beef,U238,1,1
-2,1,Milk,U238,1,1
-2,1,Poultry,U238,1,1
-2,1,Egg,U238,1,1
-2,1,Fish,U238,1,1
-2,1,Total,U238,1,1
-3,1,External Gamma,U238,1,1
-3,1,Inhalation,U238,1,1
-3,1,Inhalation Vapor,U238,1,1
-3,1,Soil,U238,1,1
-3,1,Drinking Water,U238,1,1
-3,1,Produce,U238,1,1
-3,1,Beef,U238,1,1
-3,1,Milk,U238,1,1
-3,1,Poultry,U238,1,1
-3,1,Egg,U238,1,1
-3,1,Fish,U238,1,1
-3,1,Total,U238,1,1
-4,1,External Gamma,U238,1,1
-4,1,Inhalation,U238,1,1
-4,1,Inhalation Vapor,U238,1,1
-4,1,Soil,U238,1,1
-4,1,Drinking Water,U238,1,1
-4,1,Produce,U238,1,1
-4,1,Beef,U238,1,1
-4,1,Milk,U238,1,1
-4,1,Poultry,U238,1,1
-4,1,Egg,U238,1,1
-4,1,Fish,U238,1,1
-4,1,Total,U238,1,1
-5,1,External Gamma,U238,1,1
-5,1,Inhalation,U238,1,1
-5,1,Inhalation Vapor,U238,1,1
-5,1,Soil,U238,1,1
-5,1,Drinking Water,U238,1,1
-5,1,Produce,U238,1,1
-5,1,Beef,U238,1,1
-5,1,Milk,U238,1,1
-5,1,Poultry,U238,1,1
-5,1,Egg,U238,1,1
-5,1,Fish,U238,1,1
-5,1,Total,U238,1,1
-6,1,External Gamma,U238,1,1
-6,1,Inhalation,U238,1,1
-6,1,Inhalation Vapor,U238,1,1
-6,1,Soil,U238,1,1
-6,1,Drinking Water,U238,1,1
-6,1,Produce,U238,1,1
-6,1,Beef,U238,1,1
-6,1,Milk,U238,1,1
-6,1,Poultry,U238,1,1
-6,1,Egg,U238,1,1
-6,1,Fish,U238,1,1
-6,1,Total,U238,1,1
+SOIL_INDEX,SOIL_CATEGORY,COPC,Pathway,Dose Factor
+0,none,C14,External Gamma,0.5
+0,none,C14,Inhalation,0.5
+0,none,C14,Inhalation Vapor,0.5
+0,none,C14,Soil,0.5
+0,none,C14,Drinking Water,0.5
+0,none,C14,Produce,0.5
+0,none,C14,Beef,0.5
+0,none,C14,Milk,0.5
+0,none,C14,Poultry,0.5
+0,none,C14,Egg,0.5
+0,none,C14,Total without Fish,0.5
+1,Rupert Sand,C14,External Gamma,0.5
+1,Rupert Sand,C14,Inhalation,0.5
+1,Rupert Sand,C14,Inhalation Vapor,0.5
+1,Rupert Sand,C14,Soil,0.5
+1,Rupert Sand,C14,Drinking Water,0.5
+1,Rupert Sand,C14,Produce,0.5
+1,Rupert Sand,C14,Beef,0.5
+1,Rupert Sand,C14,Milk,0.5
+1,Rupert Sand,C14,Poultry,0.5
+1,Rupert Sand,C14,Egg,0.5
+1,Rupert Sand,C14,Total without Fish,0.5
+2,Koehler Sand,C14,External Gamma,0.5
+2,Koehler Sand,C14,Inhalation,0.5
+2,Koehler Sand,C14,Inhalation Vapor,0.5
+2,Koehler Sand,C14,Soil,0.5
+2,Koehler Sand,C14,Drinking Water,0.5
+2,Koehler Sand,C14,Produce,0.5
+2,Koehler Sand,C14,Beef,0.5
+2,Koehler Sand,C14,Milk,0.5
+2,Koehler Sand,C14,Poultry,0.5
+2,Koehler Sand,C14,Egg,0.5
+2,Koehler Sand,C14,Total without Fish,0.5
+3,Dune Sand,C14,External Gamma,0.5
+3,Dune Sand,C14,Inhalation,0.5
+3,Dune Sand,C14,Inhalation Vapor,0.5
+3,Dune Sand,C14,Soil,0.5
+3,Dune Sand,C14,Drinking Water,0.5
+3,Dune Sand,C14,Produce,0.5
+3,Dune Sand,C14,Beef,0.5
+3,Dune Sand,C14,Milk,0.5
+3,Dune Sand,C14,Poultry,0.5
+3,Dune Sand,C14,Egg,0.5
+3,Dune Sand,C14,Total without Fish,0.5
+4,Burbank Loamy Sand,C14,External Gamma,0.5
+4,Burbank Loamy Sand,C14,Inhalation,0.5
+4,Burbank Loamy Sand,C14,Inhalation Vapor,0.5
+4,Burbank Loamy Sand,C14,Soil,0.5
+4,Burbank Loamy Sand,C14,Drinking Water,0.5
+4,Burbank Loamy Sand,C14,Produce,0.5
+4,Burbank Loamy Sand,C14,Beef,0.5
+4,Burbank Loamy Sand,C14,Milk,0.5
+4,Burbank Loamy Sand,C14,Poultry,0.5
+4,Burbank Loamy Sand,C14,Egg,0.5
+4,Burbank Loamy Sand,C14,Total without Fish,0.5
+5,Ephrate Sandy Loam,C14,External Gamma,0.5
+5,Ephrate Sandy Loam,C14,Inhalation,0.5
+5,Ephrate Sandy Loam,C14,Inhalation Vapor,0.5
+5,Ephrate Sandy Loam,C14,Soil,0.5
+5,Ephrate Sandy Loam,C14,Drinking Water,0.5
+5,Ephrate Sandy Loam,C14,Produce,0.5
+5,Ephrate Sandy Loam,C14,Beef,0.5
+5,Ephrate Sandy Loam,C14,Milk,0.5
+5,Ephrate Sandy Loam,C14,Poultry,0.5
+5,Ephrate Sandy Loam,C14,Egg,0.5
+5,Ephrate Sandy Loam,C14,Total without Fish,0.5
+6,Kiona Silt Loam,C14,External Gamma,0.5
+6,Kiona Silt Loam,C14,Inhalation,0.5
+6,Kiona Silt Loam,C14,Inhalation Vapor,0.5
+6,Kiona Silt Loam,C14,Soil,0.5
+6,Kiona Silt Loam,C14,Drinking Water,0.5
+6,Kiona Silt Loam,C14,Produce,0.5
+6,Kiona Silt Loam,C14,Beef,0.5
+6,Kiona Silt Loam,C14,Milk,0.5
+6,Kiona Silt Loam,C14,Poultry,0.5
+6,Kiona Silt Loam,C14,Egg,0.5
+6,Kiona Silt Loam,C14,Total without Fish,0.5
+0,none,Cl36,External Gamma,0.5
+0,none,Cl36,Inhalation,0.5
+0,none,Cl36,Inhalation Vapor,0.5
+0,none,Cl36,Soil,0.5
+0,none,Cl36,Drinking Water,0.5
+0,none,Cl36,Produce,0.5
+0,none,Cl36,Beef,0.5
+0,none,Cl36,Milk,0.5
+0,none,Cl36,Poultry,0.5
+0,none,Cl36,Egg,0.5
+0,none,Cl36,Total without Fish,0.5
+1,Rupert Sand,Cl36,External Gamma,0.5
+1,Rupert Sand,Cl36,Inhalation,0.5
+1,Rupert Sand,Cl36,Inhalation Vapor,0.5
+1,Rupert Sand,Cl36,Soil,0.5
+1,Rupert Sand,Cl36,Drinking Water,0.5
+1,Rupert Sand,Cl36,Produce,0.5
+1,Rupert Sand,Cl36,Beef,0.5
+1,Rupert Sand,Cl36,Milk,0.5
+1,Rupert Sand,Cl36,Poultry,0.5
+1,Rupert Sand,Cl36,Egg,0.5
+1,Rupert Sand,Cl36,Total without Fish,0.5
+2,Koehler Sand,Cl36,External Gamma,0.5
+2,Koehler Sand,Cl36,Inhalation,0.5
+2,Koehler Sand,Cl36,Inhalation Vapor,0.5
+2,Koehler Sand,Cl36,Soil,0.5
+2,Koehler Sand,Cl36,Drinking Water,0.5
+2,Koehler Sand,Cl36,Produce,0.5
+2,Koehler Sand,Cl36,Beef,0.5
+2,Koehler Sand,Cl36,Milk,0.5
+2,Koehler Sand,Cl36,Poultry,0.5
+2,Koehler Sand,Cl36,Egg,0.5
+2,Koehler Sand,Cl36,Total without Fish,0.5
+3,Dune Sand,Cl36,External Gamma,0.5
+3,Dune Sand,Cl36,Inhalation,0.5
+3,Dune Sand,Cl36,Inhalation Vapor,0.5
+3,Dune Sand,Cl36,Soil,0.5
+3,Dune Sand,Cl36,Drinking Water,0.5
+3,Dune Sand,Cl36,Produce,0.5
+3,Dune Sand,Cl36,Beef,0.5
+3,Dune Sand,Cl36,Milk,0.5
+3,Dune Sand,Cl36,Poultry,0.5
+3,Dune Sand,Cl36,Egg,0.5
+3,Dune Sand,Cl36,Total without Fish,0.5
+4,Burbank Loamy Sand,Cl36,External Gamma,0.5
+4,Burbank Loamy Sand,Cl36,Inhalation,0.5
+4,Burbank Loamy Sand,Cl36,Inhalation Vapor,0.5
+4,Burbank Loamy Sand,Cl36,Soil,0.5
+4,Burbank Loamy Sand,Cl36,Drinking Water,0.5
+4,Burbank Loamy Sand,Cl36,Produce,0.5
+4,Burbank Loamy Sand,Cl36,Beef,0.5
+4,Burbank Loamy Sand,Cl36,Milk,0.5
+4,Burbank Loamy Sand,Cl36,Poultry,0.5
+4,Burbank Loamy Sand,Cl36,Egg,0.5
+4,Burbank Loamy Sand,Cl36,Total without Fish,0.5
+5,Ephrate Sandy Loam,Cl36,External Gamma,0.5
+5,Ephrate Sandy Loam,Cl36,Inhalation,0.5
+5,Ephrate Sandy Loam,Cl36,Inhalation Vapor,0.5
+5,Ephrate Sandy Loam,Cl36,Soil,0.5
+5,Ephrate Sandy Loam,Cl36,Drinking Water,0.5
+5,Ephrate Sandy Loam,Cl36,Produce,0.5
+5,Ephrate Sandy Loam,Cl36,Beef,0.5
+5,Ephrate Sandy Loam,Cl36,Milk,0.5
+5,Ephrate Sandy Loam,Cl36,Poultry,0.5
+5,Ephrate Sandy Loam,Cl36,Egg,0.5
+5,Ephrate Sandy Loam,Cl36,Total without Fish,0.5
+6,Kiona Silt Loam,Cl36,External Gamma,0.5
+6,Kiona Silt Loam,Cl36,Inhalation,0.5
+6,Kiona Silt Loam,Cl36,Inhalation Vapor,0.5
+6,Kiona Silt Loam,Cl36,Soil,0.5
+6,Kiona Silt Loam,Cl36,Drinking Water,0.5
+6,Kiona Silt Loam,Cl36,Produce,0.5
+6,Kiona Silt Loam,Cl36,Beef,0.5
+6,Kiona Silt Loam,Cl36,Milk,0.5
+6,Kiona Silt Loam,Cl36,Poultry,0.5
+6,Kiona Silt Loam,Cl36,Egg,0.5
+6,Kiona Silt Loam,Cl36,Total without Fish,0.5
+0,none,H3,External Gamma,0.5
+0,none,H3,Inhalation,0.5
+0,none,H3,Inhalation Vapor,0.5
+0,none,H3,Soil,0.5
+0,none,H3,Drinking Water,0.5
+0,none,H3,Produce,0.5
+0,none,H3,Beef,0.5
+0,none,H3,Milk,0.5
+0,none,H3,Poultry,0.5
+0,none,H3,Egg,0.5
+0,none,H3,Total without Fish,0.5
+1,Rupert Sand,H3,External Gamma,0.5
+1,Rupert Sand,H3,Inhalation,0.5
+1,Rupert Sand,H3,Inhalation Vapor,0.5
+1,Rupert Sand,H3,Soil,0.5
+1,Rupert Sand,H3,Drinking Water,0.5
+1,Rupert Sand,H3,Produce,0.5
+1,Rupert Sand,H3,Beef,0.5
+1,Rupert Sand,H3,Milk,0.5
+1,Rupert Sand,H3,Poultry,0.5
+1,Rupert Sand,H3,Egg,0.5
+1,Rupert Sand,H3,Total without Fish,0.5
+2,Koehler Sand,H3,External Gamma,0.5
+2,Koehler Sand,H3,Inhalation,0.5
+2,Koehler Sand,H3,Inhalation Vapor,0.5
+2,Koehler Sand,H3,Soil,0.5
+2,Koehler Sand,H3,Drinking Water,0.5
+2,Koehler Sand,H3,Produce,0.5
+2,Koehler Sand,H3,Beef,0.5
+2,Koehler Sand,H3,Milk,0.5
+2,Koehler Sand,H3,Poultry,0.5
+2,Koehler Sand,H3,Egg,0.5
+2,Koehler Sand,H3,Total without Fish,0.5
+3,Dune Sand,H3,External Gamma,0.5
+3,Dune Sand,H3,Inhalation,0.5
+3,Dune Sand,H3,Inhalation Vapor,0.5
+3,Dune Sand,H3,Soil,0.5
+3,Dune Sand,H3,Drinking Water,0.5
+3,Dune Sand,H3,Produce,0.5
+3,Dune Sand,H3,Beef,0.5
+3,Dune Sand,H3,Milk,0.5
+3,Dune Sand,H3,Poultry,0.5
+3,Dune Sand,H3,Egg,0.5
+3,Dune Sand,H3,Total without Fish,0.5
+4,Burbank Loamy Sand,H3,External Gamma,0.5
+4,Burbank Loamy Sand,H3,Inhalation,0.5
+4,Burbank Loamy Sand,H3,Inhalation Vapor,0.5
+4,Burbank Loamy Sand,H3,Soil,0.5
+4,Burbank Loamy Sand,H3,Drinking Water,0.5
+4,Burbank Loamy Sand,H3,Produce,0.5
+4,Burbank Loamy Sand,H3,Beef,0.5
+4,Burbank Loamy Sand,H3,Milk,0.5
+4,Burbank Loamy Sand,H3,Poultry,0.5
+4,Burbank Loamy Sand,H3,Egg,0.5
+4,Burbank Loamy Sand,H3,Total without Fish,0.5
+5,Ephrate Sandy Loam,H3,External Gamma,0.5
+5,Ephrate Sandy Loam,H3,Inhalation,0.5
+5,Ephrate Sandy Loam,H3,Inhalation Vapor,0.5
+5,Ephrate Sandy Loam,H3,Soil,0.5
+5,Ephrate Sandy Loam,H3,Drinking Water,0.5
+5,Ephrate Sandy Loam,H3,Produce,0.5
+5,Ephrate Sandy Loam,H3,Beef,0.5
+5,Ephrate Sandy Loam,H3,Milk,0.5
+5,Ephrate Sandy Loam,H3,Poultry,0.5
+5,Ephrate Sandy Loam,H3,Egg,0.5
+5,Ephrate Sandy Loam,H3,Total without Fish,0.5
+6,Kiona Silt Loam,H3,External Gamma,0.5
+6,Kiona Silt Loam,H3,Inhalation,0.5
+6,Kiona Silt Loam,H3,Inhalation Vapor,0.5
+6,Kiona Silt Loam,H3,Soil,0.5
+6,Kiona Silt Loam,H3,Drinking Water,0.5
+6,Kiona Silt Loam,H3,Produce,0.5
+6,Kiona Silt Loam,H3,Beef,0.5
+6,Kiona Silt Loam,H3,Milk,0.5
+6,Kiona Silt Loam,H3,Poultry,0.5
+6,Kiona Silt Loam,H3,Egg,0.5
+6,Kiona Silt Loam,H3,Total without Fish,0.5
+0,none,I129,External Gamma,0.5
+0,none,I129,Inhalation,0.5
+0,none,I129,Inhalation Vapor,0.5
+0,none,I129,Soil,0.5
+0,none,I129,Drinking Water,0.5
+0,none,I129,Produce,0.5
+0,none,I129,Beef,0.5
+0,none,I129,Milk,0.5
+0,none,I129,Poultry,0.5
+0,none,I129,Egg,0.5
+0,none,I129,Total without Fish,0.5
+1,Rupert Sand,I129,External Gamma,0.5
+1,Rupert Sand,I129,Inhalation,0.5
+1,Rupert Sand,I129,Inhalation Vapor,0.5
+1,Rupert Sand,I129,Soil,0.5
+1,Rupert Sand,I129,Drinking Water,0.5
+1,Rupert Sand,I129,Produce,0.5
+1,Rupert Sand,I129,Beef,0.5
+1,Rupert Sand,I129,Milk,0.5
+1,Rupert Sand,I129,Poultry,0.5
+1,Rupert Sand,I129,Egg,0.5
+1,Rupert Sand,I129,Total without Fish,0.5
+2,Koehler Sand,I129,External Gamma,0.5
+2,Koehler Sand,I129,Inhalation,0.5
+2,Koehler Sand,I129,Inhalation Vapor,0.5
+2,Koehler Sand,I129,Soil,0.5
+2,Koehler Sand,I129,Drinking Water,0.5
+2,Koehler Sand,I129,Produce,0.5
+2,Koehler Sand,I129,Beef,0.5
+2,Koehler Sand,I129,Milk,0.5
+2,Koehler Sand,I129,Poultry,0.5
+2,Koehler Sand,I129,Egg,0.5
+2,Koehler Sand,I129,Total without Fish,0.5
+3,Dune Sand,I129,External Gamma,0.5
+3,Dune Sand,I129,Inhalation,0.5
+3,Dune Sand,I129,Inhalation Vapor,0.5
+3,Dune Sand,I129,Soil,0.5
+3,Dune Sand,I129,Drinking Water,0.5
+3,Dune Sand,I129,Produce,0.5
+3,Dune Sand,I129,Beef,0.5
+3,Dune Sand,I129,Milk,0.5
+3,Dune Sand,I129,Poultry,0.5
+3,Dune Sand,I129,Egg,0.5
+3,Dune Sand,I129,Total without Fish,0.5
+4,Burbank Loamy Sand,I129,External Gamma,0.5
+4,Burbank Loamy Sand,I129,Inhalation,0.5
+4,Burbank Loamy Sand,I129,Inhalation Vapor,0.5
+4,Burbank Loamy Sand,I129,Soil,0.5
+4,Burbank Loamy Sand,I129,Drinking Water,0.5
+4,Burbank Loamy Sand,I129,Produce,0.5
+4,Burbank Loamy Sand,I129,Beef,0.5
+4,Burbank Loamy Sand,I129,Milk,0.5
+4,Burbank Loamy Sand,I129,Poultry,0.5
+4,Burbank Loamy Sand,I129,Egg,0.5
+4,Burbank Loamy Sand,I129,Total without Fish,0.5
+5,Ephrate Sandy Loam,I129,External Gamma,0.5
+5,Ephrate Sandy Loam,I129,Inhalation,0.5
+5,Ephrate Sandy Loam,I129,Inhalation Vapor,0.5
+5,Ephrate Sandy Loam,I129,Soil,0.5
+5,Ephrate Sandy Loam,I129,Drinking Water,0.5
+5,Ephrate Sandy Loam,I129,Produce,0.5
+5,Ephrate Sandy Loam,I129,Beef,0.5
+5,Ephrate Sandy Loam,I129,Milk,0.5
+5,Ephrate Sandy Loam,I129,Poultry,0.5
+5,Ephrate Sandy Loam,I129,Egg,0.5
+5,Ephrate Sandy Loam,I129,Total without Fish,0.5
+6,Kiona Silt Loam,I129,External Gamma,0.5
+6,Kiona Silt Loam,I129,Inhalation,0.5
+6,Kiona Silt Loam,I129,Inhalation Vapor,0.5
+6,Kiona Silt Loam,I129,Soil,0.5
+6,Kiona Silt Loam,I129,Drinking Water,0.5
+6,Kiona Silt Loam,I129,Produce,0.5
+6,Kiona Silt Loam,I129,Beef,0.5
+6,Kiona Silt Loam,I129,Milk,0.5
+6,Kiona Silt Loam,I129,Poultry,0.5
+6,Kiona Silt Loam,I129,Egg,0.5
+6,Kiona Silt Loam,I129,Total without Fish,0.5
+0,none,Np237,External Gamma,0.5
+0,none,Np237,Inhalation,0.5
+0,none,Np237,Inhalation Vapor,0.5
+0,none,Np237,Soil,0.5
+0,none,Np237,Drinking Water,0.5
+0,none,Np237,Produce,0.5
+0,none,Np237,Beef,0.5
+0,none,Np237,Milk,0.5
+0,none,Np237,Poultry,0.5
+0,none,Np237,Egg,0.5
+0,none,Np237,Total without Fish,0.5
+1,Rupert Sand,Np237,External Gamma,0.5
+1,Rupert Sand,Np237,Inhalation,0.5
+1,Rupert Sand,Np237,Inhalation Vapor,0.5
+1,Rupert Sand,Np237,Soil,0.5
+1,Rupert Sand,Np237,Drinking Water,0.5
+1,Rupert Sand,Np237,Produce,0.5
+1,Rupert Sand,Np237,Beef,0.5
+1,Rupert Sand,Np237,Milk,0.5
+1,Rupert Sand,Np237,Poultry,0.5
+1,Rupert Sand,Np237,Egg,0.5
+1,Rupert Sand,Np237,Total without Fish,0.5
+2,Koehler Sand,Np237,External Gamma,0.5
+2,Koehler Sand,Np237,Inhalation,0.5
+2,Koehler Sand,Np237,Inhalation Vapor,0.5
+2,Koehler Sand,Np237,Soil,0.5
+2,Koehler Sand,Np237,Drinking Water,0.5
+2,Koehler Sand,Np237,Produce,0.5
+2,Koehler Sand,Np237,Beef,0.5
+2,Koehler Sand,Np237,Milk,0.5
+2,Koehler Sand,Np237,Poultry,0.5
+2,Koehler Sand,Np237,Egg,0.5
+2,Koehler Sand,Np237,Total without Fish,0.5
+3,Dune Sand,Np237,External Gamma,0.5
+3,Dune Sand,Np237,Inhalation,0.5
+3,Dune Sand,Np237,Inhalation Vapor,0.5
+3,Dune Sand,Np237,Soil,0.5
+3,Dune Sand,Np237,Drinking Water,0.5
+3,Dune Sand,Np237,Produce,0.5
+3,Dune Sand,Np237,Beef,0.5
+3,Dune Sand,Np237,Milk,0.5
+3,Dune Sand,Np237,Poultry,0.5
+3,Dune Sand,Np237,Egg,0.5
+3,Dune Sand,Np237,Total without Fish,0.5
+4,Burbank Loamy Sand,Np237,External Gamma,0.5
+4,Burbank Loamy Sand,Np237,Inhalation,0.5
+4,Burbank Loamy Sand,Np237,Inhalation Vapor,0.5
+4,Burbank Loamy Sand,Np237,Soil,0.5
+4,Burbank Loamy Sand,Np237,Drinking Water,0.5
+4,Burbank Loamy Sand,Np237,Produce,0.5
+4,Burbank Loamy Sand,Np237,Beef,0.5
+4,Burbank Loamy Sand,Np237,Milk,0.5
+4,Burbank Loamy Sand,Np237,Poultry,0.5
+4,Burbank Loamy Sand,Np237,Egg,0.5
+4,Burbank Loamy Sand,Np237,Total without Fish,0.5
+5,Ephrate Sandy Loam,Np237,External Gamma,0.5
+5,Ephrate Sandy Loam,Np237,Inhalation,0.5
+5,Ephrate Sandy Loam,Np237,Inhalation Vapor,0.5
+5,Ephrate Sandy Loam,Np237,Soil,0.5
+5,Ephrate Sandy Loam,Np237,Drinking Water,0.5
+5,Ephrate Sandy Loam,Np237,Produce,0.5
+5,Ephrate Sandy Loam,Np237,Beef,0.5
+5,Ephrate Sandy Loam,Np237,Milk,0.5
+5,Ephrate Sandy Loam,Np237,Poultry,0.5
+5,Ephrate Sandy Loam,Np237,Egg,0.5
+5,Ephrate Sandy Loam,Np237,Total without Fish,0.5
+6,Kiona Silt Loam,Np237,External Gamma,0.5
+6,Kiona Silt Loam,Np237,Inhalation,0.5
+6,Kiona Silt Loam,Np237,Inhalation Vapor,0.5
+6,Kiona Silt Loam,Np237,Soil,0.5
+6,Kiona Silt Loam,Np237,Drinking Water,0.5
+6,Kiona Silt Loam,Np237,Produce,0.5
+6,Kiona Silt Loam,Np237,Beef,0.5
+6,Kiona Silt Loam,Np237,Milk,0.5
+6,Kiona Silt Loam,Np237,Poultry,0.5
+6,Kiona Silt Loam,Np237,Egg,0.5
+6,Kiona Silt Loam,Np237,Total without Fish,0.5
+0,none,Ra226,External Gamma,0.5
+0,none,Ra226,Inhalation,0.5
+0,none,Ra226,Inhalation Vapor,0.5
+0,none,Ra226,Soil,0.5
+0,none,Ra226,Drinking Water,0.5
+0,none,Ra226,Produce,0.5
+0,none,Ra226,Beef,0.5
+0,none,Ra226,Milk,0.5
+0,none,Ra226,Poultry,0.5
+0,none,Ra226,Egg,0.5
+0,none,Ra226,Total without Fish,0.5
+1,Rupert Sand,Ra226,External Gamma,0.5
+1,Rupert Sand,Ra226,Inhalation,0.5
+1,Rupert Sand,Ra226,Inhalation Vapor,0.5
+1,Rupert Sand,Ra226,Soil,0.5
+1,Rupert Sand,Ra226,Drinking Water,0.5
+1,Rupert Sand,Ra226,Produce,0.5
+1,Rupert Sand,Ra226,Beef,0.5
+1,Rupert Sand,Ra226,Milk,0.5
+1,Rupert Sand,Ra226,Poultry,0.5
+1,Rupert Sand,Ra226,Egg,0.5
+1,Rupert Sand,Ra226,Total without Fish,0.5
+2,Koehler Sand,Ra226,External Gamma,0.5
+2,Koehler Sand,Ra226,Inhalation,0.5
+2,Koehler Sand,Ra226,Inhalation Vapor,0.5
+2,Koehler Sand,Ra226,Soil,0.5
+2,Koehler Sand,Ra226,Drinking Water,0.5
+2,Koehler Sand,Ra226,Produce,0.5
+2,Koehler Sand,Ra226,Beef,0.5
+2,Koehler Sand,Ra226,Milk,0.5
+2,Koehler Sand,Ra226,Poultry,0.5
+2,Koehler Sand,Ra226,Egg,0.5
+2,Koehler Sand,Ra226,Total without Fish,0.5
+3,Dune Sand,Ra226,External Gamma,0.5
+3,Dune Sand,Ra226,Inhalation,0.5
+3,Dune Sand,Ra226,Inhalation Vapor,0.5
+3,Dune Sand,Ra226,Soil,0.5
+3,Dune Sand,Ra226,Drinking Water,0.5
+3,Dune Sand,Ra226,Produce,0.5
+3,Dune Sand,Ra226,Beef,0.5
+3,Dune Sand,Ra226,Milk,0.5
+3,Dune Sand,Ra226,Poultry,0.5
+3,Dune Sand,Ra226,Egg,0.5
+3,Dune Sand,Ra226,Total without Fish,0.5
+4,Burbank Loamy Sand,Ra226,External Gamma,0.5
+4,Burbank Loamy Sand,Ra226,Inhalation,0.5
+4,Burbank Loamy Sand,Ra226,Inhalation Vapor,0.5
+4,Burbank Loamy Sand,Ra226,Soil,0.5
+4,Burbank Loamy Sand,Ra226,Drinking Water,0.5
+4,Burbank Loamy Sand,Ra226,Produce,0.5
+4,Burbank Loamy Sand,Ra226,Beef,0.5
+4,Burbank Loamy Sand,Ra226,Milk,0.5
+4,Burbank Loamy Sand,Ra226,Poultry,0.5
+4,Burbank Loamy Sand,Ra226,Egg,0.5
+4,Burbank Loamy Sand,Ra226,Total without Fish,0.5
+5,Ephrate Sandy Loam,Ra226,External Gamma,0.5
+5,Ephrate Sandy Loam,Ra226,Inhalation,0.5
+5,Ephrate Sandy Loam,Ra226,Inhalation Vapor,0.5
+5,Ephrate Sandy Loam,Ra226,Soil,0.5
+5,Ephrate Sandy Loam,Ra226,Drinking Water,0.5
+5,Ephrate Sandy Loam,Ra226,Produce,0.5
+5,Ephrate Sandy Loam,Ra226,Beef,0.5
+5,Ephrate Sandy Loam,Ra226,Milk,0.5
+5,Ephrate Sandy Loam,Ra226,Poultry,0.5
+5,Ephrate Sandy Loam,Ra226,Egg,0.5
+5,Ephrate Sandy Loam,Ra226,Total without Fish,0.5
+6,Kiona Silt Loam,Ra226,External Gamma,0.5
+6,Kiona Silt Loam,Ra226,Inhalation,0.5
+6,Kiona Silt Loam,Ra226,Inhalation Vapor,0.5
+6,Kiona Silt Loam,Ra226,Soil,0.5
+6,Kiona Silt Loam,Ra226,Drinking Water,0.5
+6,Kiona Silt Loam,Ra226,Produce,0.5
+6,Kiona Silt Loam,Ra226,Beef,0.5
+6,Kiona Silt Loam,Ra226,Milk,0.5
+6,Kiona Silt Loam,Ra226,Poultry,0.5
+6,Kiona Silt Loam,Ra226,Egg,0.5
+6,Kiona Silt Loam,Ra226,Total without Fish,0.5
+0,none,Re187,External Gamma,0.5
+0,none,Re187,Inhalation,0.5
+0,none,Re187,Inhalation Vapor,0.5
+0,none,Re187,Soil,0.5
+0,none,Re187,Drinking Water,0.5
+0,none,Re187,Produce,0.5
+0,none,Re187,Beef,0.5
+0,none,Re187,Milk,0.5
+0,none,Re187,Poultry,0.5
+0,none,Re187,Egg,0.5
+0,none,Re187,Total without Fish,0.5
+1,Rupert Sand,Re187,External Gamma,0.5
+1,Rupert Sand,Re187,Inhalation,0.5
+1,Rupert Sand,Re187,Inhalation Vapor,0.5
+1,Rupert Sand,Re187,Soil,0.5
+1,Rupert Sand,Re187,Drinking Water,0.5
+1,Rupert Sand,Re187,Produce,0.5
+1,Rupert Sand,Re187,Beef,0.5
+1,Rupert Sand,Re187,Milk,0.5
+1,Rupert Sand,Re187,Poultry,0.5
+1,Rupert Sand,Re187,Egg,0.5
+1,Rupert Sand,Re187,Total without Fish,0.5
+2,Koehler Sand,Re187,External Gamma,0.5
+2,Koehler Sand,Re187,Inhalation,0.5
+2,Koehler Sand,Re187,Inhalation Vapor,0.5
+2,Koehler Sand,Re187,Soil,0.5
+2,Koehler Sand,Re187,Drinking Water,0.5
+2,Koehler Sand,Re187,Produce,0.5
+2,Koehler Sand,Re187,Beef,0.5
+2,Koehler Sand,Re187,Milk,0.5
+2,Koehler Sand,Re187,Poultry,0.5
+2,Koehler Sand,Re187,Egg,0.5
+2,Koehler Sand,Re187,Total without Fish,0.5
+3,Dune Sand,Re187,External Gamma,0.5
+3,Dune Sand,Re187,Inhalation,0.5
+3,Dune Sand,Re187,Inhalation Vapor,0.5
+3,Dune Sand,Re187,Soil,0.5
+3,Dune Sand,Re187,Drinking Water,0.5
+3,Dune Sand,Re187,Produce,0.5
+3,Dune Sand,Re187,Beef,0.5
+3,Dune Sand,Re187,Milk,0.5
+3,Dune Sand,Re187,Poultry,0.5
+3,Dune Sand,Re187,Egg,0.5
+3,Dune Sand,Re187,Total without Fish,0.5
+4,Burbank Loamy Sand,Re187,External Gamma,0.5
+4,Burbank Loamy Sand,Re187,Inhalation,0.5
+4,Burbank Loamy Sand,Re187,Inhalation Vapor,0.5
+4,Burbank Loamy Sand,Re187,Soil,0.5
+4,Burbank Loamy Sand,Re187,Drinking Water,0.5
+4,Burbank Loamy Sand,Re187,Produce,0.5
+4,Burbank Loamy Sand,Re187,Beef,0.5
+4,Burbank Loamy Sand,Re187,Milk,0.5
+4,Burbank Loamy Sand,Re187,Poultry,0.5
+4,Burbank Loamy Sand,Re187,Egg,0.5
+4,Burbank Loamy Sand,Re187,Total without Fish,0.5
+5,Ephrate Sandy Loam,Re187,External Gamma,0.5
+5,Ephrate Sandy Loam,Re187,Inhalation,0.5
+5,Ephrate Sandy Loam,Re187,Inhalation Vapor,0.5
+5,Ephrate Sandy Loam,Re187,Soil,0.5
+5,Ephrate Sandy Loam,Re187,Drinking Water,0.5
+5,Ephrate Sandy Loam,Re187,Produce,0.5
+5,Ephrate Sandy Loam,Re187,Beef,0.5
+5,Ephrate Sandy Loam,Re187,Milk,0.5
+5,Ephrate Sandy Loam,Re187,Poultry,0.5
+5,Ephrate Sandy Loam,Re187,Egg,0.5
+5,Ephrate Sandy Loam,Re187,Total without Fish,0.5
+6,Kiona Silt Loam,Re187,External Gamma,0.5
+6,Kiona Silt Loam,Re187,Inhalation,0.5
+6,Kiona Silt Loam,Re187,Inhalation Vapor,0.5
+6,Kiona Silt Loam,Re187,Soil,0.5
+6,Kiona Silt Loam,Re187,Drinking Water,0.5
+6,Kiona Silt Loam,Re187,Produce,0.5
+6,Kiona Silt Loam,Re187,Beef,0.5
+6,Kiona Silt Loam,Re187,Milk,0.5
+6,Kiona Silt Loam,Re187,Poultry,0.5
+6,Kiona Silt Loam,Re187,Egg,0.5
+6,Kiona Silt Loam,Re187,Total without Fish,0.5
+0,none,Sr90,External Gamma,0.5
+0,none,Sr90,Inhalation,0.5
+0,none,Sr90,Inhalation Vapor,0.5
+0,none,Sr90,Soil,0.5
+0,none,Sr90,Drinking Water,0.5
+0,none,Sr90,Produce,0.5
+0,none,Sr90,Beef,0.5
+0,none,Sr90,Milk,0.5
+0,none,Sr90,Poultry,0.5
+0,none,Sr90,Egg,0.5
+0,none,Sr90,Total without Fish,0.5
+1,Rupert Sand,Sr90,External Gamma,0.5
+1,Rupert Sand,Sr90,Inhalation,0.5
+1,Rupert Sand,Sr90,Inhalation Vapor,0.5
+1,Rupert Sand,Sr90,Soil,0.5
+1,Rupert Sand,Sr90,Drinking Water,0.5
+1,Rupert Sand,Sr90,Produce,0.5
+1,Rupert Sand,Sr90,Beef,0.5
+1,Rupert Sand,Sr90,Milk,0.5
+1,Rupert Sand,Sr90,Poultry,0.5
+1,Rupert Sand,Sr90,Egg,0.5
+1,Rupert Sand,Sr90,Total without Fish,0.5
+2,Koehler Sand,Sr90,External Gamma,0.5
+2,Koehler Sand,Sr90,Inhalation,0.5
+2,Koehler Sand,Sr90,Inhalation Vapor,0.5
+2,Koehler Sand,Sr90,Soil,0.5
+2,Koehler Sand,Sr90,Drinking Water,0.5
+2,Koehler Sand,Sr90,Produce,0.5
+2,Koehler Sand,Sr90,Beef,0.5
+2,Koehler Sand,Sr90,Milk,0.5
+2,Koehler Sand,Sr90,Poultry,0.5
+2,Koehler Sand,Sr90,Egg,0.5
+2,Koehler Sand,Sr90,Total without Fish,0.5
+3,Dune Sand,Sr90,External Gamma,0.5
+3,Dune Sand,Sr90,Inhalation,0.5
+3,Dune Sand,Sr90,Inhalation Vapor,0.5
+3,Dune Sand,Sr90,Soil,0.5
+3,Dune Sand,Sr90,Drinking Water,0.5
+3,Dune Sand,Sr90,Produce,0.5
+3,Dune Sand,Sr90,Beef,0.5
+3,Dune Sand,Sr90,Milk,0.5
+3,Dune Sand,Sr90,Poultry,0.5
+3,Dune Sand,Sr90,Egg,0.5
+3,Dune Sand,Sr90,Total without Fish,0.5
+4,Burbank Loamy Sand,Sr90,External Gamma,0.5
+4,Burbank Loamy Sand,Sr90,Inhalation,0.5
+4,Burbank Loamy Sand,Sr90,Inhalation Vapor,0.5
+4,Burbank Loamy Sand,Sr90,Soil,0.5
+4,Burbank Loamy Sand,Sr90,Drinking Water,0.5
+4,Burbank Loamy Sand,Sr90,Produce,0.5
+4,Burbank Loamy Sand,Sr90,Beef,0.5
+4,Burbank Loamy Sand,Sr90,Milk,0.5
+4,Burbank Loamy Sand,Sr90,Poultry,0.5
+4,Burbank Loamy Sand,Sr90,Egg,0.5
+4,Burbank Loamy Sand,Sr90,Total without Fish,0.5
+5,Ephrate Sandy Loam,Sr90,External Gamma,0.5
+5,Ephrate Sandy Loam,Sr90,Inhalation,0.5
+5,Ephrate Sandy Loam,Sr90,Inhalation Vapor,0.5
+5,Ephrate Sandy Loam,Sr90,Soil,0.5
+5,Ephrate Sandy Loam,Sr90,Drinking Water,0.5
+5,Ephrate Sandy Loam,Sr90,Produce,0.5
+5,Ephrate Sandy Loam,Sr90,Beef,0.5
+5,Ephrate Sandy Loam,Sr90,Milk,0.5
+5,Ephrate Sandy Loam,Sr90,Poultry,0.5
+5,Ephrate Sandy Loam,Sr90,Egg,0.5
+5,Ephrate Sandy Loam,Sr90,Total without Fish,0.5
+6,Kiona Silt Loam,Sr90,External Gamma,0.5
+6,Kiona Silt Loam,Sr90,Inhalation,0.5
+6,Kiona Silt Loam,Sr90,Inhalation Vapor,0.5
+6,Kiona Silt Loam,Sr90,Soil,0.5
+6,Kiona Silt Loam,Sr90,Drinking Water,0.5
+6,Kiona Silt Loam,Sr90,Produce,0.5
+6,Kiona Silt Loam,Sr90,Beef,0.5
+6,Kiona Silt Loam,Sr90,Milk,0.5
+6,Kiona Silt Loam,Sr90,Poultry,0.5
+6,Kiona Silt Loam,Sr90,Egg,0.5
+6,Kiona Silt Loam,Sr90,Total without Fish,0.5
+0,none,Tc99,External Gamma,0.5
+0,none,Tc99,Inhalation,0.5
+0,none,Tc99,Inhalation Vapor,0.5
+0,none,Tc99,Soil,0.5
+0,none,Tc99,Drinking Water,0.5
+0,none,Tc99,Produce,0.5
+0,none,Tc99,Beef,0.5
+0,none,Tc99,Milk,0.5
+0,none,Tc99,Poultry,0.5
+0,none,Tc99,Egg,0.5
+0,none,Tc99,Total without Fish,0.5
+1,Rupert Sand,Tc99,External Gamma,0.5
+1,Rupert Sand,Tc99,Inhalation,0.5
+1,Rupert Sand,Tc99,Inhalation Vapor,0.5
+1,Rupert Sand,Tc99,Soil,0.5
+1,Rupert Sand,Tc99,Drinking Water,0.5
+1,Rupert Sand,Tc99,Produce,0.5
+1,Rupert Sand,Tc99,Beef,0.5
+1,Rupert Sand,Tc99,Milk,0.5
+1,Rupert Sand,Tc99,Poultry,0.5
+1,Rupert Sand,Tc99,Egg,0.5
+1,Rupert Sand,Tc99,Total without Fish,0.5
+2,Koehler Sand,Tc99,External Gamma,0.5
+2,Koehler Sand,Tc99,Inhalation,0.5
+2,Koehler Sand,Tc99,Inhalation Vapor,0.5
+2,Koehler Sand,Tc99,Soil,0.5
+2,Koehler Sand,Tc99,Drinking Water,0.5
+2,Koehler Sand,Tc99,Produce,0.5
+2,Koehler Sand,Tc99,Beef,0.5
+2,Koehler Sand,Tc99,Milk,0.5
+2,Koehler Sand,Tc99,Poultry,0.5
+2,Koehler Sand,Tc99,Egg,0.5
+2,Koehler Sand,Tc99,Total without Fish,0.5
+3,Dune Sand,Tc99,External Gamma,0.5
+3,Dune Sand,Tc99,Inhalation,0.5
+3,Dune Sand,Tc99,Inhalation Vapor,0.5
+3,Dune Sand,Tc99,Soil,0.5
+3,Dune Sand,Tc99,Drinking Water,0.5
+3,Dune Sand,Tc99,Produce,0.5
+3,Dune Sand,Tc99,Beef,0.5
+3,Dune Sand,Tc99,Milk,0.5
+3,Dune Sand,Tc99,Poultry,0.5
+3,Dune Sand,Tc99,Egg,0.5
+3,Dune Sand,Tc99,Total without Fish,0.5
+4,Burbank Loamy Sand,Tc99,External Gamma,0.5
+4,Burbank Loamy Sand,Tc99,Inhalation,0.5
+4,Burbank Loamy Sand,Tc99,Inhalation Vapor,0.5
+4,Burbank Loamy Sand,Tc99,Soil,0.5
+4,Burbank Loamy Sand,Tc99,Drinking Water,0.5
+4,Burbank Loamy Sand,Tc99,Produce,0.5
+4,Burbank Loamy Sand,Tc99,Beef,0.5
+4,Burbank Loamy Sand,Tc99,Milk,0.5
+4,Burbank Loamy Sand,Tc99,Poultry,0.5
+4,Burbank Loamy Sand,Tc99,Egg,0.5
+4,Burbank Loamy Sand,Tc99,Total without Fish,0.5
+5,Ephrate Sandy Loam,Tc99,External Gamma,0.5
+5,Ephrate Sandy Loam,Tc99,Inhalation,0.5
+5,Ephrate Sandy Loam,Tc99,Inhalation Vapor,0.5
+5,Ephrate Sandy Loam,Tc99,Soil,0.5
+5,Ephrate Sandy Loam,Tc99,Drinking Water,0.5
+5,Ephrate Sandy Loam,Tc99,Produce,0.5
+5,Ephrate Sandy Loam,Tc99,Beef,0.5
+5,Ephrate Sandy Loam,Tc99,Milk,0.5
+5,Ephrate Sandy Loam,Tc99,Poultry,0.5
+5,Ephrate Sandy Loam,Tc99,Egg,0.5
+5,Ephrate Sandy Loam,Tc99,Total without Fish,0.5
+6,Kiona Silt Loam,Tc99,External Gamma,0.5
+6,Kiona Silt Loam,Tc99,Inhalation,0.5
+6,Kiona Silt Loam,Tc99,Inhalation Vapor,0.5
+6,Kiona Silt Loam,Tc99,Soil,0.5
+6,Kiona Silt Loam,Tc99,Drinking Water,0.5
+6,Kiona Silt Loam,Tc99,Produce,0.5
+6,Kiona Silt Loam,Tc99,Beef,0.5
+6,Kiona Silt Loam,Tc99,Milk,0.5
+6,Kiona Silt Loam,Tc99,Poultry,0.5
+6,Kiona Silt Loam,Tc99,Egg,0.5
+6,Kiona Silt Loam,Tc99,Total without Fish,0.5
+0,none,Th230,External Gamma,0.5
+0,none,Th230,Inhalation,0.5
+0,none,Th230,Inhalation Vapor,0.5
+0,none,Th230,Soil,0.5
+0,none,Th230,Drinking Water,0.5
+0,none,Th230,Produce,0.5
+0,none,Th230,Beef,0.5
+0,none,Th230,Milk,0.5
+0,none,Th230,Poultry,0.5
+0,none,Th230,Egg,0.5
+0,none,Th230,Total without Fish,0.5
+1,Rupert Sand,Th230,External Gamma,0.5
+1,Rupert Sand,Th230,Inhalation,0.5
+1,Rupert Sand,Th230,Inhalation Vapor,0.5
+1,Rupert Sand,Th230,Soil,0.5
+1,Rupert Sand,Th230,Drinking Water,0.5
+1,Rupert Sand,Th230,Produce,0.5
+1,Rupert Sand,Th230,Beef,0.5
+1,Rupert Sand,Th230,Milk,0.5
+1,Rupert Sand,Th230,Poultry,0.5
+1,Rupert Sand,Th230,Egg,0.5
+1,Rupert Sand,Th230,Total without Fish,0.5
+2,Koehler Sand,Th230,External Gamma,0.5
+2,Koehler Sand,Th230,Inhalation,0.5
+2,Koehler Sand,Th230,Inhalation Vapor,0.5
+2,Koehler Sand,Th230,Soil,0.5
+2,Koehler Sand,Th230,Drinking Water,0.5
+2,Koehler Sand,Th230,Produce,0.5
+2,Koehler Sand,Th230,Beef,0.5
+2,Koehler Sand,Th230,Milk,0.5
+2,Koehler Sand,Th230,Poultry,0.5
+2,Koehler Sand,Th230,Egg,0.5
+2,Koehler Sand,Th230,Total without Fish,0.5
+3,Dune Sand,Th230,External Gamma,0.5
+3,Dune Sand,Th230,Inhalation,0.5
+3,Dune Sand,Th230,Inhalation Vapor,0.5
+3,Dune Sand,Th230,Soil,0.5
+3,Dune Sand,Th230,Drinking Water,0.5
+3,Dune Sand,Th230,Produce,0.5
+3,Dune Sand,Th230,Beef,0.5
+3,Dune Sand,Th230,Milk,0.5
+3,Dune Sand,Th230,Poultry,0.5
+3,Dune Sand,Th230,Egg,0.5
+3,Dune Sand,Th230,Total without Fish,0.5
+4,Burbank Loamy Sand,Th230,External Gamma,0.5
+4,Burbank Loamy Sand,Th230,Inhalation,0.5
+4,Burbank Loamy Sand,Th230,Inhalation Vapor,0.5
+4,Burbank Loamy Sand,Th230,Soil,0.5
+4,Burbank Loamy Sand,Th230,Drinking Water,0.5
+4,Burbank Loamy Sand,Th230,Produce,0.5
+4,Burbank Loamy Sand,Th230,Beef,0.5
+4,Burbank Loamy Sand,Th230,Milk,0.5
+4,Burbank Loamy Sand,Th230,Poultry,0.5
+4,Burbank Loamy Sand,Th230,Egg,0.5
+4,Burbank Loamy Sand,Th230,Total without Fish,0.5
+5,Ephrate Sandy Loam,Th230,External Gamma,0.5
+5,Ephrate Sandy Loam,Th230,Inhalation,0.5
+5,Ephrate Sandy Loam,Th230,Inhalation Vapor,0.5
+5,Ephrate Sandy Loam,Th230,Soil,0.5
+5,Ephrate Sandy Loam,Th230,Drinking Water,0.5
+5,Ephrate Sandy Loam,Th230,Produce,0.5
+5,Ephrate Sandy Loam,Th230,Beef,0.5
+5,Ephrate Sandy Loam,Th230,Milk,0.5
+5,Ephrate Sandy Loam,Th230,Poultry,0.5
+5,Ephrate Sandy Loam,Th230,Egg,0.5
+5,Ephrate Sandy Loam,Th230,Total without Fish,0.5
+6,Kiona Silt Loam,Th230,External Gamma,0.5
+6,Kiona Silt Loam,Th230,Inhalation,0.5
+6,Kiona Silt Loam,Th230,Inhalation Vapor,0.5
+6,Kiona Silt Loam,Th230,Soil,0.5
+6,Kiona Silt Loam,Th230,Drinking Water,0.5
+6,Kiona Silt Loam,Th230,Produce,0.5
+6,Kiona Silt Loam,Th230,Beef,0.5
+6,Kiona Silt Loam,Th230,Milk,0.5
+6,Kiona Silt Loam,Th230,Poultry,0.5
+6,Kiona Silt Loam,Th230,Egg,0.5
+6,Kiona Silt Loam,Th230,Total without Fish,0.5
+0,none,U232,External Gamma,0.5
+0,none,U232,Inhalation,0.5
+0,none,U232,Inhalation Vapor,0.5
+0,none,U232,Soil,0.5
+0,none,U232,Drinking Water,0.5
+0,none,U232,Produce,0.5
+0,none,U232,Beef,0.5
+0,none,U232,Milk,0.5
+0,none,U232,Poultry,0.5
+0,none,U232,Egg,0.5
+0,none,U232,Total without Fish,0.5
+1,Rupert Sand,U232,External Gamma,0.5
+1,Rupert Sand,U232,Inhalation,0.5
+1,Rupert Sand,U232,Inhalation Vapor,0.5
+1,Rupert Sand,U232,Soil,0.5
+1,Rupert Sand,U232,Drinking Water,0.5
+1,Rupert Sand,U232,Produce,0.5
+1,Rupert Sand,U232,Beef,0.5
+1,Rupert Sand,U232,Milk,0.5
+1,Rupert Sand,U232,Poultry,0.5
+1,Rupert Sand,U232,Egg,0.5
+1,Rupert Sand,U232,Total without Fish,0.5
+2,Koehler Sand,U232,External Gamma,0.5
+2,Koehler Sand,U232,Inhalation,0.5
+2,Koehler Sand,U232,Inhalation Vapor,0.5
+2,Koehler Sand,U232,Soil,0.5
+2,Koehler Sand,U232,Drinking Water,0.5
+2,Koehler Sand,U232,Produce,0.5
+2,Koehler Sand,U232,Beef,0.5
+2,Koehler Sand,U232,Milk,0.5
+2,Koehler Sand,U232,Poultry,0.5
+2,Koehler Sand,U232,Egg,0.5
+2,Koehler Sand,U232,Total without Fish,0.5
+3,Dune Sand,U232,External Gamma,0.5
+3,Dune Sand,U232,Inhalation,0.5
+3,Dune Sand,U232,Inhalation Vapor,0.5
+3,Dune Sand,U232,Soil,0.5
+3,Dune Sand,U232,Drinking Water,0.5
+3,Dune Sand,U232,Produce,0.5
+3,Dune Sand,U232,Beef,0.5
+3,Dune Sand,U232,Milk,0.5
+3,Dune Sand,U232,Poultry,0.5
+3,Dune Sand,U232,Egg,0.5
+3,Dune Sand,U232,Total without Fish,0.5
+4,Burbank Loamy Sand,U232,External Gamma,0.5
+4,Burbank Loamy Sand,U232,Inhalation,0.5
+4,Burbank Loamy Sand,U232,Inhalation Vapor,0.5
+4,Burbank Loamy Sand,U232,Soil,0.5
+4,Burbank Loamy Sand,U232,Drinking Water,0.5
+4,Burbank Loamy Sand,U232,Produce,0.5
+4,Burbank Loamy Sand,U232,Beef,0.5
+4,Burbank Loamy Sand,U232,Milk,0.5
+4,Burbank Loamy Sand,U232,Poultry,0.5
+4,Burbank Loamy Sand,U232,Egg,0.5
+4,Burbank Loamy Sand,U232,Total without Fish,0.5
+5,Ephrate Sandy Loam,U232,External Gamma,0.5
+5,Ephrate Sandy Loam,U232,Inhalation,0.5
+5,Ephrate Sandy Loam,U232,Inhalation Vapor,0.5
+5,Ephrate Sandy Loam,U232,Soil,0.5
+5,Ephrate Sandy Loam,U232,Drinking Water,0.5
+5,Ephrate Sandy Loam,U232,Produce,0.5
+5,Ephrate Sandy Loam,U232,Beef,0.5
+5,Ephrate Sandy Loam,U232,Milk,0.5
+5,Ephrate Sandy Loam,U232,Poultry,0.5
+5,Ephrate Sandy Loam,U232,Egg,0.5
+5,Ephrate Sandy Loam,U232,Total without Fish,0.5
+6,Kiona Silt Loam,U232,External Gamma,0.5
+6,Kiona Silt Loam,U232,Inhalation,0.5
+6,Kiona Silt Loam,U232,Inhalation Vapor,0.5
+6,Kiona Silt Loam,U232,Soil,0.5
+6,Kiona Silt Loam,U232,Drinking Water,0.5
+6,Kiona Silt Loam,U232,Produce,0.5
+6,Kiona Silt Loam,U232,Beef,0.5
+6,Kiona Silt Loam,U232,Milk,0.5
+6,Kiona Silt Loam,U232,Poultry,0.5
+6,Kiona Silt Loam,U232,Egg,0.5
+6,Kiona Silt Loam,U232,Total without Fish,0.5
+0,none,U233,External Gamma,0.5
+0,none,U233,Inhalation,0.5
+0,none,U233,Inhalation Vapor,0.5
+0,none,U233,Soil,0.5
+0,none,U233,Drinking Water,0.5
+0,none,U233,Produce,0.5
+0,none,U233,Beef,0.5
+0,none,U233,Milk,0.5
+0,none,U233,Poultry,0.5
+0,none,U233,Egg,0.5
+0,none,U233,Total without Fish,0.5
+1,Rupert Sand,U233,External Gamma,0.5
+1,Rupert Sand,U233,Inhalation,0.5
+1,Rupert Sand,U233,Inhalation Vapor,0.5
+1,Rupert Sand,U233,Soil,0.5
+1,Rupert Sand,U233,Drinking Water,0.5
+1,Rupert Sand,U233,Produce,0.5
+1,Rupert Sand,U233,Beef,0.5
+1,Rupert Sand,U233,Milk,0.5
+1,Rupert Sand,U233,Poultry,0.5
+1,Rupert Sand,U233,Egg,0.5
+1,Rupert Sand,U233,Total without Fish,0.5
+2,Koehler Sand,U233,External Gamma,0.5
+2,Koehler Sand,U233,Inhalation,0.5
+2,Koehler Sand,U233,Inhalation Vapor,0.5
+2,Koehler Sand,U233,Soil,0.5
+2,Koehler Sand,U233,Drinking Water,0.5
+2,Koehler Sand,U233,Produce,0.5
+2,Koehler Sand,U233,Beef,0.5
+2,Koehler Sand,U233,Milk,0.5
+2,Koehler Sand,U233,Poultry,0.5
+2,Koehler Sand,U233,Egg,0.5
+2,Koehler Sand,U233,Total without Fish,0.5
+3,Dune Sand,U233,External Gamma,0.5
+3,Dune Sand,U233,Inhalation,0.5
+3,Dune Sand,U233,Inhalation Vapor,0.5
+3,Dune Sand,U233,Soil,0.5
+3,Dune Sand,U233,Drinking Water,0.5
+3,Dune Sand,U233,Produce,0.5
+3,Dune Sand,U233,Beef,0.5
+3,Dune Sand,U233,Milk,0.5
+3,Dune Sand,U233,Poultry,0.5
+3,Dune Sand,U233,Egg,0.5
+3,Dune Sand,U233,Total without Fish,0.5
+4,Burbank Loamy Sand,U233,External Gamma,0.5
+4,Burbank Loamy Sand,U233,Inhalation,0.5
+4,Burbank Loamy Sand,U233,Inhalation Vapor,0.5
+4,Burbank Loamy Sand,U233,Soil,0.5
+4,Burbank Loamy Sand,U233,Drinking Water,0.5
+4,Burbank Loamy Sand,U233,Produce,0.5
+4,Burbank Loamy Sand,U233,Beef,0.5
+4,Burbank Loamy Sand,U233,Milk,0.5
+4,Burbank Loamy Sand,U233,Poultry,0.5
+4,Burbank Loamy Sand,U233,Egg,0.5
+4,Burbank Loamy Sand,U233,Total without Fish,0.5
+5,Ephrate Sandy Loam,U233,External Gamma,0.5
+5,Ephrate Sandy Loam,U233,Inhalation,0.5
+5,Ephrate Sandy Loam,U233,Inhalation Vapor,0.5
+5,Ephrate Sandy Loam,U233,Soil,0.5
+5,Ephrate Sandy Loam,U233,Drinking Water,0.5
+5,Ephrate Sandy Loam,U233,Produce,0.5
+5,Ephrate Sandy Loam,U233,Beef,0.5
+5,Ephrate Sandy Loam,U233,Milk,0.5
+5,Ephrate Sandy Loam,U233,Poultry,0.5
+5,Ephrate Sandy Loam,U233,Egg,0.5
+5,Ephrate Sandy Loam,U233,Total without Fish,0.5
+6,Kiona Silt Loam,U233,External Gamma,0.5
+6,Kiona Silt Loam,U233,Inhalation,0.5
+6,Kiona Silt Loam,U233,Inhalation Vapor,0.5
+6,Kiona Silt Loam,U233,Soil,0.5
+6,Kiona Silt Loam,U233,Drinking Water,0.5
+6,Kiona Silt Loam,U233,Produce,0.5
+6,Kiona Silt Loam,U233,Beef,0.5
+6,Kiona Silt Loam,U233,Milk,0.5
+6,Kiona Silt Loam,U233,Poultry,0.5
+6,Kiona Silt Loam,U233,Egg,0.5
+6,Kiona Silt Loam,U233,Total without Fish,0.5
+0,none,U234,External Gamma,0.5
+0,none,U234,Inhalation,0.5
+0,none,U234,Inhalation Vapor,0.5
+0,none,U234,Soil,0.5
+0,none,U234,Drinking Water,0.5
+0,none,U234,Produce,0.5
+0,none,U234,Beef,0.5
+0,none,U234,Milk,0.5
+0,none,U234,Poultry,0.5
+0,none,U234,Egg,0.5
+0,none,U234,Total without Fish,0.5
+1,Rupert Sand,U234,External Gamma,0.5
+1,Rupert Sand,U234,Inhalation,0.5
+1,Rupert Sand,U234,Inhalation Vapor,0.5
+1,Rupert Sand,U234,Soil,0.5
+1,Rupert Sand,U234,Drinking Water,0.5
+1,Rupert Sand,U234,Produce,0.5
+1,Rupert Sand,U234,Beef,0.5
+1,Rupert Sand,U234,Milk,0.5
+1,Rupert Sand,U234,Poultry,0.5
+1,Rupert Sand,U234,Egg,0.5
+1,Rupert Sand,U234,Total without Fish,0.5
+2,Koehler Sand,U234,External Gamma,0.5
+2,Koehler Sand,U234,Inhalation,0.5
+2,Koehler Sand,U234,Inhalation Vapor,0.5
+2,Koehler Sand,U234,Soil,0.5
+2,Koehler Sand,U234,Drinking Water,0.5
+2,Koehler Sand,U234,Produce,0.5
+2,Koehler Sand,U234,Beef,0.5
+2,Koehler Sand,U234,Milk,0.5
+2,Koehler Sand,U234,Poultry,0.5
+2,Koehler Sand,U234,Egg,0.5
+2,Koehler Sand,U234,Total without Fish,0.5
+3,Dune Sand,U234,External Gamma,0.5
+3,Dune Sand,U234,Inhalation,0.5
+3,Dune Sand,U234,Inhalation Vapor,0.5
+3,Dune Sand,U234,Soil,0.5
+3,Dune Sand,U234,Drinking Water,0.5
+3,Dune Sand,U234,Produce,0.5
+3,Dune Sand,U234,Beef,0.5
+3,Dune Sand,U234,Milk,0.5
+3,Dune Sand,U234,Poultry,0.5
+3,Dune Sand,U234,Egg,0.5
+3,Dune Sand,U234,Total without Fish,0.5
+4,Burbank Loamy Sand,U234,External Gamma,0.5
+4,Burbank Loamy Sand,U234,Inhalation,0.5
+4,Burbank Loamy Sand,U234,Inhalation Vapor,0.5
+4,Burbank Loamy Sand,U234,Soil,0.5
+4,Burbank Loamy Sand,U234,Drinking Water,0.5
+4,Burbank Loamy Sand,U234,Produce,0.5
+4,Burbank Loamy Sand,U234,Beef,0.5
+4,Burbank Loamy Sand,U234,Milk,0.5
+4,Burbank Loamy Sand,U234,Poultry,0.5
+4,Burbank Loamy Sand,U234,Egg,0.5
+4,Burbank Loamy Sand,U234,Total without Fish,0.5
+5,Ephrate Sandy Loam,U234,External Gamma,0.5
+5,Ephrate Sandy Loam,U234,Inhalation,0.5
+5,Ephrate Sandy Loam,U234,Inhalation Vapor,0.5
+5,Ephrate Sandy Loam,U234,Soil,0.5
+5,Ephrate Sandy Loam,U234,Drinking Water,0.5
+5,Ephrate Sandy Loam,U234,Produce,0.5
+5,Ephrate Sandy Loam,U234,Beef,0.5
+5,Ephrate Sandy Loam,U234,Milk,0.5
+5,Ephrate Sandy Loam,U234,Poultry,0.5
+5,Ephrate Sandy Loam,U234,Egg,0.5
+5,Ephrate Sandy Loam,U234,Total without Fish,0.5
+6,Kiona Silt Loam,U234,External Gamma,0.5
+6,Kiona Silt Loam,U234,Inhalation,0.5
+6,Kiona Silt Loam,U234,Inhalation Vapor,0.5
+6,Kiona Silt Loam,U234,Soil,0.5
+6,Kiona Silt Loam,U234,Drinking Water,0.5
+6,Kiona Silt Loam,U234,Produce,0.5
+6,Kiona Silt Loam,U234,Beef,0.5
+6,Kiona Silt Loam,U234,Milk,0.5
+6,Kiona Silt Loam,U234,Poultry,0.5
+6,Kiona Silt Loam,U234,Egg,0.5
+6,Kiona Silt Loam,U234,Total without Fish,0.5
+0,none,U235,External Gamma,0.5
+0,none,U235,Inhalation,0.5
+0,none,U235,Inhalation Vapor,0.5
+0,none,U235,Soil,0.5
+0,none,U235,Drinking Water,0.5
+0,none,U235,Produce,0.5
+0,none,U235,Beef,0.5
+0,none,U235,Milk,0.5
+0,none,U235,Poultry,0.5
+0,none,U235,Egg,0.5
+0,none,U235,Total without Fish,0.5
+1,Rupert Sand,U235,External Gamma,0.5
+1,Rupert Sand,U235,Inhalation,0.5
+1,Rupert Sand,U235,Inhalation Vapor,0.5
+1,Rupert Sand,U235,Soil,0.5
+1,Rupert Sand,U235,Drinking Water,0.5
+1,Rupert Sand,U235,Produce,0.5
+1,Rupert Sand,U235,Beef,0.5
+1,Rupert Sand,U235,Milk,0.5
+1,Rupert Sand,U235,Poultry,0.5
+1,Rupert Sand,U235,Egg,0.5
+1,Rupert Sand,U235,Total without Fish,0.5
+2,Koehler Sand,U235,External Gamma,0.5
+2,Koehler Sand,U235,Inhalation,0.5
+2,Koehler Sand,U235,Inhalation Vapor,0.5
+2,Koehler Sand,U235,Soil,0.5
+2,Koehler Sand,U235,Drinking Water,0.5
+2,Koehler Sand,U235,Produce,0.5
+2,Koehler Sand,U235,Beef,0.5
+2,Koehler Sand,U235,Milk,0.5
+2,Koehler Sand,U235,Poultry,0.5
+2,Koehler Sand,U235,Egg,0.5
+2,Koehler Sand,U235,Total without Fish,0.5
+3,Dune Sand,U235,External Gamma,0.5
+3,Dune Sand,U235,Inhalation,0.5
+3,Dune Sand,U235,Inhalation Vapor,0.5
+3,Dune Sand,U235,Soil,0.5
+3,Dune Sand,U235,Drinking Water,0.5
+3,Dune Sand,U235,Produce,0.5
+3,Dune Sand,U235,Beef,0.5
+3,Dune Sand,U235,Milk,0.5
+3,Dune Sand,U235,Poultry,0.5
+3,Dune Sand,U235,Egg,0.5
+3,Dune Sand,U235,Total without Fish,0.5
+4,Burbank Loamy Sand,U235,External Gamma,0.5
+4,Burbank Loamy Sand,U235,Inhalation,0.5
+4,Burbank Loamy Sand,U235,Inhalation Vapor,0.5
+4,Burbank Loamy Sand,U235,Soil,0.5
+4,Burbank Loamy Sand,U235,Drinking Water,0.5
+4,Burbank Loamy Sand,U235,Produce,0.5
+4,Burbank Loamy Sand,U235,Beef,0.5
+4,Burbank Loamy Sand,U235,Milk,0.5
+4,Burbank Loamy Sand,U235,Poultry,0.5
+4,Burbank Loamy Sand,U235,Egg,0.5
+4,Burbank Loamy Sand,U235,Total without Fish,0.5
+5,Ephrate Sandy Loam,U235,External Gamma,0.5
+5,Ephrate Sandy Loam,U235,Inhalation,0.5
+5,Ephrate Sandy Loam,U235,Inhalation Vapor,0.5
+5,Ephrate Sandy Loam,U235,Soil,0.5
+5,Ephrate Sandy Loam,U235,Drinking Water,0.5
+5,Ephrate Sandy Loam,U235,Produce,0.5
+5,Ephrate Sandy Loam,U235,Beef,0.5
+5,Ephrate Sandy Loam,U235,Milk,0.5
+5,Ephrate Sandy Loam,U235,Poultry,0.5
+5,Ephrate Sandy Loam,U235,Egg,0.5
+5,Ephrate Sandy Loam,U235,Total without Fish,0.5
+6,Kiona Silt Loam,U235,External Gamma,0.5
+6,Kiona Silt Loam,U235,Inhalation,0.5
+6,Kiona Silt Loam,U235,Inhalation Vapor,0.5
+6,Kiona Silt Loam,U235,Soil,0.5
+6,Kiona Silt Loam,U235,Drinking Water,0.5
+6,Kiona Silt Loam,U235,Produce,0.5
+6,Kiona Silt Loam,U235,Beef,0.5
+6,Kiona Silt Loam,U235,Milk,0.5
+6,Kiona Silt Loam,U235,Poultry,0.5
+6,Kiona Silt Loam,U235,Egg,0.5
+6,Kiona Silt Loam,U235,Total without Fish,0.5
+0,none,U236,External Gamma,0.5
+0,none,U236,Inhalation,0.5
+0,none,U236,Inhalation Vapor,0.5
+0,none,U236,Soil,0.5
+0,none,U236,Drinking Water,0.5
+0,none,U236,Produce,0.5
+0,none,U236,Beef,0.5
+0,none,U236,Milk,0.5
+0,none,U236,Poultry,0.5
+0,none,U236,Egg,0.5
+0,none,U236,Total without Fish,0.5
+1,Rupert Sand,U236,External Gamma,0.5
+1,Rupert Sand,U236,Inhalation,0.5
+1,Rupert Sand,U236,Inhalation Vapor,0.5
+1,Rupert Sand,U236,Soil,0.5
+1,Rupert Sand,U236,Drinking Water,0.5
+1,Rupert Sand,U236,Produce,0.5
+1,Rupert Sand,U236,Beef,0.5
+1,Rupert Sand,U236,Milk,0.5
+1,Rupert Sand,U236,Poultry,0.5
+1,Rupert Sand,U236,Egg,0.5
+1,Rupert Sand,U236,Total without Fish,0.5
+2,Koehler Sand,U236,External Gamma,0.5
+2,Koehler Sand,U236,Inhalation,0.5
+2,Koehler Sand,U236,Inhalation Vapor,0.5
+2,Koehler Sand,U236,Soil,0.5
+2,Koehler Sand,U236,Drinking Water,0.5
+2,Koehler Sand,U236,Produce,0.5
+2,Koehler Sand,U236,Beef,0.5
+2,Koehler Sand,U236,Milk,0.5
+2,Koehler Sand,U236,Poultry,0.5
+2,Koehler Sand,U236,Egg,0.5
+2,Koehler Sand,U236,Total without Fish,0.5
+3,Dune Sand,U236,External Gamma,0.5
+3,Dune Sand,U236,Inhalation,0.5
+3,Dune Sand,U236,Inhalation Vapor,0.5
+3,Dune Sand,U236,Soil,0.5
+3,Dune Sand,U236,Drinking Water,0.5
+3,Dune Sand,U236,Produce,0.5
+3,Dune Sand,U236,Beef,0.5
+3,Dune Sand,U236,Milk,0.5
+3,Dune Sand,U236,Poultry,0.5
+3,Dune Sand,U236,Egg,0.5
+3,Dune Sand,U236,Total without Fish,0.5
+4,Burbank Loamy Sand,U236,External Gamma,0.5
+4,Burbank Loamy Sand,U236,Inhalation,0.5
+4,Burbank Loamy Sand,U236,Inhalation Vapor,0.5
+4,Burbank Loamy Sand,U236,Soil,0.5
+4,Burbank Loamy Sand,U236,Drinking Water,0.5
+4,Burbank Loamy Sand,U236,Produce,0.5
+4,Burbank Loamy Sand,U236,Beef,0.5
+4,Burbank Loamy Sand,U236,Milk,0.5
+4,Burbank Loamy Sand,U236,Poultry,0.5
+4,Burbank Loamy Sand,U236,Egg,0.5
+4,Burbank Loamy Sand,U236,Total without Fish,0.5
+5,Ephrate Sandy Loam,U236,External Gamma,0.5
+5,Ephrate Sandy Loam,U236,Inhalation,0.5
+5,Ephrate Sandy Loam,U236,Inhalation Vapor,0.5
+5,Ephrate Sandy Loam,U236,Soil,0.5
+5,Ephrate Sandy Loam,U236,Drinking Water,0.5
+5,Ephrate Sandy Loam,U236,Produce,0.5
+5,Ephrate Sandy Loam,U236,Beef,0.5
+5,Ephrate Sandy Loam,U236,Milk,0.5
+5,Ephrate Sandy Loam,U236,Poultry,0.5
+5,Ephrate Sandy Loam,U236,Egg,0.5
+5,Ephrate Sandy Loam,U236,Total without Fish,0.5
+6,Kiona Silt Loam,U236,External Gamma,0.5
+6,Kiona Silt Loam,U236,Inhalation,0.5
+6,Kiona Silt Loam,U236,Inhalation Vapor,0.5
+6,Kiona Silt Loam,U236,Soil,0.5
+6,Kiona Silt Loam,U236,Drinking Water,0.5
+6,Kiona Silt Loam,U236,Produce,0.5
+6,Kiona Silt Loam,U236,Beef,0.5
+6,Kiona Silt Loam,U236,Milk,0.5
+6,Kiona Silt Loam,U236,Poultry,0.5
+6,Kiona Silt Loam,U236,Egg,0.5
+6,Kiona Silt Loam,U236,Total without Fish,0.5
+0,none,U238,External Gamma,0.5
+0,none,U238,Inhalation,0.5
+0,none,U238,Inhalation Vapor,0.5
+0,none,U238,Soil,0.5
+0,none,U238,Drinking Water,0.5
+0,none,U238,Produce,0.5
+0,none,U238,Beef,0.5
+0,none,U238,Milk,0.5
+0,none,U238,Poultry,0.5
+0,none,U238,Egg,0.5
+0,none,U238,Total without Fish,0.5
+1,Rupert Sand,U238,External Gamma,0.5
+1,Rupert Sand,U238,Inhalation,0.5
+1,Rupert Sand,U238,Inhalation Vapor,0.5
+1,Rupert Sand,U238,Soil,0.5
+1,Rupert Sand,U238,Drinking Water,0.5
+1,Rupert Sand,U238,Produce,0.5
+1,Rupert Sand,U238,Beef,0.5
+1,Rupert Sand,U238,Milk,0.5
+1,Rupert Sand,U238,Poultry,0.5
+1,Rupert Sand,U238,Egg,0.5
+1,Rupert Sand,U238,Total without Fish,0.5
+2,Koehler Sand,U238,External Gamma,0.5
+2,Koehler Sand,U238,Inhalation,0.5
+2,Koehler Sand,U238,Inhalation Vapor,0.5
+2,Koehler Sand,U238,Soil,0.5
+2,Koehler Sand,U238,Drinking Water,0.5
+2,Koehler Sand,U238,Produce,0.5
+2,Koehler Sand,U238,Beef,0.5
+2,Koehler Sand,U238,Milk,0.5
+2,Koehler Sand,U238,Poultry,0.5
+2,Koehler Sand,U238,Egg,0.5
+2,Koehler Sand,U238,Total without Fish,0.5
+3,Dune Sand,U238,External Gamma,0.5
+3,Dune Sand,U238,Inhalation,0.5
+3,Dune Sand,U238,Inhalation Vapor,0.5
+3,Dune Sand,U238,Soil,0.5
+3,Dune Sand,U238,Drinking Water,0.5
+3,Dune Sand,U238,Produce,0.5
+3,Dune Sand,U238,Beef,0.5
+3,Dune Sand,U238,Milk,0.5
+3,Dune Sand,U238,Poultry,0.5
+3,Dune Sand,U238,Egg,0.5
+3,Dune Sand,U238,Total without Fish,0.5
+4,Burbank Loamy Sand,U238,External Gamma,0.5
+4,Burbank Loamy Sand,U238,Inhalation,0.5
+4,Burbank Loamy Sand,U238,Inhalation Vapor,0.5
+4,Burbank Loamy Sand,U238,Soil,0.5
+4,Burbank Loamy Sand,U238,Drinking Water,0.5
+4,Burbank Loamy Sand,U238,Produce,0.5
+4,Burbank Loamy Sand,U238,Beef,0.5
+4,Burbank Loamy Sand,U238,Milk,0.5
+4,Burbank Loamy Sand,U238,Poultry,0.5
+4,Burbank Loamy Sand,U238,Egg,0.5
+4,Burbank Loamy Sand,U238,Total without Fish,0.5
+5,Ephrate Sandy Loam,U238,External Gamma,0.5
+5,Ephrate Sandy Loam,U238,Inhalation,0.5
+5,Ephrate Sandy Loam,U238,Inhalation Vapor,0.5
+5,Ephrate Sandy Loam,U238,Soil,0.5
+5,Ephrate Sandy Loam,U238,Drinking Water,0.5
+5,Ephrate Sandy Loam,U238,Produce,0.5
+5,Ephrate Sandy Loam,U238,Beef,0.5
+5,Ephrate Sandy Loam,U238,Milk,0.5
+5,Ephrate Sandy Loam,U238,Poultry,0.5
+5,Ephrate Sandy Loam,U238,Egg,0.5
+5,Ephrate Sandy Loam,U238,Total without Fish,0.5
+6,Kiona Silt Loam,U238,External Gamma,0.5
+6,Kiona Silt Loam,U238,Inhalation,0.5
+6,Kiona Silt Loam,U238,Inhalation Vapor,0.5
+6,Kiona Silt Loam,U238,Soil,0.5
+6,Kiona Silt Loam,U238,Drinking Water,0.5
+6,Kiona Silt Loam,U238,Produce,0.5
+6,Kiona Silt Loam,U238,Beef,0.5
+6,Kiona Silt Loam,U238,Milk,0.5
+6,Kiona Silt Loam,U238,Poultry,0.5
+6,Kiona Silt Loam,U238,Egg,0.5
+6,Kiona Silt Loam,U238,Total without Fish,0.5
