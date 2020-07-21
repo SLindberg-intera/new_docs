@@ -10,6 +10,7 @@ AS
     cc.copc,
     sl.soil_nm AS soil,
     df.pathway_nm AS pathway,
+    cc.elapsed_tm,
     cc.model_date,
     cc.cell_row,
     cc.cell_column,

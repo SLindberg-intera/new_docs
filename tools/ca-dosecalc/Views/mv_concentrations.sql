@@ -8,6 +8,7 @@ AS
  SELECT DISTINCT a.model_name,
     a.model_version,
     c.contam_nm AS copc,
+    c.elapsed_tm as elapsed_tm,
     to_date(a.mdl_start_yr::text, 'YYYY'::text)::timestamp without time zone + ((c.elapsed_tm || ' days'::text)::interval) AS model_date,
     g."row" AS cell_row,
     g.col AS cell_column,

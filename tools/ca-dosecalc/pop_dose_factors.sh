@@ -1,8 +1,5 @@
-###  This script is not for QA
+# Populates the dose_factors table
 #
-#   it must be rebuilt to load data from the external dose factors table
-#   
-
 dbase=$1
 
 # pop pathways
