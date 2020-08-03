@@ -106,6 +106,9 @@ class DoseFile:
         """ calculate the "Total" dose for each
              row/layer/col/timestep by summing the contributions
              for each pathway
+
+
+             note: this is not used and marked for deletion
         """ 
         df = self.df.groupby(
             ['model_date','elapsed_tm',
@@ -188,10 +191,10 @@ def process_dose(fpath, copc, domain, year_range, outputDir):
     n = make_filename(outname, copc, domain, year_range)
     to_csv(dfmax, n)
 
-    outname = os.path.join(outputDir, "max_total_for_time")
-    n = make_filename(outname, copc, domain, year_range)
-    dfsum = reduced.sum_pathways()
-    to_csv(dfsum, n)
+    #outname = os.path.join(outputDir, "max_total_for_time")
+    #n = make_filename(outname, copc, domain, year_range)
+    #dfsum = reduced.sum_pathways()
+    #to_csv(dfsum, n)
 
 def parse_control_file(fpath):
     """ returns the control file as a dict """
