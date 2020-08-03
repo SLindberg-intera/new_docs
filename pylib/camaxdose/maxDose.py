@@ -41,6 +41,9 @@ class Cell:
         self.row = row
         self.col = col
 
+    def __repr__(self):
+        return "Cell(row={}, col={})".format(self.row, self.col)
+
 class YearRange:
     """ container class; represent a start and end year"""
     def __init__(self, start_year, end_year):
@@ -155,10 +158,27 @@ class Domain:
     """ container for a model domain/boundary """
     def __init__(self, name, fpath):
         self.name=name
+        self.fpath = fpath
+        try:
+            self._cells = self.load_file()
+        except Exception as e:
+            self._cells = None
+
+    def load_file(self):
+        """  load cells from the target file 
+
+        file is assumed to be a header row and then
+        each line containing a comma-separated ROW,COL tuple
+        """
+        
+        with open(self.fpath, 'r') as f:
+            cells = [Cell(*line.strip().split(",")) 
+               for line in f.readlines()[1:]]
+        return cells 
 
     @property
     def cells(self):
-        return None
+        return self._cells
 
 def process_dose(fpath, copc, domain, year_range, outputDir):
     """
