@@ -1,0 +1,34 @@
+﻿<Page x:Class="surf_rate_interp.gui.columnConfig"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:surf_rate_interp.gui"
+      mc:Ignorable="d" 
+     
+      Title="columnSetting">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <DataGrid Grid.Column="0" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ItemsSource="{Binding}" AutoGenerateColumns="False" x:Name="auGrid">
+            <DataGrid.Columns>
+                <DataGridTextColumn IsReadOnly="true" x:Name="col0" Header="File" Binding="{Binding file}" Width="*" >
+                    <DataGridTextColumn.ElementStyle>
+                        <Style>
+                            <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                            <Setter Property="TextBlock.TextAlignment" Value="Left"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridCheckBoxColumn IsReadOnly="true" x:Name="col1" Header="Done" Binding="{Binding processed}" Width="50" MaxWidth="50"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        
+
+
+    </Grid>
+</Page>

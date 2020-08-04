@@ -6,7 +6,7 @@
 //using System.Windows;
 using System.Windows.Controls;
 using System.Text.RegularExpressions;
-namespace stomp_extrap_modflow.gui
+namespace surf_rate_interp.gui
 {
     public class DataGriddecimalColumn : DataGridTextColumn
     {

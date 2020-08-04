@@ -99,11 +99,11 @@ namespace stomp_extrap_modflow.gui
                         {
                             columns temp = new columns();
                             temp.column_num = i + 1;
-                            if (header2 != null && header2.Length > i)
-                                temp.title = String.Format("{0} {1}", header1[i], header2[i]);
-                            else
-                                temp.title = header1[i];
-
+                            //if (header2 != null && header2.Length > i)
+                            //    temp.title = String.Format("{0} {1}", header1[i], header2[i]);
+                            //else
+                            //    temp.title = header1[i];
+                            temp.title = header1[i];
 
                             temp.definition = "";
                             temp.conv_factor = 1;
