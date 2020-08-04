@@ -162,6 +162,7 @@ class Domain:
         try:
             self._cells = self.load_file()
         except Exception as e:
+            print("Cells is None")
             self._cells = None
 
     def load_file(self):
