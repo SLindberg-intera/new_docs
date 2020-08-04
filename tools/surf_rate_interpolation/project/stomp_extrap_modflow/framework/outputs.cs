@@ -118,7 +118,6 @@ namespace stomp_extrap_modflow.framework
                 string file_key = rem_invalid_char(key);
                 string fileName = path + "\\" + o_filename + "_"+ file_key + "_cumulative.csv";
                 string csv = key;
-
                 csv += Environment.NewLine + "Year, Total " + units.Replace("/year","") + Environment.NewLine;
                 csv += String.Join(
                     Environment.NewLine,

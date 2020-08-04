@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 using stomp_extrap_modflow.data;
 namespace stomp_extrap_modflow.framework
 {
+    class Data
+    {
+        public decimal Year { get; set; }
+        public decimal Rate { get; set; }
+    };
+
     class interpolate_data
     {
         public Dictionary<string, SortedDictionary<decimal, decimal>> f_data;
@@ -28,35 +34,10 @@ namespace stomp_extrap_modflow.framework
                     //Time is used in the key, if "" then skip
                     if (!col.time && col.definition != "")
                     {
-                        //check key exists in new data
-                        if (f_data.ContainsKey(col.definition))
-                        {
-                            
-                            //if definition has multiple columns to be added together
-                            if (f_data[col.definition].ContainsKey(data[i][time]))
-                            {
-                                //only grab the first row of a unique year (so if there are 3 rows marked as 2006 only 
-                                //process the first row and skip the other two).  2006 and 2006.001 are both unique when
-                                //compared against each other.
-                                if (first == i)
-                                {
-                                    f_data[col.definition][data[i][time]] += (data[i][col.column_num - 1] * col.conv_factor);
-                                }
-                            }
-                            else
-                            {
-                                f_data[col.definition].Add(data[i][time]+start_year, (data[i][col.column_num - 1] * col.conv_factor));
-                                first = i;
-                            }
-                        }
-                        else
-                        {
-                            f_data.Add(col.definition, new SortedDictionary<decimal, decimal>());
-                            f_data[col.definition].Add(data[i][time]+start_year, (data[i][col.column_num - 1] * col.conv_factor));
-                            first = i;
-                        }
+                        //use existing cumulative
                         if (useCumulative)
                         {
+                            Data temp = new Data();
                             //check key exists in new data
                             if (c_data.ContainsKey(col.definition))
                             {
@@ -85,69 +66,40 @@ namespace stomp_extrap_modflow.framework
                                 first = i;
                             }
                         }
+                        //build rate data, which will be used to generate the cumulative.
+                        else
+                        {
+                            //check key exists in new data
+                            if (f_data.ContainsKey(col.definition))
+                            {
+
+                                //if definition has multiple columns to be added together
+                                if (f_data[col.definition].ContainsKey(data[i][time]))
+                                {
+                                    //only grab the first row of a unique year (so if there are 3 rows marked as 2006 only 
+                                    //process the first row and skip the other two).  2006 and 2006.001 are both unique when
+                                    //compared against each other.
+                                    if (first == i)
+                                    {
+                                        f_data[col.definition][data[i][time]] += (data[i][col.column_num - 1] * col.conv_factor);
+                                    }
+                                }
+                                else
+                                {
+                                    f_data[col.definition].Add(data[i][time] + start_year, (data[i][col.column_num - 1] * col.conv_factor));
+                                    first = i;
+                                }
+                            }
+                            else
+                            {
+                                f_data.Add(col.definition, new SortedDictionary<decimal, decimal>());
+                                f_data[col.definition].Add(data[i][time] + start_year, (data[i][col.column_num - 1] * col.conv_factor));
+                                first = i;
+                            }
+                        }
                     }
                 }
-                //foreach (columns col in column_def)
-               // {
-
-                    
-                    //Time is used in the key, if "" then skip
-                   // if (!col.time && col.definition != "")
-                    //{
-                        //if(data[i][time] == 2059 && col.column_num == 18)
-                        //{
-                        //    decimal x = 0;
-                        //}
-                        //decimal time_dif = 1; 
-                        //decimal temp = 0;
-                        ////if column does not exist create it
-                        //if (!c_data.ContainsKey(col.definition))
-                        //{ 
-                        //    c_data.Add(col.definition, new Dictionary<decimal, decimal>());
-                        //}
-
-                        ////if time step already exists add new data to it otherwise create it
-                        //if (c_data[col.definition].ContainsKey(data[i][time]) )
-                        //{
-                        //    //then do nothing, 
-                        //    if (i > 1)
-                        //    {
-                        //        time_dif = data[i][time] - data[i - 1][time];
-                        //    }
-                        //    c_data[col.definition][data[i][time]] += data[i][col.column_num - 1] * time_dif;
-                        //}
-                        //else
-                        //{
-                        //    //if previous year exists retrieve its value
-                        //    if (i > 1 )
-                        //    {
-                        //        //time_dif = data[i][time] - data[i - 1][time];
-                        //        if (c_data[col.definition].ContainsKey(data[i - 1][time]))
-                        //        {
-                        //            temp = c_data[col.definition][data[i - 1][time]];
-                        //        }
-                        //    }
-                        //    c_data[col.definition].Add(data[i][time], temp + (data[i][col.column_num - 1] * time_dif));
-                        //}
-                        ////get previous data value and add new data value to it.
-                        //if (c_data[col.definition].Keys.Count > 0)
-                        //{
-                        //    temp = c_data[col.definition][data[i - 1][time]] + data[i][col.column_num - 1];
-                        //}
-                        //else
-                        //{
-                        //    temp = data[i][col.column_num - 1];
-                        //}
-                        //if(!c_data[col.definition].ContainsKey(data[i][time]))
-                        //{
-                        //    c_data[col.definition].Add(data[i][time], temp);
-                        //}
-                        //else
-                        //{
-                        //    c_data[col.definition][data[i][time]] = c_data[col.definition][data[i][time]] + data[i][col.column_num - 1];
-                        //}
-                   // }
-                //}
+                
             }
             if (!useCumulative)
             {
@@ -155,6 +107,7 @@ namespace stomp_extrap_modflow.framework
             }
             interpolate_years();
         }
+
         private void process_cumulative()
         {
             foreach(string key in f_data.Keys)
@@ -178,7 +131,71 @@ namespace stomp_extrap_modflow.framework
                 }
             }
         }
+        private void interp_single_year(string key, int cur_year,decimal min,decimal max)
+        {
+            //define year before the one to be interpolated
+            decimal prev_year = cur_year;
+            if (cur_year != min)
+            {
+                prev_year = c_data[key].Keys.ToList().Where(k => k < cur_year).Max();
+            }
+            if (c_data[key].ContainsKey(cur_year - 1))
+            {
+                prev_year = cur_year - 1;
+            }
+            decimal prev_val = 0;
+            if (cur_year != min)
+            {
+                prev_val = c_data[key][prev_year];
+            }
+
+            //define year after the one to be interpolated
+            decimal next_year = c_data[key].Keys.ToList().Where(k => k > cur_year).Min();
+            decimal next_val = c_data[key][next_year];
+
+            //interpolate cum for current year and add it to the c_data
+            decimal interp_cum = prev_val + (((cur_year - prev_year) / (next_year - prev_year)) * (next_val - prev_val));
+            c_data[key].Add(cur_year, interp_cum);
+        }
         private void interpolate_years()
+        {
+            //year_data will hold the final yearly rate
+            year_data = new Dictionary<string, Dictionary<int, decimal>>();
+            //use the column names from c_data
+            
+            foreach (string key in c_data.Keys)
+            {
+                SortedDictionary<decimal, decimal> data = c_data[key];
+                year_data.Add(key, new Dictionary<int, decimal>());
+                //get min/max year for data
+                int max = (int)Math.Floor(data.Keys.ToList().Max());
+                int min = (int)Math.Floor(data.Keys.ToList().Min());
+                //loop through data using integer years 
+                //if integer year does not exist in data then interpolate it.
+                for (int cur_year = min; cur_year < max; cur_year++)
+                {
+                    //decimal year1 = cur_year;
+                    int year2 = cur_year+1;
+                    decimal cur_val = 0;
+                    decimal val2 = 0;
+                    //interpolate cumulative for current year if it does not exist
+                    if (!c_data[key].ContainsKey(cur_year))
+                    {
+                        interp_single_year(key, cur_year, min, max);
+                    }
+                    //interpolate year 2 if needed
+                    if(!c_data[key].ContainsKey(year2))
+                    {
+                        interp_single_year(key, year2, min, max);
+                    }
+                    
+                    cur_val = c_data[key][cur_year];
+                    val2 = c_data[key][year2];
+                    year_data[key].Add(cur_year, val2 - cur_val);
+                }
+            }
+        }
+        private void interpolate_years_old()
         {
             year_data = new Dictionary<string, Dictionary<int, decimal>>();
             foreach (string key in f_data.Keys)

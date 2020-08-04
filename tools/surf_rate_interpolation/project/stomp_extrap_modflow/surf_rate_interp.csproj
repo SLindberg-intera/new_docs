@@ -97,14 +97,26 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="data\configCols.cs" />
     <Compile Include="data\water_table.cs" />
     <Compile Include="framework\hssp_threaded.cs" />
+    <Compile Include="framework\processes.cs" />
     <Compile Include="framework\WaitCursor.cs" />
+    <Compile Include="gui\columnConfig.xaml.cs">
+      <DependentUpon>columnConfig.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="gui\config_interp.xaml.cs">
+      <DependentUpon>config_interp.xaml</DependentUpon>
+    </Compile>
     <Compile Include="utility\UiServices.cs" />
     <Compile Include="utility\WaitCursor.cs" />
     <Page Include="gui\buildHSS.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="gui\columnConfig.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="gui\columnSetting.xaml">
       <SubType>Designer</SubType>
@@ -113,6 +125,10 @@
     <Page Include="gui\gridSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="gui\config_interp.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="gui\Interpolate.xaml">
       <SubType>Designer</SubType>
