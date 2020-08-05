@@ -110,7 +110,6 @@ class DoseFile:
         """
         reduced = extract_for_year_range(self.df, year_range)
         if cells is None:
-            print("Cells is none, no mask applied")
             pass
         else:    
             reduced = extract_for_cells(reduced, cells)
@@ -140,8 +139,6 @@ class DoseFile:
                 ascending=[False, True])
         outdf = outdf.groupby(['pathway'], sort=False).first()
         #outdf = outdf.idxmax()
-        #print("Dose output:\n", outdf['dose'])
-        print("RESULT:\n", outdf)
        
         return outdf.reset_index()
 
@@ -316,7 +313,6 @@ def main(input_control_file_path):
     
     for domain in domains:
         for date_range in date_ranges:
-            print(domain, date_range)
             process_dose(dose_path, copc, domain, date_range, outputDir)
 
 
