@@ -35,6 +35,10 @@ import pandas as pd
 import json
 import sys
 
+def row_col_to_id(row, col):
+    """ map (row, col) to a single number """
+    return int(row)+int(col)*1000
+
 class Cell:
     """ container class; represent a row/col pair"""
     def __init__(self, row, col):
@@ -44,15 +48,23 @@ class Cell:
     def __repr__(self):
         return "Cell(row={}, col={})".format(self.row, self.col)
 
+    @property
+    def id(self):
+        """ return a single value that can be used to ID a cell """
+        return row_col_to_id(self.row, self.col)
+
 class YearRange:
     """ container class; represent a start and end year"""
     def __init__(self, start_year, end_year):
         self.start_year = start_year
         self.end_year = end_year
+    def __repr__(self):
+        return "YearRange(start_year={}, end_year={})".format(
+           self.start_year, self.end_year)
 
 def date_string_to_year(date_str):
     """ turn '2020-01-01' to the integer 2020 """
-    return int(date_str[0:4])
+    return int(date_str.split("-")[0])
 
 def extract_for_year_range(df, year_range):
     """
@@ -60,19 +72,21 @@ def extract_for_year_range(df, year_range):
             dates are from start_year to end_year, inclusive
     """
     years = df.model_date.apply(date_string_to_year).values
-    return df.iloc[
+     
+    out = df.iloc[
         (years >=year_range.start_year)&(years<=year_range.end_year)]
+    return out
 
 def extract_for_cells(df, cells):
     """ given a Cells instance and a pandas dataframe, 
 
     return a dataframe that only includes the cells
     """
-    rows = [i.row for i in cells]
-    cols = [i.col for i in cells]
-    t2=df['cell_row'].isin(rows)
-    t3=df['cell_column'].isin(cols)
-    return df.loc[t2&t3]
+    ids = [i.id for i in cells]
+    truth = df.apply(
+           lambda x: row_col_to_id(x.cell_row, x.cell_column), axis=1)
+    truth = truth.isin(ids)
+    return df.loc[truth]
 
 class DoseFile:
     """ pandas dataframe representation of a dose file """
@@ -94,34 +108,17 @@ class DoseFile:
         
             if inplace=False, does not update 
         """
+        reduced = extract_for_year_range(self.df, year_range)
         if cells is None:
-            reduced = extract_for_year_range(self.df, year_range)
+            print("Cells is none, no mask applied")
+            pass
         else:    
-            reduced = extract_for_cells(extract_for_year_range(
-                self.df, year_range), cells)
-        if(inplace):
+            reduced = extract_for_cells(reduced, cells)
+        if(inplace==True):
             self.df = reduced
             return self
 
         return self.from_df(reduced)
-
-    def sum_pathways(self):
-        """ calculate the "Total" dose for each
-             row/layer/col/timestep by summing the contributions
-             for each pathway
-
-
-             note: this is not used and marked for deletion
-        """ 
-        df = self.df.groupby(
-            ['model_date','elapsed_tm',
-                'cell_row','cell_column', 
-                'cell_layer']).agg({"dose":['sum']})
-        df.columns=['dose']
-        df = df.reset_index()
-        outdf = df.sort_values(by='dose',
-            ascending=False).groupby(['model_date','elapsed_tm']).first()
-        return outdf
 
     def max_by_pathway_by_time(self):
         """ for each pathway, for each timestep,
@@ -139,8 +136,13 @@ class DoseFile:
 
             returns a pandas dataframe
         """
-        outdf = self.df.sort_values(by='dose',
-                ascending=False).groupby(['pathway']).first()
+        outdf = self.df.sort_values(by=['dose', 'elapsed_tm'],
+                ascending=[False, True])
+        outdf = outdf.groupby(['pathway'], sort=False).first()
+        #outdf = outdf.idxmax()
+        #print("Dose output:\n", outdf['dose'])
+        print("RESULT:\n", outdf)
+       
         return outdf.reset_index()
 
 
@@ -162,8 +164,11 @@ class Domain:
         try:
             self._cells = self.load_file()
         except Exception as e:
-            print("Cells is None")
             self._cells = None
+    
+    def __repr__(self):
+        return "Domain(name={}, fpath={})".format(
+            self.name, self.fpath)
 
     def load_file(self):
         """  load cells from the target file 
@@ -211,11 +216,6 @@ def process_dose(fpath, copc, domain, year_range, outputDir):
     outname = os.path.join(outputDir, "max_for_pathway")
     n = make_filename(outname, copc, domain, year_range)
     to_csv(dfmax, n)
-
-    #outname = os.path.join(outputDir, "max_total_for_time")
-    #n = make_filename(outname, copc, domain, year_range)
-    #dfsum = reduced.sum_pathways()
-    #to_csv(dfsum, n)
 
 def parse_control_file(fpath):
     """ returns the control file as a dict """
@@ -316,6 +316,7 @@ def main(input_control_file_path):
     
     for domain in domains:
         for date_range in date_ranges:
+            print(domain, date_range)
             process_dose(dose_path, copc, domain, date_range, outputDir)
 
 
