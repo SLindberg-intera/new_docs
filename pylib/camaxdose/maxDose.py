@@ -82,6 +82,8 @@ def extract_for_cells(df, cells):
 
     return a dataframe that only includes the cells
     """
+    if(len(df)==0):
+        return df  # there is nothing to extract
     ids = [i.id for i in cells]
     truth = df.apply(
            lambda x: row_col_to_id(x.cell_row, x.cell_column), axis=1)
@@ -324,7 +326,11 @@ if __name__=="__main__":
         sys.exit(1)
 
     if(os.path.exists(control_file)):
-        main(control_file)
+        try:
+            main(control_file)
+        except Exception as e:
+            print("Failed for {}".format(control_file))
+            raise e
     else:
         raise IOError("Path to the input control file does not exist")
 
