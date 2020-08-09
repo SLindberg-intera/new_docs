@@ -43,7 +43,7 @@ BEGIN
 	END IF;
 
 	INSERT INTO public.stg_ucn (mdl_id, contam, col, "row", layer, stress_period, time_step, elapsed_time, concentration)
-	SELECT DISTINCT mdlidin, copcin, mcolumn, mrow, mlayer, stress_period, time_step, etime, concentration
+	SELECT mdlidin, copcin, mcolumn, mrow, mlayer, stress_period, time_step, etime, concentration
 	FROM (
 		SELECT mcolumn, mrow, mlayer, stress_period, time_step, round(elapsed_time) etime, concentration, 
 			RANK() OVER (PARTITION BY mcolumn, mrow, mlayer, stress_period ORDER BY stress_period, time_step DESC) pos
