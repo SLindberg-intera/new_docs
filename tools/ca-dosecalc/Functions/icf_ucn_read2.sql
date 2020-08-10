@@ -1,3 +1,10 @@
+/*
+	This function has a bug DO NOT USE
+
+*/
+
+
+
 -- FUNCTION: public.icf_ucn_read2(character varying, integer, numeric)
 
 -- DROP FUNCTION public.icf_ucn_read2(character varying, integer, numeric);
@@ -28,7 +35,10 @@ AS $BODY$
 			dat = uo.get_alldata(mflay=layerin)
 			t, r, c = np.indices(dat.shape)
 			l = np.repeat(layerin,np.prod(dat.shape))
-			df = pd.DataFrame({'mlayer':l+1,'mrow':r.flatten()+1,'mcolumn':c.flatten()+1,'stress_period':sp[t.flatten(),1],'time_step':sp[t.flatten(),0],'elapsed_time':ts[t.flatten()],'concentration':dat.flatten()}, columns=['mlayer','mrow','mcolumn','stress_period','time_step','elapsed_time','concentration']).to_records(index=False)
+			cflat = c.flatten()
+			rflat = r.flatten()
+			tflat = t.flatten()
+			df = pd.DataFrame({'mlayer':l+1,'mrow':rflat+1,'mcolumn':cflat+1,'stress_period':sp[tflat,1],'time_step':sp[tflat,0],'elapsed_time':ts[tflat],'concentration':dat.flatten()}, columns=['mlayer','mrow','mcolumn','stress_period','time_step','elapsed_time','concentration']).to_records(index=False)
 	return df[df['concentration']>=thresh]
 $BODY$;
 
