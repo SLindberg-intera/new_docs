@@ -11,8 +11,7 @@
 # --------------------------
 
 # Set help/usage message
-usage="
-$(basename "$0") [-h] -d database -m model -f ucnfile -c copc -u unit
+usage="$(basename "$0") [-h] -d database -m model -f ucnfile -c copc -u unit -t flaname
 
 where :
      -h  show this help message
@@ -21,10 +20,11 @@ where :
      -f  the full path to the .UCN file to load
      -c  the name of hte copc ('Tc99')
      -u  the unit (usually pCi/m^3 )
+     -t  the temp file name for storing the flat UCN file as a csv
 "
 # Get command line arguments
 tkeep=1
-while getopts 'h:f:d:m:c:u:' opt; do
+while getopts 'h:f:d:m:c:u:t:' opt; do
   case "${opt}" in
     h)  echo "$usage" >&2
         exit;;
@@ -33,6 +33,7 @@ while getopts 'h:f:d:m:c:u:' opt; do
     d)  dbase=$OPTARG;;
     c)  copcnm=$OPTARG;;
     u)  unit=$OPTARG;;
+    t)  flatfilename=$OPTARG;;
     :)  printf "missing argument for -%s\n" "$OPTARG" >&2
         echo "$usage" >&2
         exit 1;;
@@ -57,19 +58,29 @@ mdlid=$(psql -d "$dbase" -qtA -c "select mdl_id from public.models where mdl_nm=
 # obtain the unit id for the units
 unitid=$(psql -d "$dbase" -qtA -c "select unit_id from public.units where unit_in='$unit';")
 
+# obtain the cutoff threshold for the copc
+thresh=$(psql -d "$dbase" -qtA -c "select min_thresh as thresh from copc where contam_nm='$copcnm';")
+echo "thresh is $thresh"
+
+
 # obtain the layer indicies
-layersArr=$(psql -d "$dbase" -qtA -c "select array_agg(lay - 1) from (select distinct lay from cells where mdl_id=$mdlid) a;")
-layers=$(echo "$layersArr" | sed 's/,/ /g' | sed 's/{//g' | sed 's/}//g')
+#layersArr=$(psql -d "$dbase" -qtA -c "select array_agg(lay - 1) from (select distinct lay from cells where mdl_id=$mdlid) a;")
+#layers=$(echo "$layersArr" | sed 's/,/ /g' | sed 's/{//g' | sed 's/}//g')
 
 # remove elements in the ucn staging table
 rval=$(psql -d "$dbase" -qtA -c "truncate stg_ucn;")
 
-for lay in $layers
-do
-  # load UCN file into ucn staging table one layer at a time
-  rval=$(psql -d "$dbase" -qtA -c "select icf_ucn_get('$fname', $mdlid, '$copcnm', $lay);")
-done
-d=$(date)
+script=$(readlink -f "$0")
+basedir=$(dirname "$script")
+echo "The threshold is $thresh"
+# fnameflat='/home/ca/dose/testDose/test/tempftest.csv'
+
+python3 $basedir'/portUCN.py' $fname $thresh $flatfilename
+
+psql -d $dbase -qtA -c "truncate table stg_ucn;"
+psql -d $dbase -qtA -c "\copy stg_ucn(elapsed_time, layer, row, col, concentration) from '$flatfilename' delimiter ',' csv;"
+psql -d $dbase -qtA -c "update stg_ucn set stress_period=1, mdl_id=1, contam='$copcnm', model_nm='$copcnm';"
+
 echo "$d: moved data from ucn into staging table"
 
 # load all ucn data into the concentrations table
