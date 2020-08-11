@@ -1,0 +1,15 @@
+{
+    "copc":"U235",
+    "dosepath":"data/U235.csv",
+    "comment":"This is ignored by this tool",
+    "domains":[
+        {"name":"inner", "fpath":""},
+        {"name":"outer", "fpath":""},
+        {"name":"ca99", "fpath":""}
+    ],
+    "outputdir":"output",
+    "dateranges":[
+        {"start_year":2070, "end_year":3070},
+        {"start_year":3070, "end_year":12070}
+    ]
+}
