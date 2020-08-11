@@ -53,6 +53,9 @@ dosefactsFile=$6
 outputFile=${15}
 
 
+tempfilename=$(dirname $outputFile)'/'$(basename $outputFile '.csv')'-conc.csv'
+
+
 # this constitutes a model run
 mdl=$copc
 dbase='dosecalc'$copc
@@ -64,7 +67,7 @@ $toolsdir/shapefile_loader.sh -d $dbase -f $gridShapefile -m $mdl
 $toolsdir/populate_cells.sh -m $mdl -l $NLay -d $dbase
 $toolsdir/load_soils.sh -f $soilFile -d "$dbase" -m $mdl
 $toolsdir/pop_dose_factors.sh $dbase $pathwaysFile $copcFile $dosefactsFile
-$toolsdir/pop_concentration.sh -f $ucnFile -c $copc -m $mdl -d $dbase -u $unitsin 
+$toolsdir/pop_concentration.sh -f $ucnFile -c $copc -m $mdl -d $dbase -u $unitsin -t $tempfilename
 $toolsdir/pop_views.sh $dbase
 $toolsdir/output_dose.sh $dbase $copc $outputFormat $outputFile
 
