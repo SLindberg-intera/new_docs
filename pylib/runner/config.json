@@ -181,6 +181,13 @@
 		},
 	{"name":"CalcDose", "command":"calcDose.py", "description":"qualified on 07.27.2020.  Update on 08.10.2020; This tool calculates the dose given dose factors and groundwater concentrations "},
 	{"name":"maxDose", "command":"maxDose.py", "description":"qualified on 08.11.2020; This tool calculates the maximum dose over regions and time intervals given the output from CalcDose. "}
+		,
+
+		{
+
+		"name":"CIE Source Rerouting Tool", "command":"reroute_sources_cie_linux-intel-64.exe", "description":"qualified on 08.14.2020; This tool builds a Hydrocarbon Spill Screening Model (HSSM) package for MT3D modeling purposes"
+
+		}
 	],
 	"LOGGER":{
 		"format":"%(levelname)s--%(asctime)s--%(message)s",
