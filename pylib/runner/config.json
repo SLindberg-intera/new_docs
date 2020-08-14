@@ -185,7 +185,7 @@
 
 		{
 
-		"name":"CIE Source Rerouting Tool", "command":"reroute_sources_cie_linux-intel-64.exe", "description":"qualified on 08.14.2020; This tool builds a Hydrocarbon Spill Screening Model (HSSM) package for MT3D modeling purposes"
+		"name":"CIE Source Rerouting Tool", "command":"reroute_sources_cie_linux-intel-64.exe", "description":"qualified on 08.14.2020; this tool redistributes wastewater volumes and contaminant inventories (H-3, I 129, Sr-90, Tc-99, total U, Cr, NO3 and CN) for the 216 U 10 Pond system and the 216-B-3 Pond system"
 
 		}
 	],
