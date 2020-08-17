@@ -17,10 +17,10 @@ class DoseFile:
         represents a path to a dose file
 
     """
-    allowed_columns = ['pathway', 'elapsed_tm', 
+    allowed_columns = ['pathway', 'elapsed_tm', 'model_date',
 	'cell_layer','cell_row','cell_column', 'dose']
     index_cols = ['pathway', 
-	'elapsed_tm','cell_layer','cell_row','cell_column']
+	'elapsed_tm','cell_layer','cell_row','cell_column','model_date']
 
     def __init__(self, copc, fpath):
         self.copc=copc
@@ -83,7 +83,7 @@ class DoseFiles:
         fn = lambda a, b: pd.concat([a, b], axis=1)
         total = reduce(fn, [i.df for i in self._dosefiles])
         keys = [i.copc for i in self._dosefiles]
-        total['Sum'] = total[keys].sum(axis=1)
+        total['dose'] = total[keys].sum(axis=1)
         return total
 
     @property
