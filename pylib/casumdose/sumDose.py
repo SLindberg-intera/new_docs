@@ -1,3 +1,19 @@
+"""
+  This computes the sum of the dose by aggregating
+      over the dose from several COPCs.  
+
+       the sum is over the COPCS and is computed for each distinct
+         (row, column, layer, timestep, and exposure route/pathway)
+
+   This program takes an inputControlFile (a JSON) that tells the program
+    where to store the output and where to find the inputs.
+
+   Inputs are assumed to be the output of ca-dosecalc
+
+
+
+"""
+
 import json
 import os, sys
 import warnings
