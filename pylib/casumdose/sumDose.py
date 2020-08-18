@@ -52,7 +52,34 @@ class DoseFile:
 
 
 class ControlFile:
-    """ Represents the input control file """
+    """ Represents the input control file
+          this is expected to be a JSON file that tells the name of
+           the expected output, and then a list of files to use 
+           as inputs.  Please see the documentation for more details.
+
+          an example control file is provided 
+             in exampleInputControlFile.json
+
+        {
+          "comment":"This is a test",  <-- not read
+          "outputFile":"outputs/dose.csv", <-- defines output
+          "doseFiles":[  <-- one input file per entry in this list
+        	{ 
+              "copc":"d1",  <-- the label used to track this file
+              "fpath":"inputs/data1.csv" <-- path to input file
+        	},
+        	{ 
+              "copc":"d2",
+              "fpath":"inputs/data2.csv"
+        	},
+            {
+              "copc":"d3",
+              "fpath":"inputs/data3.csv"
+            }
+          ]
+        }
+          
+    """
     DOSEFILES = 'doseFiles'
     OUTPUTFILE = 'outputFile'
 
