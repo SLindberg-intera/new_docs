@@ -1,7 +1,10 @@
 import json
 import os, sys
-import pandas as pd
-from functools import reduce
+import warnings
+
+#import pandas as pd
+import modin.pandas as pd
+#from functools import reduce
 
 def parse_control_file(fpath):
     """ returns the control file as a dict """
@@ -80,8 +83,9 @@ class DoseFiles:
     def merge(self):
         """ conbine all the dataframes into a single
              by joining on their axes """
-        fn = lambda a, b: pd.concat([a, b], axis=1)
-        total = reduce(fn, [i.df for i in self._dosefiles])
+        #fn = lambda a, b: pd.concat([a, b], axis=1)
+        #total = reduce(fn, [i.df for i in self._dosefiles])
+        total = pd.concat([i.df for i in self._dosefiles], axis=1)
         keys = [i.copc for i in self._dosefiles]
         total['dose'] = total[keys].sum(axis=1)
         return total
@@ -104,7 +108,9 @@ def main(input_control_file):
 
     dfs = DoseFiles(inputs.doseFiles) 
     with open(inputs.output_file, "w") as f:
-        dfs.total.to_csv(f)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore") # catching handled to_csv warn
+            dfs.total.to_csv(f)
 
 
 if __name__ == "__main__":
