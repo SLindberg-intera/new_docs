@@ -1,0 +1,18 @@
+{
+  "comment":"This is a test",
+  "outputFile":"outputs/dose.csv",
+  "doseFiles":[
+	{ 
+      "copc":"d1",
+      "fpath":"inputs/data1.csv"
+	},
+	{ 
+      "copc":"d2",
+      "fpath":"inputs/data2.csv"
+	},
+    {
+      "copc":"d3",
+      "fpath":"inputs/data3.csv"
+    }
+  ]
+}
