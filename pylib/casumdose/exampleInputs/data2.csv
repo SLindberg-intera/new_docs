@@ -1,0 +1,4 @@
+elapsed_tm,model_date,soil,pathway,cell_row,cell_column,cell_layer,concentration,dose_factor,dose
+0,1/1/2019,A Soil,A Route,1,1,1,8,10,80
+0,1/1/2019,B Soil,A Route,1,1,2,9,11,99
+1,1/2/2019,A Soil,A Route,1,1,1,11,10,110
