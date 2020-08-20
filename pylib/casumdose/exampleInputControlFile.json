@@ -1,6 +1,7 @@
 {
-  "comment":"This is a test",
+  "comment":"This is an example input control file.  It works for both doseCalc and doseCalcDB.",
   "outputFile":"outputs/dose.csv",
+  "dbname":"onlyRelevantForDoseCalcDB",
   "doseFiles":[
 	{ 
       "copc":"d1",

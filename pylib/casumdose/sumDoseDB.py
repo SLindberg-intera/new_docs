@@ -25,8 +25,6 @@
 import json
 import os, sys
 import subprocess
-from timeit import default_timer as timer
-startTime = timer()
 
 def parse_control_file(fpath):
     """ returns the control file as a dict """
@@ -39,10 +37,6 @@ class DoseFile:
         represents a path to a dose file
 
     """
-    allowed_columns = ['pathway', 'elapsed_tm', 'model_date',
-	'cell_layer','cell_row','cell_column', 'dose']
-    index_cols = ['pathway', 
-	'elapsed_tm','cell_layer','cell_row','cell_column','model_date']
 
     def __init__(self, copc, fpath):
         self.copc=copc
@@ -68,15 +62,15 @@ class ControlFile:
           "doseFiles":[  <-- one input file per entry in this list
         	{ 
               "copc":"d1",  <-- the label used to track this file
-              "fpath":"inputs/data1.csv" <-- path to input file
+              "fpath":"/inputs/data1.csv" <-- absoulte path to input file
         	},
         	{ 
               "copc":"d2",
-              "fpath":"inputs/data2.csv"
+              "fpath":"/inputs/data2.csv"
         	},
             {
               "copc":"d3",
-              "fpath":"inputs/data3.csv"
+              "fpath":"/inputs/data3.csv"
             }
           ]
         }
@@ -135,7 +129,7 @@ def run_command(cmd):
 
         call the command as a linux subprocess
     """
-    proc = subprocess.run(cmd)
+    proc = subprocess.run(cmd) 
     #, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 def create_run_sql_cmd(dbname, sql):
@@ -221,14 +215,14 @@ def calc_sum_cmd(dbname, copcs):
     details = details_sql(copcs)
     sql = """
     create table sumdose as 
-        select elapsed_tm, model_date, cell_row, cell_layer, cell_column,
-            soil, pathway, {details}, dose from (
+        select pathway, elapsed_tm, cell_layer, cell_row, cell_column, model_date, 
+            {details}, dose from (
                 select elapsed_tm, model_date, cell_row,
-                     cell_layer, cell_column, soil, pathway,
+                     cell_layer, cell_column, pathway,
                     json_object_agg(copc, dose)
                  as details, sum(dose) as dose from dose
-        group by elapsed_tm, model_date, cell_row, cell_layer, cell_column,
-            soil, pathway) A;
+        group by
+            pathway, elapsed_tm, cell_layer, cell_row, cell_column, model_date) A;
 
     """.format(details=details)
 
@@ -254,13 +248,17 @@ def create_index_cmd(dbname,):
     """
     return create_run_sql_cmd(dbname, sql)
 
+
 def comment_cmd(comment):
-    now = timer()
-    hrs_since_start = (now - startTime)/(60*60.0)
-    outs = "{} - {}".format("{:.3f}h".format(hrs_since_start), comment) 
-    return ["echo", outs]
+    """ return a command that when executed yields the comment
+        prepends the time since run start
+    """
+    return ["echo", comment]
 
 def export_cmd(dbname, outfile):
+    """  return a command that when executed causes the database to export
+          the summed dose data
+    """
     sql = """
          copy sumdose to '{}' delimiter ',' csv header;
     """.format(outfile)
@@ -284,9 +282,9 @@ def main(input_control_file):
 
     def load_data_cmds():
         for item in dose_files:
-            yield comment_cmd("Start Loading for '{}'".format(item.copc))
+            yield comment_cmd("Start loading dose file '{}'".format(item.copc))
             yield copy_table_cmd(inputs.dbname,item.copc, item.fpath)
-            yield comment_cmd("Loaded data for '{}'".format(item.copc))
+            yield comment_cmd("Loaded dose file '{}'".format(item.copc))
 
     copcs = [item.copc for item in dose_files]
 
@@ -294,17 +292,17 @@ def main(input_control_file):
        drop_database_cmd(inputs.dbname),
        create_database_cmd(inputs.dbname),
        create_dose_table_cmd(inputs.dbname),
-       comment_cmd("Loading tables"),
+       comment_cmd("Start loading dose files"),
        *list(load_data_cmds()),
-       comment_cmd("Loaded tables"),
-       comment_cmd("Starting index"),
+       comment_cmd("Finished loading dose files"),
+       comment_cmd("Starting indexing"),
        create_index_cmd(inputs.dbname),
        vacuum_cmd(inputs.dbname),
-       comment_cmd("Completed index"),
+       comment_cmd("Finished indexing"),
        comment_cmd("Start aggregation"),
        calc_sum_cmd(inputs.dbname, copcs),
        comment_cmd("Ended aggregation"),
-       comment_cmd("writing to '{}'".format(inputs.output_file)),
+       comment_cmd("writing output to '{}'".format(inputs.output_file)),
        export_cmd(inputs.dbname, inputs.output_file),
        comment_cmd("END")
     ]
