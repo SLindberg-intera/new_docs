@@ -9,9 +9,9 @@
     where to store the output and where to find the inputs.
 
    Inputs are assumed to be the output of ca-dosecalc
-
-
-    this program uses postgres to do the actual calculation:
+  
+  this program uses postgres to do the actual calculation, which 
+   is done in "main()":
          - shell commands are constructed py parsing the input control file
          - shell commands are exected (many are sql statements):
              - a database is created
@@ -125,7 +125,8 @@ def drop_database_cmd(dbname):
     return ["dropdb", dbname]
 
 def run_command(cmd):
-    """ for a given cmd (command; an output of functions ending in _cmd
+    """ for a given cmd (i.e. a command -- the output of 
+          any function in this script ending in _cmd
 
         call the command as a linux subprocess
     """
@@ -139,9 +140,9 @@ def create_run_sql_cmd(dbname, sql):
     return ["psql", '-d', dbname,'-qAt','-c', sql]
 
 def create_dose_table_cmd(dbname):
-    """  Returns a command
+    """  Returns a command that when executed
 
-    create the dose table and the staging table 
+    creates the dose table and the staging table 
 
     """
     sql = """
@@ -174,7 +175,7 @@ def create_dose_table_cmd(dbname):
     return create_run_sql_cmd(dbname, sql)
 
 def copy_table_cmd(dbname, name, inputfile):
-    """  returns a command
+    """  returns a command that when executed
 
         Loads data from the inputfile into staging.  It then loads it into
         the dose table.
@@ -200,13 +201,15 @@ def details_frag(copc):
     """ given a copc (string), return a text fragment that can 
          be used to extract that copc's dose 
 
-        this is used to build the column headers in calc_sum_cmd
+        this is used to build the column headers in calc_sum_cmd from
+          the copc names that are provided at run time in the inputControlFile
     """
     return '''details->'{copc}' as "{copc}"'''.format(copc=copc)
 
 def details_sql(copcs):
     """ return a string that will be used to select dose 
-            this is used in calc_sum_cmd
+            this is used do define column names in in calc_sum_cmd
+              given the copc names specified at run time in the inputControlFile
     """
     return ", ".join([details_frag(copc) for copc in copcs])
 
@@ -235,7 +238,7 @@ def vacuum_cmd(dbname):
     return create_run_sql_cmd(dbname, sql)
 
 def create_index_cmd(dbname,):
-    """ command to create index on the dose table; useful for aggregation """
+    """ command to create index on the dose table; useful for efficient aggregation """
     sql = """
         create index tm_idx on dose (elapsed_tm);
         create index path_idx on dose (pathway);
@@ -250,9 +253,7 @@ def create_index_cmd(dbname,):
 
 
 def comment_cmd(comment):
-    """ return a command that when executed yields the comment
-        prepends the time since run start
-    """
+    """ return a command that when executed yields the comment """
     return ["echo", comment]
 
 def export_cmd(dbname, outfile):
@@ -281,6 +282,7 @@ def main(input_control_file):
     dose_files = DoseFiles(inputs.doseFiles) 
 
     def load_data_cmds():
+        """ iterator that yields commands to load each of the dose files """
         for item in dose_files:
             yield comment_cmd("Start loading dose file '{}'".format(item.copc))
             yield copy_table_cmd(inputs.dbname,item.copc, item.fpath)
