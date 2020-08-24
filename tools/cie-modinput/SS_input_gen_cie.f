@@ -68,11 +68,11 @@ c
 c
       CALL DATE_AND_TIME (date,time)
 c
-      WRITE(20,"(5a)") date(5:6),'/',
-     >  date(7:8),'/',date(1:4)
+      WRITE(20,"(6a)") date(5:6),'/',
+     >  date(7:8),'/',date(1:4),','
 c
-      WRITE(20,"(5a)") time(1:2),':',
-     >  time(3:4),':',time(5:6)
+      WRITE(20,"(6a)") time(1:2),':',
+     >  time(3:4),':',time(5:6),','
 c
       WRITE(20,"(i1,a1)") 2,','
       llen=len(trim(model))
