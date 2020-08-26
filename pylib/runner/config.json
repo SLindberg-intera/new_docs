@@ -182,7 +182,6 @@
 	{"name":"CalcDose", "command":"calcDose.py", "description":"qualified on 07.27.2020.  Update on 08.10.2020; This tool calculates the dose given dose factors and groundwater concentrations "},
 	{"name":"maxDose", "command":"maxDose.py", "description":"qualified on 08.11.2020; This tool calculates the maximum dose over regions and time intervals given the output from CalcDose. "},
 	{"name":"sumDose", "command":"sumDose.py", "description":"qualified on 08.19.2020; This tool calculates the total dose by summing over multiple COPCs. "},
-	{"name":"sumDoseDB", "command":"sumDoseDB.py", "description":"qualified on 08.20.2020; This tool calculates the total dose by summing over multiple COPCs; same as sumDose, but accepts very large files. "},
 	{
 		"name":"CIE Source Rerouting Tool", "command":"reroute_sources_cie_linux-intel-64.exe", "description":"qualified on 08.14.2020; this tool redistributes wastewater volumes and contaminant inventories (H-3, I 129, Sr-90, Tc-99, total U, Cr, NO3 and CN) for the 216 U 10 Pond system and the 216-B-3 Pond system"
 
