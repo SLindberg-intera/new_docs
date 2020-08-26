@@ -97,9 +97,21 @@ def load_dose_table_cmd(dbname, dosepath, datacols):
     colnames = datacols.as_table_names_str()
 
     sql = """
-       create table dose(
+        create table dose(
            {colfrags}
            );
+        create table maxdose(
+            domain varchar(100),
+            start_year INTEGER,
+            end_year INTEGER,
+            {colfrags}
+        ); 
+        create table maxdosets(
+            domain varchar(100),
+            start_year INTEGER,
+            end_year INTEGER,
+            {colfrags}
+        );
 
         COPY dose({cols}) 
          from '{fname}' DELIMITER ',' CSV HEADER;
@@ -107,6 +119,23 @@ def load_dose_table_cmd(dbname, dosepath, datacols):
     """.format(colfrags=colfrags, cols=colnames, fname=dosepath)
     return create_run_sql_cmd(dbname, sql)
 
+
+def export_cmd(dbname, outdir):
+    """ return a command that when executed writes the results to file 
+
+        two files are producted: 
+            max_dose_timeseries: max year-by-year
+            max_dose: the maximum over the interval 
+    """
+    
+    timefile = os.path.join(outdir, 'max_dose_timeseries.csv')
+    totalfile = os.path.join(outdir, 'max_dose.csv') 
+
+    sql = """
+        copy maxdose to '{}' delimiter ',' csv header;
+        copy maxdosets to '{}' delimiter ',' csv header;
+     """.format(totalfile, timefile)
+    return create_run_sql_cmd(dbname, sql)
 
 def load_boundary_cmd(dbname, boundary):
     """  returns a command that when executed, loads 
@@ -188,24 +217,6 @@ def details_sql(copcs):
     """
     return ", ".join([details_frag(copc) for copc in copcs])
 
-def calc_sum_cmd(dbname, copcs):
-    """ command to aggregate the dose as the table 'sumdose'  """
-    details = details_sql(copcs)
-    sql = """
-    create table sumdose as 
-        select pathway, elapsed_tm, cell_layer, cell_row, cell_column, model_date, 
-            {details}, dose from (
-                select elapsed_tm, model_date, cell_row,
-                     cell_layer, cell_column, pathway,
-                    json_object_agg(copc, dose)
-                 as details, sum(dose) as dose from dose
-        group by
-            pathway, elapsed_tm, cell_layer, cell_row, cell_column, model_date) A;
-
-    """.format(details=details)
-
-    return create_run_sql_cmd(dbname, sql)
-
 def vacuum_cmd(dbname):
     """ return a command that when executed performs a vacuum analyze on
         the dose table """
@@ -232,15 +243,6 @@ def create_index_cmd(dbname,):
 def comment_cmd(comment):
     """ return a command that when executed yields the comment """
     return ["echo", comment]
-
-def export_cmd(dbname, outfile):
-    """  return a command that when executed causes the database to export
-          the summed dose data
-    """
-    sql = """
-         copy sumdose to '{}' delimiter ',' csv header;
-    """.format(outfile)
-    return create_run_sql_cmd(dbname, sql)
 
 
 def row_col_to_id(row, col):
@@ -278,61 +280,68 @@ class ExtractionInterval:
         self.year_range = year_range
         self.domain = domain
 
-    def extract_max_ts_to_file_cmd(self, dbname, outpath, copc):
-        """ return a cmd that aggregates timeseries of the max over pathways
-        """
-        outfilename = "max_for_pathway_for_time_{}_{}_yr{}-{}.csv".format(
-            copc, self.domain.name, self.year_range.start_year, 
-            self.year_range.end_year)
-        fpath = os.path.join(outpath, outfilename)
+    def extract_max_ts_to_file_cmd(self, dbname, copc):
+        """ return a cmd that aggregates timeseries of the max over pathways """
         sql = """
-             copy (select * from (select distinct on (year, pathway) D.* 
-                from (
-                select *, split_part(model_date, '-',1)::int as year
-                from dose) D, include I 
+             insert into maxdosets 
+                select A.boundary, 
+                   {start_year} as start_year,
+                   {end_year} as end_year, S.* from (
+                    select distinct on (year) 
+                        boundary, year, cell_row, cell_column,
+                         cell_layer, elapsed_tm 
+                         from (
+                            select *, split_part(model_date, '-', 1)::int as year
+                            from dose
+                           ) D, include I 
                     where D.cell_row=I.row
                         and I."column"=D.cell_column
-                        and boundary = '{}'
-                        and D.year >= {}
-                        and D.year <= {}
-                  order by year, pathway, dose desc) A
-            order by year, pathway
-            ) to '{}' DELIMITER ',' CSV HEADER;
+                        and boundary = '{boundary}'
+                        and year >= {start_year}
+                        and year <= {end_year}
+                    order by year, dose desc) A,
+                        dose S where
+                         S.cell_row=A.cell_row and
+                         S.cell_column=A.cell_column and
+                         S.cell_layer=A.cell_layer
+                         and S.elapsed_tm=A.elapsed_tm
+            order by boundary, start_year, elapsed_tm, elapsed_tm;
         
-        """.format(self.domain.name, 
-            self.year_range.start_year,
-            self.year_range.end_year, fpath)
+        """.format(boundary=self.domain.name, 
+            start_year=self.year_range.start_year,
+            end_year=self.year_range.end_year)
 
         return create_run_sql_cmd(dbname, sql)
 
-    def extract_max_to_file_cmd(self, dbname, outpath, copc):
+    def extract_max_to_file_cmd(self, dbname, copc):
         """returns cmd that aggregates the max over pathways """
-
-        outfilename = "max_for_pathway_{}_{}_yr{}-{}.csv".format(
-            copc, self.domain.name, self.year_range.start_year, 
-            self.year_range.end_year)
-        fpath = os.path.join(outpath, outfilename)
-
         sql = """
-            copy (
-                select * from (select distinct on (pathway) D.* 
-                from (
-                        select *, split_part(model_date, '-', 1)::int as year
-                        from dose
-                    ) D, include I 
+             insert into maxdose 
+                select A.boundary, 
+                   {start_year} as start_year,
+                   {end_year} as end_year, S.* from (
+                    select boundary, year, 
+                    cell_row, cell_column, cell_layer, elapsed_tm 
+                         from (
+                            select *, split_part(model_date, '-', 1)::int as year
+                            from dose
+                           ) D, include I 
                     where D.cell_row=I.row
                         and I."column"=D.cell_column
-                        and boundary = '{}'
-                        and year >= {}
-                        and year <= {}
-                    order by pathway, dose desc) A
-            order by dose desc
+                        and boundary = '{boundary}'
+                        and year >= {start_year}
+                        and year <= {end_year}
+                    order by dose desc limit 1) A,
+                        dose S where
+                         S.cell_row=A.cell_row and
+                         S.cell_column=A.cell_column and
+                         S.cell_layer=A.cell_layer
+                         and S.elapsed_tm=A.elapsed_tm
+            order by pathway;
 
-            ) to '{}' DELIMITER ',' CSV HEADER;
-
-        """.format(self.domain.name, 
-            self.year_range.start_year,
-            self.year_range.end_year, fpath)
+        """.format(boundary=self.domain.name, 
+            start_year=self.year_range.start_year,
+            end_year=self.year_range.end_year)
 
         return create_run_sql_cmd(dbname, sql)
 
@@ -582,10 +591,10 @@ def main(input_control_file_path):
             yield load_boundary_cmd(dbname, domain)
 
     excmds = list(
-        i.extract_max_to_file_cmd(dbname, outputDir, copc) 
+        i.extract_max_to_file_cmd(dbname, copc) 
             for i in intervals)
     extscmds = list(
-        i.extract_max_ts_to_file_cmd(dbname, outputDir, copc)
+        i.extract_max_ts_to_file_cmd(dbname, copc)
             for i in intervals)
     
     commands = [
@@ -597,7 +606,8 @@ def main(input_control_file_path):
         create_index_cmd(dbname),
         vacuum_cmd(dbname),
         *excmds,
-        *extscmds
+        *extscmds,
+        export_cmd(dbname, outputDir) 
     ]
     # apply index
     # vacuum analyzee
