@@ -186,7 +186,12 @@
 	{
 		"name":"CIE Source Rerouting Tool", "command":"reroute_sources_cie_linux-intel-64.exe", "description":"qualified on 08.14.2020; this tool redistributes wastewater volumes and contaminant inventories (H-3, I 129, Sr-90, Tc-99, total U, Cr, NO3 and CN) for the 216 U 10 Pond system and the 216-B-3 Pond system"
 
+		},
+		{
+		"name":"CIE Steady State STOMP Input File Generator Tool", "command":"SS_input_gen_cie_linux-intel-64.exe", "description":"qualified on 08.26.2020; this tool generates the STOMP Input file input_cie_SS for the CIE steady-state simulation"
+
 		}
+
 
   ],
 	"LOGGER":{
