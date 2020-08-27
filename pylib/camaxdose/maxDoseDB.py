@@ -86,37 +86,53 @@ class DoseColumns:
         """ return a string that can be used in a sql SELECT statement """
         return ",".join(self.names)
 
-def load_dose_table_cmd(dbname, dosepath, datacols):
+def make_pathway_qry_str(routes):
+    """return a query fragment that selects for routes/pathways  """
+    if routes is None:
+        return ""
+    if len(routes) ==0:
+        return ""
+    return "where pathway in ({})".format(",".join(
+        map("'{}'".format, routes)))
+
+def load_dose_table_cmd(dbname, dosepath, datacols, routes=None):
     """ returns a command that when executed
 
       loads the dose table 
 
         datacols is expected to be a list of column names 
+           routes is a list of exposure pathways/routes to INCLUDE
     """
     colfrags = datacols.as_table_def_str()
     colnames = datacols.as_table_names_str()
+    pathwaystr = make_pathway_qry_str(routes)
 
     sql = """
-        create table dose(
+        create unlogged table dosestg(
            {colfrags}
-           );
-        create table maxdose(
+        );
+        create unlogged table maxdose(
             domain varchar(100),
             start_year INTEGER,
             end_year INTEGER,
             {colfrags}
         ); 
-        create table maxdosets(
+        create unlogged table maxdosets(
             domain varchar(100),
             start_year INTEGER,
             end_year INTEGER,
             {colfrags}
         );
 
-        COPY dose({cols}) 
+        COPY dosestg({cols}) 
          from '{fname}' DELIMITER ',' CSV HEADER;
 
-    """.format(colfrags=colfrags, cols=colnames, fname=dosepath)
+        select * into unlogged dose 
+            from dosestg {pth};
+                 
+    """.format(colfrags=colfrags, cols=colnames, fname=dosepath,
+            pth=pathwaystr
+        )
     return create_run_sql_cmd(dbname, sql)
 
 
@@ -178,13 +194,18 @@ def create_include_table_cmd(dbname):
     return create_run_sql_cmd(dbname, sql)
 
 
-def copy_table_cmd(dbname, name, inputfile):
+def copy_table_cmd(dbname, name, inputfile, routes=None):
     """  returns a command that when executed
 
         Loads data from the inputfile into staging.  It then loads it into
         the dose table.
 
+        If routes is not None, it will select only those
+          routes/pathways specified
+
     """
+    routestr = make_pathway_qry_str(routes)
+    
     sql = """
         truncate dosestg;
         COPY dosestg(elapsed_tm, model_date, soil, pathway, cell_row,
@@ -195,9 +216,9 @@ def copy_table_cmd(dbname, name, inputfile):
         INSERT INTO dose 
             select '{1}' as copc, elapsed_tm, model_date, soil, pathway, cell_row,
               cell_column, cell_layer, concentration, dose_factor, dose
-            from dosestg;
+            from dosestg {};
 
-    """.format(inputfile, name)
+    """.format(inputfile, name, routestr)
     return create_run_sql_cmd(dbname, sql)
 
 
@@ -514,6 +535,7 @@ class ControlFile:
     OUTPUTDIR = 'outputdir'
     COLUMNS = 'columns'
     DBNAME = 'dbname' 
+    ROUTES = 'routes'
 
     def __init__(self, fpath):
         self.data = parse_control_file(fpath)
@@ -534,6 +556,12 @@ class ControlFile:
     @property
     def columns(self):
         return self[self.COLUMNS]
+    @property
+    def routes(self):
+        try:
+            return self[self.ROUTES]
+        except KeyError:
+            return None
 
     @property
     def date_ranges(self):
@@ -583,6 +611,7 @@ def main(input_control_file_path):
     dbname = inputs.dbname
     datacols = DoseColumns(inputs.columns)
     copc = inputs.copc
+    routes = inputs.routes
 
     intervals = list(iter_extraction_intervals(date_ranges, domains))
     
@@ -596,12 +625,11 @@ def main(input_control_file_path):
     extscmds = list(
         i.extract_max_ts_to_file_cmd(dbname, copc)
             for i in intervals)
-    
     commands = [
         drop_database_cmd(dbname),
         create_database_cmd(dbname),
         create_include_table_cmd(dbname),
-        load_dose_table_cmd(dbname, dose_path, datacols),
+        load_dose_table_cmd(dbname, dose_path, datacols, routes),
         *list(load_table_commands()),
         create_index_cmd(dbname),
         vacuum_cmd(dbname),
