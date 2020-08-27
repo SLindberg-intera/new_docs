@@ -79,6 +79,7 @@ class ControlFile:
     DOSEFILES = 'doseFiles'
     OUTPUTFILE = 'outputFile'
     DBNAME = 'dbname'
+    PATHWAYS = 'pathways'
 
     def __init__(self, fpath):
         self.data = parse_control_file(fpath)
@@ -98,6 +99,13 @@ class ControlFile:
     @property
     def dbname(self):
         return self[self.DBNAME]
+
+    @property
+    def pathways(self):
+        try:
+            return self[self.PATHWAYS]
+        except KeyError as e:
+            return None
 
     @property
     def doseFiles(self):
@@ -146,7 +154,7 @@ def create_dose_table_cmd(dbname):
 
     """
     sql = """
-        create table dose (
+        create unlogged table dose (
             copc VARCHAR(100),
             elapsed_tm INTEGER, 
             model_date VARCHAR(100), 
@@ -159,7 +167,7 @@ def create_dose_table_cmd(dbname):
             dose_factor DOUBLE PRECISION, 
             dose DOUBLE PRECISION);
 
-        create table dosestg (
+        create unlogged table dosestg (
             elapsed_tm INTEGER, 
             model_date VARCHAR(100), 
             soil VARCHAR(200), 
@@ -174,13 +182,19 @@ def create_dose_table_cmd(dbname):
     """
     return create_run_sql_cmd(dbname, sql)
 
-def copy_table_cmd(dbname, name, inputfile):
+def copy_table_cmd(dbname, name, inputfile, pathways=None):
     """  returns a command that when executed
 
         Loads data from the inputfile into staging.  It then loads it into
         the dose table.
 
     """
+    wherepath = None
+    if pathways is not None:
+        wherepath = "where pathway in ({})".format(
+             ",".join(map("'{}'".format, pathways))
+        )
+
     sql = """
         truncate dosestg;
         COPY dosestg(elapsed_tm, model_date, soil, pathway, cell_row,
@@ -191,9 +205,11 @@ def copy_table_cmd(dbname, name, inputfile):
         INSERT INTO dose 
             select '{1}' as copc, elapsed_tm, model_date, soil, pathway, cell_row,
               cell_column, cell_layer, concentration, dose_factor, dose
-            from dosestg;
+            from dosestg
+        {wherepath}
+    ;
 
-    """.format(inputfile, name)
+    """.format(inputfile, name, wherepath=wherepath)
     return create_run_sql_cmd(dbname, sql)
 
 
@@ -217,7 +233,7 @@ def calc_sum_cmd(dbname, copcs):
     """ command to aggregate the dose as the table 'sumdose'  """
     details = details_sql(copcs)
     sql = """
-    create table sumdose as 
+    create unlogged table sumdose as 
         select pathway, elapsed_tm, cell_layer, cell_row, cell_column, model_date, 
             {details}, dose from (
                 select elapsed_tm, model_date, cell_row,
@@ -280,12 +296,14 @@ def main(input_control_file):
         return
 
     dose_files = DoseFiles(inputs.doseFiles) 
+    pathways = inputs.pathways
 
     def load_data_cmds():
         """ iterator that yields commands to load each of the dose files """
         for item in dose_files:
             yield comment_cmd("Start loading dose file '{}'".format(item.copc))
-            yield copy_table_cmd(inputs.dbname,item.copc, item.fpath)
+            yield copy_table_cmd(inputs.dbname,item.copc, item.fpath,
+                pathways)
             yield comment_cmd("Loaded dose file '{}'".format(item.copc))
 
     copcs = [item.copc for item in dose_files]
