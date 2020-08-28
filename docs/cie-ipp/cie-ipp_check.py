@@ -19,7 +19,7 @@ Pseudo Code:    The code in general works in the following manner:
                     a.  VZEHSIT
                     b.  RADINV (SIMV2)
                     c.  LIQINV (SAC)
-                    d.  SWR Inventory
+                    d.  CHEMINV (chemical inventory)
                     e.  REROUTED Sites/Inventory
                 2.  Build dictionary from primary sources
                 3.  Read final output from ca-ipp.pl and verify that it contains the right records
@@ -149,55 +149,62 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--VZEHSIT',
                     dest='vzehsit',
                     type=file_path,
-                    default=r"S:\PSC\!HANFORD\ICF\Prod\VZEHSIT\v1.1\data\Original\
-                            WasteSites("r"ehsit)_Geometry_SIMV2_CA-dos2unix.csv",
+                    required=True,
                     help='Provide the path to the VZEHSIT work product from the ICF'
                     )
 parser.add_argument('--VZINV',
                     dest='vzinv',
                     type=file_path,
-                    default=r"S:\PSC\!HANFORD\ICF\Prod\VZINV\v1.0\data\F_CP-61786_R1_sorted_mar42020.csv",
                     help='Provide the path to the VZINV work product from the ICF'
+                    )
+parser.add_argument('--CHEMINV',
+                    dest='cheminv',
+                    type=file_path,
+                    help='Provide the path to the CHEMINV work product from the ICF'
                     )
 parser.add_argument('--CLEANINV',
                     dest='cleaninv',
                     type=file_path,
-                    default=r"S:\PSC\!HANFORD\ICF\Prod\CLEANINV\v1.0\data\inflow-04_inv1-edited.res",
                     help='Provide the path to the CLEANINV work product from the ICF'
                     )
 parser.add_argument('--RCASWR_dir',
                     dest='rcaswr_dir',
                     type=dir_path,
-                    default=r"S:\PSC\!HANFORD\ICF\Prod\RCASWR\v1.0\data",
                     help='Provide the path to the RCASWR work product data directory from the ICF'
                     )
 parser.add_argument('--RCASWR_idx',
                     dest='rcaswr_idx',
-                    default=r"CASWR_Output_20200219_summary_03.09.2020.csv",
+                    type=str,
                     help='Provide only the filename of the RCASWR index file from the ICF (do not include path)'
                     )
-parser.add_argument('--REDFIN',
-                    dest='redfin',
+parser.add_argument('--REROUTE',
+                    dest='reroute',
                     nargs='+',
                     type=file_path,
-                    default=[
-                        r"Z:\v4-2Test\ICF-unqualified\SALDSINV\v1.0\data\600-211_salds_Inventory_02272020.csv",
-                        r"Z:\v4-2Test\ICF-unqualified\U10B3INV\v1.0\data\U-10_B-3_reroute_rates.csv"
-                    ],
                     help='Provide each rerouting work product file (and path) from the ICF, separated by spaces'
                     )
 parser.add_argument('-i', '--ipp_output',
-                   dest='ipp_output',
-                   type=file_path,
-                   default=r"C:\cygwin64\home\JFullerton\Intera\PSC-CHPRC\C003.HANOFF\CA_CIE\ca-ipp_SQA\CA-inventory-mar102020-ipp_mixedQA.csv",
-                   help='Provide the file and associated path (can be relative) to the ca-ipp.pl output file being\n'
-                        'verified. This should be a CSV file.'
+                    dest='ipp_output',
+                    type=file_path,
+                    help='Provide the file and associated path (can be relative) to the ca-ipp.pl output file being\n'
+                         'verified. This should be a CSV file.'
                    )
-parser.add_argument('--chems',
-                    dest='chems',
-                    type=bool,
-                    default=False,
-                    help='Type "False" if you want to ignore chemicals for comparison. Vice versa if otherwise.'
+parser.add_argument('--COPCs',
+                    dest='copcs',
+                    nargs='+',
+                    type=str,
+                    default=[
+                        'H-3',
+                        'I-129',
+                        'Sr-90',
+                        'Tc-99',
+                        'U',
+                        'Cr',
+                        'NO3',
+                        'CN'
+                    ],
+                    help='This flag allows you to define which constituents/analytes to include in the check. Call\n'
+                         'the flag in the commandline for as many COPCs that need to be checked.'
                     )
 parser.add_argument('-o', '--output',
                     dest='output',
@@ -333,14 +340,20 @@ def combine_lex(lex1, lex2, liq_only=False, swr_only=False):
 class InvObj:
     def __init__(self, user_args):
         self.inv_args = user_args  # User arguments passed from namespace as namespace
-        self.vz_sites = self.parse_vzehsit()    # Parse list of accepted waste sites as generator
-        self.inv_lex = self.init_lex()          # Initialize final inventory dictionary
-        self.swr_lex = self.parse_swr()         # Solid waste release dictionary
-        self.red_lex = self.parse_red()         # Rerouted waste releases dictionary
-        self.sac_lex = self.parse_sac()         # SAC liquid-only inventory
-        self.sim_lex = self.parse_sim()         # SIMV2 RAD inventory
-        self.inv_lex = self.build_inv()         # Populate final inventory dictionary
-        self.inv_lex = self.clean_inv()         # Clean up any sites that don't have any waste streams/water sources
+        self.vz_sites = self.parse_vzehsit()        # Parse list of accepted waste sites as generator
+        self.inv_lex = self.init_lex()              # Initialize final inventory dictionary
+        if args.get("RCASWR_dir", "") != '' or args.get("RCASWR_idx", "") != '':
+            self.swr_lex = self.parse_swr()         # Solid waste release dictionary
+        if args.get("reroute", "") != '':
+            self.red_lex = self.parse_red()         # Rerouted waste releases dictionary
+        if args.get("cleaninv", "") != '':
+            self.sac_lex = self.parse_sac()         # SAC liquid-only inventory
+        if args.get("cheminv", "") != '':
+            self.chm_lex = self.parse_chm()         # Chemical Inventory
+        if args.get("vzinv", "") != '':
+            self.sim_lex = self.parse_sim()         # SIMV2 RAD inventory
+        self.inv_lex = self.build_inv()             # Populate final inventory dictionary
+        self.inv_lex = self.clean_inv()             # Clean up any sites that don't have any waste streams/water sources
 
     def parse_vzehsit(self):
         path = self.inv_args.vzehsit
@@ -427,7 +440,7 @@ class InvObj:
         ]
         # Keep track of any sites that aren't part of VZEHSIT to pass to logger
         not_vzehsit = []
-        for red_file in self.inv_args.redfin:
+        for red_file in self.inv_args.reroute:
             df = csv_parser(red_file, skip_lines=[1])
             # Split by waste site and stream and store in dictionary
             df['year'] = df[year_col]
@@ -474,6 +487,10 @@ class InvObj:
         logging.info("##Sites with data in SAC not present in VZEHSIT ({}):".format(len(unused_sac_sites)))
         for site in sorted(unused_sac_sites):
             logging.info(site)
+        return new_lex
+
+    def parse_chm(self):
+        chm_path = self.
         return new_lex
 
     def parse_sim(self):
@@ -540,25 +557,33 @@ class InvObj:
     def build_inv(self):
         # This method will combine all of primary source information into the final inventory dictionary for comparison
         # against the ca-ipp output file (comparison done in another function, not included in this class)
-        final_lex = self.inv_lex
-        swr_lex = self.swr_lex
-        red_lex = self.red_lex
-        sim_lex = self.sim_lex
-        sac_lex = self.sac_lex
         # The order is essential for this given the functional requirements listed at the header of this file. The order
         # for adding the parsed information is as follows:
         #   1.  Solid Waste Release (swr_lex)
         #   2.  Rerouted Inventory  (red_lex)
         #   3.  SIMV2 Inventory     (sim_inv)
         #   4.  SAC Water Inventory (sac_lex)
-        logging.info('##Merging SWR into final dictionary')
-        final_lex = combine_lex(final_lex, swr_lex)
-        logging.info('##Merging Rerouted Sites into final dictionary')
-        final_lex = combine_lex(final_lex, red_lex)
-        logging.info('##Merging SIMV2 into final dictionary')
-        final_lex = combine_lex(final_lex, sim_lex, swr_only=swr_lex)
-        logging.info('##Merging SAC into final dictionary')
-        final_lex = combine_lex(final_lex, sac_lex, liq_only=True)
+        final_lex = self.inv_lex
+        if hasattr(self, "swr_lex"):
+            swr_lex = self.swr_lex
+            logging.info('##Merging SWR into final dictionary')
+            final_lex = combine_lex(final_lex, swr_lex)
+        if hasattr(self, "red_lex"):
+            red_lex = self.red_lex
+            logging.info('##Merging Rerouted Sites into final dictionary')
+            final_lex = combine_lex(final_lex, red_lex)
+        if hasattr(self, "chm_lex"):
+            chm_lex = self.chm_lex
+            logging.info('##Merging Chemical Inventory into final dictionary')
+            final_lex = combine_lex(final_lex, chm_lex)
+        if hasattr(self, "sim_lex"):
+            sim_lex = self.sim_lex
+            logging.info('##Merging SIMV2 into final dictionary')
+            final_lex = combine_lex(final_lex, sim_lex, swr_only=swr_lex)
+        if hasattr(self, "sac_lex"):
+            sac_lex = self.sac_lex
+            logging.info('##Merging SAC into final dictionary')
+            final_lex = combine_lex(final_lex, sac_lex, liq_only=True)
         logging.info('##All primary source data have been merged into a hashed dictionary, proceeding to check.')
         return final_lex
 
