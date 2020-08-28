@@ -105,6 +105,7 @@ class SoilGroups:
         'quincy sand': 9,
         'riverwash': 10,
         'scooteney stoney silt loam': 11,
+        'scooteney stony silt loam': 11,
         'warden silt loam': 12
     }
     grouped_soil_indices = {
@@ -130,7 +131,7 @@ class SoilGroups:
         },
         6: {
             'raw_indices': [4, 6, 8, 11, 12],
-            'group_name': 'Esquatzel/Pasco/Kiona/Warden Silt Loam'
+            'group_name': 'Esquatzel/Kiona/Scooteney Stony/Pasco/Warden Silt Loam'
         }
     }
 
