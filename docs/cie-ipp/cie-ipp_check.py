@@ -220,7 +220,6 @@ parser.add_argument('--verbosity',
                          '"ALL" is equivalent to "NOTSET" when setting the logger and will print all messages.'
                     )
 args = parser.parse_args()
-is_RCASWR_idx(args.rcaswr_idx, args.rcaswr_dir)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -339,18 +338,18 @@ def combine_lex(lex1, lex2, liq_only=False, swr_only=False):
 
 class InvObj:
     def __init__(self, user_args):
-        self.inv_args = user_args  # User arguments passed from namespace as namespace
+        self.inv_args = user_args                   # User arguments passed from namespace as namespace
         self.vz_sites = self.parse_vzehsit()        # Parse list of accepted waste sites as generator
         self.inv_lex = self.init_lex()              # Initialize final inventory dictionary
-        if args.get("RCASWR_dir", "") != '' or args.get("RCASWR_idx", "") != '':
+        if self.inv_args.rcaswr_dir is not None or self.inv_args.rcaswr_idx is not None:
             self.swr_lex = self.parse_swr()         # Solid waste release dictionary
-        if args.get("reroute", "") != '':
+        if self.inv_args.reroute is not None:
             self.red_lex = self.parse_red()         # Rerouted waste releases dictionary
-        if args.get("cleaninv", "") != '':
+        if self.inv_args.cleaninv is not None:
             self.sac_lex = self.parse_sac()         # SAC liquid-only inventory
-        if args.get("cheminv", "") != '':
+        if self.inv_args.cheminv is not None:
             self.chm_lex = self.parse_chm()         # Chemical Inventory
-        if args.get("vzinv", "") != '':
+        if self.inv_args.vzinv is not None:
             self.sim_lex = self.parse_sim()         # SIMV2 RAD inventory
         self.inv_lex = self.build_inv()             # Populate final inventory dictionary
         self.inv_lex = self.clean_inv()             # Clean up any sites that don't have any waste streams/water sources
@@ -426,7 +425,7 @@ class InvObj:
     def parse_red(self):
         new_lex = {}
         # Waste site column to use for building dictionary
-        site_col = "CA site name"
+        site_col = "CIE site name"
         year_col = 'Discharge/decay-corrected year'
         water_col = 'Volume [m3]'
         # Ignore the following columns when evaluating for copc's
@@ -498,18 +497,13 @@ class InvObj:
         chm_path = self.inv_args.cheminv
         site_col = 'CIE Site Name'
         year_col = 'Year'
-        aux_cols = [
-            site_col,
-            'Source Type',
-            year_col,
-        ]
         copc_cols = [
             'U-Total [kg]',
             'Cr [kg]',
             'NO3 [kg]',
             'CN [kg]'
         ]
-        df = csv_parser(chm_path, skip_lines=None, use_cols=aux_cols + copc_cols, codec='utf-8')
+        df = csv_parser(chm_path, skip_lines=[], codec='utf-8')
         not_vzehsit = []
         new_lex = {}
         site_counter = 0
@@ -641,6 +635,7 @@ class InvObj:
                 logging.info(site)
         else:
             logging.info("##All sites in VZEHSIT have at least one waste stream/water volume time series.")
+        # Include only the waste streams of interest
         copc_list = []
         for site in final_lex:
             copc_list += final_lex[site].keys()
@@ -827,6 +822,10 @@ def compare_series(ser1, ser2):
 # Main Program
 if __name__ == '__main__':
     configure_logger(os.path.join(args.output, "ca_ipp_check.log"), args.verbosity)
+    if args.rcaswr_idx is not None and args.rcaswr_dir is not None:
+        is_RCASWR_idx(args.rcaswr_idx, args.rcaswr_dir)
+    else:
+        logging.debug("No Solid Waste Releases to be considered in this check.")
     inv_check = InvObj(args)
     # Pass the path to the ipp_output file, whether chemicals should be included, and the list of VZEHSIT sites
     vz_sites = list(inv_check.parse_vzehsit())
