@@ -229,7 +229,7 @@ is_RCASWR_idx(args.rcaswr_idx, args.rcaswr_dir)
 
 def csv_parser(path, skip_lines, use_cols=None, col_names=None, codec='utf-8'):
     """
-    :param encoding:        Encoding to be used when parsing CSV file
+    :param codec:           Encoding to be used when parsing CSV file
     :param path:            Path to CSV file being parsed
     :param skip_lines:      Number of lines to skip at the top of the file, may be integer or list
     :param use_cols:        Columns to be used from the file being parsed
@@ -420,7 +420,7 @@ class InvObj:
                 logging.debug("{}".format(site))
         else:
             logging.info("##Total number of Solid Waste Release Sites: {}".format(site_counter))
-            logging.info("##All Solid Waste Release Sites present in VZEHSIT")
+            logging.info("##All Solid Waste Release Sites are present in VZEHSIT")
         return new_lex
 
     def parse_red(self):
@@ -467,6 +467,10 @@ class InvObj:
                             new_lex[site] = {
                                 new_copc: site_df
                             }
+        if len(not_vzehsit) > 0:
+            logging.debug("##Rerouted sites NOT in VZEHSIT:")
+            for site in not_vzehsit:
+                logging.debug("{}".format(site))
         logging.info("##Rerouted Waste Sites:")
         logging.info("{:<40}{:<40}".format("Waste Site:", "[Listing of routed waste streams]"))
         for site in new_lex:
@@ -490,7 +494,47 @@ class InvObj:
         return new_lex
 
     def parse_chm(self):
-        chm_path = self.
+        # Take the CHEMINV work product file, parse as Pandas dataframe, then convert to
+        chm_path = self.inv_args.cheminv
+        site_col = 'CIE Site Name'
+        year_col = 'Year'
+        aux_cols = [
+            site_col,
+            'Source Type',
+            year_col,
+        ]
+        copc_cols = [
+            'U-Total [kg]',
+            'Cr [kg]',
+            'NO3 [kg]',
+            'CN [kg]'
+        ]
+        df = csv_parser(chm_path, skip_lines=None, use_cols=aux_cols + copc_cols, codec='utf-8')
+        not_vzehsit = []
+        new_lex = {}
+        site_counter = 0
+        for copc in df.columns:
+            if copc in copc_cols:
+                for site in get_unique_vals(df, site_col):
+                    if site not in self.inv_lex:
+                        not_vzehsit.append(site)
+                    site_df = df.loc[df[site_col] == site, [year_col, copc]].copy(deep=True)
+                    if len(site_df) == 0:
+                        continue
+                    if site in new_lex:
+                        new_lex[site][copc] = site_df
+                    else:
+                        site_counter += 1
+                        new_lex[site] = {
+                            copc: site_df
+                        }
+        if len(not_vzehsit) > 0:
+            logging.debug("##CHEMINV sites NOT in VZEHSIT:")
+            for site in not_vzehsit:
+                logging.debug("{}".format(site))
+        else:
+            logging.info("##Total number of CHEMINV Sites: {}".format(site_counter))
+            logging.info("##All CHEMINV Sites are present in VZEHSIT")
         return new_lex
 
     def parse_sim(self):
