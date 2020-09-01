@@ -106,15 +106,21 @@ def is_integer(mystr):
         return False
 
 
-def normalize_col_names(old_col, water_col=None):
+def normalize_col_names(old_col, water_col=None, chm_col=False):
     """
     :param old_col:     Old column name to change
     :param water_col:   If water column, the old column name will match the string provided
+    :param chm_col:     If reformatting a chemical column
     :return:
     """
-    if water_col is None:
+    # For radionuclide waste columns
+    if water_col is None and chm_col is False:
         new_copc = old_col.replace(' (decay only)', '').upper()
         new_col = '{}(ci/year)'.format(new_copc)
+    # For chemical waste columns
+    elif chm_col:
+        new_copc = old_col.replace('-Total', '').replace(' [kg]', '').upper()
+        new_col = '{}(kg/year)'.format(new_copc)
     else:
         new_copc = 'WATER'
         new_col = '{}(m^3/year)'.format(new_copc)
@@ -339,8 +345,16 @@ def combine_lex(lex1, lex2, liq_only=False, swr_only=False):
 class InvObj:
     def __init__(self, user_args):
         self.inv_args = user_args                   # User arguments passed from namespace as namespace
+        if hasattr(self.inv_args, "copcs"):         # Make all copc's uppercase for consistency
+            self.inv_args.copcs = [c.upper() for c in self.inv_args.copcs] + ['WATER']
         self.vz_sites = self.parse_vzehsit()        # Parse list of accepted waste sites as generator
         self.inv_lex = self.init_lex()              # Initialize final inventory dictionary
+        self.chm_cols = {                           # Chemical columns (general match for input files, no uppercase)
+            'Cr',
+            'NO3',
+            'U',
+            'CN'
+        }
         if self.inv_args.rcaswr_dir is not None or self.inv_args.rcaswr_idx is not None:
             self.swr_lex = self.parse_swr()         # Solid waste release dictionary
         if self.inv_args.reroute is not None:
@@ -432,7 +446,7 @@ class InvObj:
         non_copcs = [
             'Inventory Module',
             'SIMV2 site name',
-            'CA site name',
+            site_col,
             'Source Type',
             year_col,
             'year',
@@ -453,6 +467,8 @@ class InvObj:
                         site_df = df.loc[df[site_col] == site, ['year', copc]].copy(deep=True)
                         if copc == water_col:
                             new_copc, new_col = normalize_col_names(copc, water_col=water_col)
+                        elif copc in self.chm_cols:
+                            new_copc, new_col = normalize_col_names(copc, chm_col=True)
                         else:
                             new_copc, new_col = normalize_col_names(copc)
                         site_df[new_col] = site_df[copc]
@@ -510,17 +526,23 @@ class InvObj:
         for copc in df.columns:
             if copc in copc_cols:
                 for site in get_unique_vals(df, site_col):
-                    if site not in self.inv_lex:
-                        not_vzehsit.append(site)
+                    if site.upper() not in self.inv_lex:
+                        not_vzehsit.append(site.upper())
                     site_df = df.loc[df[site_col] == site, [year_col, copc]].copy(deep=True)
+                    # Normalize the column names
+                    new_copc, new_col = normalize_col_names(copc, chm_col=True)
+                    site_df[new_col] = site_df[copc]
+                    site_df = clean_df(site_df, [copc])
+                    # Normalize the site name to only have upper case
+                    site = site.upper()
                     if len(site_df) == 0:
                         continue
                     if site in new_lex:
-                        new_lex[site][copc] = site_df
+                        new_lex[site][new_copc] = site_df
                     else:
                         site_counter += 1
                         new_lex[site] = {
-                            copc: site_df
+                            new_copc: site_df
                         }
         if len(not_vzehsit) > 0:
             logging.debug("##CHEMINV sites NOT in VZEHSIT:")
@@ -555,7 +577,9 @@ class InvObj:
         # Convert all waste stream types (solid vs liquid) to liquid if inventory module is "Entrained Solids"
         df.loc[df[waste_mod] == 'SIM-v2 entrained solids', waste_type] = 'Liquid'
         # Exclude inventory records that are waste_type = 'solid' if in solid waste release
-        df = df.loc[~((df[site_col].isin(self.swr_lex)) & (df[waste_type] == 'Solids')), :]
+        # Only necessary if solid waste release sites are included in the analysis/check
+        if hasattr(self, "swr_lex"):
+            df = df.loc[~((df[site_col].isin(self.swr_lex)) & (df[waste_type] == 'Solids')), :]
         # Split by waste site and stream and store in dictionary
         for copc in df.columns:
             if copc in non_copcs:
@@ -617,7 +641,12 @@ class InvObj:
         if hasattr(self, "sim_lex"):
             sim_lex = self.sim_lex
             logging.info('##Merging SIMV2 into final dictionary')
-            final_lex = combine_lex(final_lex, sim_lex, swr_only=swr_lex)
+            # If SWR is included in analysis, make sure SIMV2 dictionary doesn't override the values
+            if hasattr(self, "swr_lex"):
+                final_lex = combine_lex(final_lex, sim_lex, swr_only=swr_lex)
+            # If no SWR, merge SIMV2 like normal
+            else:
+                final_lex = combine_lex(final_lex, sim_lex)
         if hasattr(self, "sac_lex"):
             sac_lex = self.sac_lex
             logging.info('##Merging SAC into final dictionary')
@@ -627,22 +656,32 @@ class InvObj:
 
     def clean_inv(self):
         # Remove any dictionary keys that don't have waste streams/water sources
-        final_lex = {site: self.inv_lex[site] for site in self.inv_lex if len(self.inv_lex[site].keys()) > 0}
-        unused_sites = set(self.inv_lex.keys()) - set(final_lex.keys())
-        if len(unused_sites) > 0:
-            logging.info("##The following sites had no inventory or water volume:")
-            for site in sorted(unused_sites):
-                logging.info(site)
-        else:
-            logging.info("##All sites in VZEHSIT have at least one waste stream/water volume time series.")
-        # Include only the waste streams of interest
+        final_lex = {}
         copc_list = []
-        for site in final_lex:
-            copc_list += final_lex[site].keys()
+        for site in self.inv_lex.keys():
+            for copc in self.inv_lex[site].keys():
+                if copc in self.inv_args.copcs:
+                    copc_list.append(copc)
+                    if site in final_lex:
+                        final_lex[site][copc] = self.inv_lex[site][copc]
+                    else:
+                        final_lex[site] = {
+                            copc: self.inv_lex[site][copc]
+                        }
+        # final_lex = {site: self.inv_lex[site] for site in self.inv_lex if len(self.inv_lex[site].keys()) > 0}
+        # Log the final waste streams to be included in the analysis
         copc_list = sorted(list(set(copc_list)))
         logging.info("##Waste streams to be considered for this check:")
         write_str = len(copc_list) * "{:<10}"
         logging.info(write_str.format(*copc_list))
+        # Log the waste sites that have no inventory for evaluation after excluding the extraneous information
+        unused_sites = set(self.inv_lex.keys()) - set(final_lex.keys())
+        if len(unused_sites) > 0:
+            logging.info("##The following sites had no inventory or water volume (after excluding extraneous COPC's):")
+            for site in sorted(unused_sites):
+                logging.info(site)
+        else:
+            logging.info("##All sites in VZEHSIT have at least one waste stream/water volume time series.")
         return final_lex
 
 
