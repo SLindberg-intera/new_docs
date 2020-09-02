@@ -15,20 +15,21 @@ Functional Req's to verify from ca-ipp:
                     c.  SIMV2 was replaced with rerouted information
                     d.  SIMV2 sites are not present in VZEHSIT
 Pseudo Code:    The code in general works in the following manner:
-                1.  Read primary sources used by ca-ipp.pl script:
+                1.  Read primary sources used by cie-ipp.pl script:
                     a.  VZEHSIT
                     b.  RADINV (SIMV2)
                     c.  LIQINV (SAC)
                     d.  CHEMINV (chemical inventory)
                     e.  REROUTED Sites/Inventory
                 2.  Build dictionary from primary sources
-                3.  Read final output from ca-ipp.pl and verify that it contains the right records
+                3.  Read final output from cie-ipp.pl and verify that it contains the right records
 """
 import os
 import argparse
 import pandas as pd
 import logging
 import math
+from copy import deepcopy
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -192,7 +193,7 @@ parser.add_argument('--REROUTE',
 parser.add_argument('-i', '--ipp_output',
                     dest='ipp_output',
                     type=file_path,
-                    help='Provide the file and associated path (can be relative) to the ca-ipp.pl output file being\n'
+                    help='Provide the file and associated path (can be relative) to the cie-ipp.pl output file being\n'
                          'verified. This should be a CSV file.'
                    )
 parser.add_argument('--COPCs',
@@ -211,6 +212,14 @@ parser.add_argument('--COPCs',
                     ],
                     help='This flag allows you to define which constituents/analytes to include in the check. Call\n'
                          'the flag in the commandline for as many COPCs that need to be checked.'
+                    )
+parser.add_argument('--exclude_solids',
+                    dest='exclude_solids',
+                    type=bool,
+                    default=True,
+                    help='This flag allows you to specify whether to include solids. Liquids will always be included,\n'
+                         'and any "entrained solids" will be treated as liquids. Default is [True], meaning that \n'
+                         'solids will not be included (solid sources that are not "entrained solids").'
                     )
 parser.add_argument('-o', '--output',
                     dest='output',
@@ -246,7 +255,7 @@ def csv_parser(path, skip_lines, use_cols=None, col_names=None, codec='utf-8'):
     elif use_cols is None:
         df = pd.read_csv(path, engine='c', skiprows=skip_lines, names=col_names, encoding=codec)
     elif col_names is None:
-        df = pd.read_csv(path, engine='c', skiprows=skip_lines, names=use_cols, encoding=codec)
+        df = pd.read_csv(path, engine='c', skiprows=skip_lines, usecols=use_cols, encoding=codec)
     else:
         df = pd.read_csv(path, engine='c', skiprows=skip_lines, usecols=use_cols, names=col_names, encoding=codec)
     # Make sure to clean up all trailing spaces for all columns
@@ -344,7 +353,7 @@ def combine_lex(lex1, lex2, liq_only=False, swr_only=False):
 
 class InvObj:
     def __init__(self, user_args):
-        self.inv_args = user_args                   # User arguments passed from namespace as namespace
+        self.inv_args = deepcopy(user_args)         # User arguments passed from namespace as namespace
         if hasattr(self.inv_args, "copcs"):         # Make all copc's uppercase for consistency
             self.inv_args.copcs = [c.upper() for c in self.inv_args.copcs] + ['WATER']
         self.vz_sites = self.parse_vzehsit()        # Parse list of accepted waste sites as generator
@@ -580,6 +589,10 @@ class InvObj:
         # Only necessary if solid waste release sites are included in the analysis/check
         if hasattr(self, "swr_lex"):
             df = df.loc[~((df[site_col].isin(self.swr_lex)) & (df[waste_type] == 'Solids')), :]
+        if self.inv_args.exclude_solids:
+            liq_df = df.loc[df[waste_type] == 'Liquid', :]
+            sol_df = df.loc[df[waste_mod] == 'SIM-v2 entrained solids', :]
+            df = liq_df.append(sol_df)
         # Split by waste site and stream and store in dictionary
         for copc in df.columns:
             if copc in non_copcs:
@@ -677,7 +690,7 @@ class InvObj:
         # Log the waste sites that have no inventory for evaluation after excluding the extraneous information
         unused_sites = set(self.inv_lex.keys()) - set(final_lex.keys())
         if len(unused_sites) > 0:
-            logging.info("##The following sites had no inventory or water volume (after excluding extraneous COPC's):")
+            logging.info("##The following sites had no inventory or water volume (after excluding extraneous sources):")
             for site in sorted(unused_sites):
                 logging.info(site)
         else:
@@ -685,33 +698,49 @@ class InvObj:
         return final_lex
 
 
-def parse_ipp_output(path, include_chems, vzehsit):
+def parse_ipp_output(path, copc_list, vzehsit):
     ipp_out_lex = {}
-    # Waste streams to ignore if not verifying chemicals
-    if not include_chems:
-        non_copcs = [
-            'U',
-            'Cr',
-            'NO3',
-            'CN'
-        ]
-    else:
-        non_copcs = []
-    # Column names of ca-ipp.pl output to be used throughout parsing
+    header_lines = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12]
+    # Column names of cie-ipp.pl output to be used throughout parsing
     year_col = 'Discharge/decay-corrected year'
     water_col = 'Volume [m3]'
     site_col = 'CA site name'
-    df = csv_parser(path, skip_lines=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12])
-    non_copcs += [
+    non_copcs = [
         'Inventory Module',
         'SIMV2 site name',
         site_col,
         'Source Type',
         'year'
     ]
-    df['year'] = df[year_col]
+    # Parse only those columns of interest as specified by the user and necessary ID columns
+    usecols = non_copcs[:-1] + [year_col] + copc_list + [water_col]
+    df = csv_parser(path, skip_lines=header_lines, use_cols=usecols)
+    # Verify whether all copc columns were included from cie-ipp.pl output, also identify chems vs rads
+    ipp_out_text = open(path, 'r')
+    i = 0
+    while i in header_lines:        # Not concerned about skipping the last of these lines, as we want the units line
+        next(ipp_out_text)
+        i += 1
+    col_row = next(ipp_out_text)[::-1].replace(',', '', 1)[::-1].replace('\n', '').replace('\r', '').split(',')
+    unit_row = next(ipp_out_text)[::-1].replace(',', '', 1)[::-1].replace('\n', '').replace('\r', '').split(',')
+    # Compare col_row against the columns
+    excluded_copcs = list(set(copc_list).difference(set(col_row)))
+    if len(excluded_copcs) > 0:
+        write_str = len(copc_list) * "{:10}"
+        logging.warning("The following COPCs were not included in the analysis, though they are in the IPP output:")
+        logging.warning(write_str.format(*excluded_copcs))
+    # Identify chems vs rads
+    rad_indices = [index for index, value in enumerate(unit_row) if value.lower() == 'ci']
+    chem_indices = [index for index, value in enumerate(unit_row) if value.lower() == 'kg']
+    rad_list = [col_row[i] for i in rad_indices]
+    chem_list = [col_row[i] for i in chem_indices]
+    # Make sure to only pull those rads/chemicals specified by the user
+    rad_list = list(set(rad_list).intersection(set(copc_list)))
+    chem_list = list(set(chem_list).intersection(set(copc_list)))
+    # Drop the old year column and replace with "year"
+    df.rename(columns={year_col: 'year'}, inplace=True)
     col_names = df.columns
-    # Track all sites that are not tracked in VZEHSIT
+    # Track all sites that are not in VZEHSIT
     sites_not_vzehsit = []
     # Break out each of the waste sites and waste streams into a dictionary of the same format as was done with InvObj
     for copc in col_names:
@@ -720,6 +749,8 @@ def parse_ipp_output(path, include_chems, vzehsit):
         else:
             if copc == water_col:
                 new_copc, new_col = normalize_col_names(copc, water_col=water_col)
+            elif copc in chem_list:
+                new_copc, new_col = normalize_col_names(copc, chm_col=True)
             else:
                 new_copc, new_col = normalize_col_names(copc)
             df[new_col] = df[copc]
@@ -743,23 +774,31 @@ def parse_ipp_output(path, include_chems, vzehsit):
                     ipp_out_lex[site][new_copc] = site_df
     if len(sites_not_vzehsit) > 0:
         logging.critical(
-            "##QA-FAIL(FR-1): The ca-ipp.pl output has {} site(s) that are not in VZEHSIT:".format(len(sites_not_vzehsit))
+            "##QA-FAIL(FR-1): The cie-ipp.pl output has {} site(s) that are not in VZEHSIT:".format(len(sites_not_vzehsit))
         )
         for site in sites_not_vzehsit:
             logging.critical(site)
     else:
-        logging.info("#\n#\n##QA-PASS (FR-1): The ca-ipp.pl output only has sites listed in the VZEHSIT.\n#\n#")
+        logging.info("#\n#\n##QA-PASS (FR-1): The cie-ipp.pl output only has sites listed in the VZEHSIT.\n#\n#")
     return ipp_out_lex
 
 
 def compare_ipp_output(check_obj, ipp_out):
     """
     :param check_obj:       This is the InvObj object, or in other words, the expected result set
-    :param lex2:            This is the dictionary representation of the ca-ipp.pl output to compare
+    :param lex2:            This is the dictionary representation of the cie-ipp.pl output to compare
     :return:
     """
     lex1 = check_obj.inv_lex
-    check_list = [[check_obj.red_lex, "FR-3"], [check_obj.swr_lex, "FR-4"], [lex1, "FR-2, FR-5, and FR-6"]]
+    check_list = []
+    if hasattr(check_obj, "red_lex"):
+        check_list.append([check_obj.red_lex, "Rerouted Sites Check"])
+    if hasattr(check_obj, "swr_lex"):
+        check_list.append([check_obj.swr_lex, "Solid Waste Release Check"])
+    if hasattr(check_obj, "chm_lex"):
+        check_list.append([check_obj.chm_lex, "Chemical Inventory Check"])
+    check_list.append([lex1, "SIMV2 Check"])
+    # check_list = [[check_obj.red_lex, "FR-3"], [check_obj.swr_lex, "FR-4"], [lex1, "FR-2, FR-5, and FR-6"]]
     # Verify that the same waste sites have been used
     unused_sites = set(lex1.keys()) - set(ipp_out.keys())
     # Known exceptions to site list [["missing site", "known exception"]]
@@ -779,8 +818,8 @@ def compare_ipp_output(check_obj, ipp_out):
         for site in site_exceptions:
             logging.info(write_str.format(site, site_exceptions[site]))
     if len(missed_sites) > 0:
-        logging.warning("##Output from ca-ipp.pl does not contain the following sites:")
-        for site in unused_sites:
+        logging.warning("##Output from cie-ipp.pl does not contain the following sites:")
+        for site in sorted(unused_sites):
             logging.warning(site)
     for check in check_list:
         lex, src = check
@@ -798,7 +837,7 @@ def compare_ipp_output(check_obj, ipp_out):
 def compare_lex(lex1, lex2):
     """
     :param lex1:    Primary dictionary to check with
-    :param lex2:    ca-ipp.pl output to verify
+    :param lex2:    cie-ipp.pl output to verify
     :return:
     """
     mismatched_sites = {}
@@ -844,7 +883,7 @@ def compare_dfs(df1, df2):
 
 
 def compare_series(ser1, ser2):
-    # Make sure that precision is matched by rounding to 6 significant digits (the expected output format of ca-ipp.pl)
+    # Make sure that precision is matched by rounding to 6 significant digits (the expected output format of cie-ipp.pl)
     ser1 = ser1.apply(lambda x: round_sigfigs(x, 6))
     ser2 = ser2.apply(lambda x: round_sigfigs(x, 6))
     try:
@@ -868,5 +907,5 @@ if __name__ == '__main__':
     inv_check = InvObj(args)
     # Pass the path to the ipp_output file, whether chemicals should be included, and the list of VZEHSIT sites
     vz_sites = list(inv_check.parse_vzehsit())
-    ipp_out = parse_ipp_output(args.ipp_output, args.chems, vz_sites)
+    ipp_out = parse_ipp_output(args.ipp_output, args.copcs, vz_sites)
     compare_ipp_output(inv_check, ipp_out)
