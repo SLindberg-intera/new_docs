@@ -884,6 +884,27 @@ WESF
 241-WR VAULT
 #
 #
+##QA-FAIL (SAC Check): the following differences were found:
+241-A-103           Waste Site Missing  
+241-AX-102          Waste Site Missing  
+241-B-112           Waste Site Missing  
+241-B-201           Waste Site Missing  
+241-B-203           Waste Site Missing  
+241-B-204           Waste Site Missing  
+241-BX-108          Waste Site Missing  
+241-BY-107          Waste Site Missing  
+241-BY-108          Waste Site Missing  
+241-SX-104          Waste Site Missing  
+241-SX-110          Waste Site Missing  
+241-T-108           Waste Site Missing  
+241-T-109           Waste Site Missing  
+241-TY-101          Waste Site Missing  
+241-WR VAULT        Waste Site Missing  
+#
+#
+
+#
+#
 ##QA-PASS (Rerouted Sites Check)
 #
 #

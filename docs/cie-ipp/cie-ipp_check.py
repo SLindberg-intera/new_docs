@@ -794,6 +794,10 @@ def compare_ipp_output(check_obj, ipp_out):
     """
     lex1 = check_obj.inv_lex
     check_list = []
+    if hasattr(check_obj, "sac_lex"):
+        site_list = check_obj.sac_lex.keys()
+        check_lex = {site: check_obj.inv_lex[site] for site in site_list}
+        check_list.append([check_lex, "SAC Check"])
     if hasattr(check_obj, "red_lex"):
         site_list = check_obj.red_lex.keys()
         check_lex = {site: check_obj.inv_lex[site] for site in site_list}
