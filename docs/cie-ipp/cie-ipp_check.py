@@ -538,6 +538,7 @@ class InvObj:
                     if site.upper() not in self.inv_lex:
                         not_vzehsit.append(site.upper())
                     site_df = df.loc[df[site_col] == site, [year_col, copc]].copy(deep=True)
+                    site_df.rename(columns={year_col: 'year'}, inplace=True)
                     # Normalize the column names
                     new_copc, new_col = normalize_col_names(copc, chm_col=True)
                     site_df[new_col] = site_df[copc]
@@ -545,6 +546,8 @@ class InvObj:
                     # Normalize the site name to only have upper case
                     site = site.upper()
                     if len(site_df) == 0:
+                        continue
+                    elif site_df[new_col].sum() == 0:
                         continue
                     if site in new_lex:
                         new_lex[site][new_copc] = site_df
@@ -792,12 +795,21 @@ def compare_ipp_output(check_obj, ipp_out):
     lex1 = check_obj.inv_lex
     check_list = []
     if hasattr(check_obj, "red_lex"):
-        check_list.append([check_obj.red_lex, "Rerouted Sites Check"])
+        site_list = check_obj.red_lex.keys()
+        check_lex = {site: check_obj.inv_lex[site] for site in site_list}
+        check_list.append([check_lex, "Rerouted Sites Check"])
     if hasattr(check_obj, "swr_lex"):
-        check_list.append([check_obj.swr_lex, "Solid Waste Release Check"])
+        site_list = check_obj.swr_lex.keys()
+        check_lex = {site: check_obj.inv_lex[site] for site in site_list}
+        check_list.append([check_lex, "Solid Waste Release Check"])
     if hasattr(check_obj, "chm_lex"):
-        check_list.append([check_obj.chm_lex, "Chemical Inventory Check"])
-    check_list.append([lex1, "SIMV2 Check"])
+        site_list = check_obj.chm_lex.keys()
+        check_lex = {site: check_obj.inv_lex[site] for site in site_list}
+        check_list.append([check_lex, "Chemical Inventory Check"])
+    if hasattr(check_obj, "sim_lex"):
+        site_list = check_obj.sim_lex.keys()
+        check_lex = {site: check_obj.inv_lex[site] for site in site_list}
+        check_list.append([check_lex, "SIMV2 Check"])
     # check_list = [[check_obj.red_lex, "FR-3"], [check_obj.swr_lex, "FR-4"], [lex1, "FR-2, FR-5, and FR-6"]]
     # Verify that the same waste sites have been used
     unused_sites = set(lex1.keys()) - set(ipp_out.keys())
