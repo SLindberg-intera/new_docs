@@ -777,12 +777,12 @@ def parse_ipp_output(path, copc_list, vzehsit):
                     ipp_out_lex[site][new_copc] = site_df
     if len(sites_not_vzehsit) > 0:
         logging.critical(
-            "##QA-FAIL(FR-1): The cie-ipp.pl output has {} site(s) that are not in VZEHSIT:".format(len(sites_not_vzehsit))
+            "##QA-FAIL(Waste Site Parse Check): The cie-ipp.pl output has {} site(s) that are not in VZEHSIT:".format(len(sites_not_vzehsit))
         )
         for site in sites_not_vzehsit:
             logging.critical(site)
     else:
-        logging.info("#\n#\n##QA-PASS (FR-1): The cie-ipp.pl output only has sites listed in the VZEHSIT.\n#\n#")
+        logging.info("#\n#\n##QA-PASS (Waste Site Parse Check): The cie-ipp.pl output only has sites listed in the VZEHSIT.\n#\n#")
     return ipp_out_lex
 
 
@@ -814,7 +814,6 @@ def compare_ipp_output(check_obj, ipp_out):
         site_list = check_obj.sim_lex.keys()
         check_lex = {site: check_obj.inv_lex[site] for site in site_list}
         check_list.append([check_lex, "SIMV2 Check"])
-    # check_list = [[check_obj.red_lex, "FR-3"], [check_obj.swr_lex, "FR-4"], [lex1, "FR-2, FR-5, and FR-6"]]
     # Verify that the same waste sites have been used
     unused_sites = set(lex1.keys()) - set(ipp_out.keys())
     # Known exceptions to site list [["missing site", "known exception"]]
