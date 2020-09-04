@@ -190,6 +190,10 @@
 		{
 		"name":"CIE Steady State STOMP Input File Generator Tool", "command":"SS_input_gen_cie_linux-intel-64.exe", "description":"qualified on 08.26.2020; this tool generates the STOMP Input file input_cie_SS for the CIE steady-state simulation"
 
+		},
+		{
+		"name":"CIE Transient Output Card Generator Tool", "command":"OC_TR_gen_cie_linux-intel-64.exe", "description":"qualified on 09.04.2020; this tool creates the Output Control Card portion of a STOMP input file used for mass balance and transport production simulations"
+
 		}
 
 
