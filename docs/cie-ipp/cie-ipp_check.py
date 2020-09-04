@@ -914,7 +914,7 @@ def compare_series(ser1, ser2):
 # ----------------------------------------------------------------------------------------------------------------------
 # Main Program
 if __name__ == '__main__':
-    configure_logger(os.path.join(args.output, "ca_ipp_check.log"), args.verbosity)
+    configure_logger(os.path.join(args.output, "ipp_check.log"), args.verbosity)
     if args.rcaswr_idx is not None and args.rcaswr_dir is not None:
         is_RCASWR_idx(args.rcaswr_idx, args.rcaswr_dir)
     else:
