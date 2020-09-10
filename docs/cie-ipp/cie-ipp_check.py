@@ -132,7 +132,9 @@ def clean_df(df, drop_cols):
     """
     Removes the unwanted columns, and "NAN" records.
     This will NOT take into account whether all of your records are kept. If a "NAN"  cell is present in the row,
-    the function will exclude the row and return the new dataframe.
+    the function will exclude the row and return the new dataframe. This will also summarize/sum by year (no duplicate
+    years will be kept, unique years and corresponding values only). If two years with different values are present,
+    the function will return a single year with an sum of the different values of the same year.
     :param df:          Dataframe to be cleaned
     :param drop_cols:   "List" data type containing strings representing column names
     :return:
@@ -145,6 +147,8 @@ def clean_df(df, drop_cols):
     except TypeError:
         raise TypeError("This function expects a dataframe with an iterable")
         exit()
+    # Groupby years, then return as dataframe
+    df = pd.DataFrame(df.groupby(by='year', as_index=False).sum())
     return df
 
 
@@ -339,25 +343,30 @@ def stomp_format_parser(path, skip_pattern='241'):
     return new_lex
 
 
-def combine_lex(lex1, lex2, liq_only=False, swr_only=False):
-    # Merge dictionaries into "lex1" (i.e. if site is present in both lex1 and lex2, and no keys are in lex1[site]
-    # then lex1[site] = lex2[site])
+def combine_lex(lex1, lex2):
+    """
+    This will combine site records from lex2 into lex1 if (*IF*) lex1[site].keys() == 0 (i.e. has not received other
+    information from another primary source)
+    :param lex1:        Dictionary to combine information into, should start out as a dictionary with sites and no
+                        other nested keys (i.e. len(lex1[site].keys()) = 0 should yield True)
+    :param lex2:        Dictionary of site records from a primary source to be combined into lex1
+    :return:            Combined dictionary, dictionary of sites and streams used from primary source
+    """
+    used_lex = {}
     for site in lex1:
-        if swr_only:
-            if site in swr_only:
-                continue
+        # This conditional statement prevents the function from adding information to a site record where another
+        # primary source has already provided information. An example is if the rerouted sites source has information
+        # for a site, then a subsequent source like SIMv2 should not be allowed to provide any new information for the
+        # same site.
+        if len(lex1[site].keys()) > 0:
+            continue
+        # If there is information from the source being added for the site in question...
         if site in lex2:
+            used_lex[site] = []
             for copc in lex2[site]:
-                if copc in lex1[site]:
-                    continue
-                elif liq_only:
-                    if len(lex1[site].keys()) > 0:
-                        continue
-                    else:
-                        lex1[site][copc] = lex2[site][copc]
-                else:
-                    lex1[site][copc] = lex2[site][copc]
-    return lex1
+                used_lex[site].append(copc)
+                lex1[site][copc] = lex2[site][copc]
+    return lex1, used_lex
 
 
 class InvObj:
@@ -607,9 +616,7 @@ class InvObj:
         if hasattr(self, "swr_lex"):
             df = df.loc[~((df[site_col].isin(self.swr_lex)) & (df[waste_type] == 'Solids')), :]
         if self.inv_args.exclude_solids:
-            liq_df = df.loc[df[waste_type] == 'Liquid', :]
-            sol_df = df.loc[df[waste_mod] == 'SIM-v2 entrained solids', :]
-            df = liq_df.append(sol_df)
+            df = df.loc[df[waste_type] == 'Liquid', :]
         # Split by waste site and stream and store in dictionary
         for copc in df.columns:
             if copc in non_copcs:
@@ -659,24 +666,30 @@ class InvObj:
         final_lex = self.inv_lex
         if hasattr(self, "red_lex"):
             logging.info('##Merging Rerouted Sites into final dictionary')
-            final_lex = combine_lex(final_lex, self.red_lex)
+            final_lex, used_lex = combine_lex(final_lex, self.red_lex)
+            self.clean_lex(used_lex, 'red_lex')
         if hasattr(self, "swr_lex"):
             logging.info('##Merging SWR into final dictionary')
-            final_lex = combine_lex(final_lex, self.swr_lex)
+            final_lex, used_lex = combine_lex(final_lex, self.swr_lex)
+            self.clean_lex(used_lex, 'swr_lex')
         if hasattr(self, "sim_lex"):
             logging.info('##Merging SIMV2 into final dictionary')
             # If SWR is included in analysis, make sure SIMV2 dictionary doesn't override the values
             if hasattr(self, "swr_lex"):
-                final_lex = combine_lex(final_lex, self.sim_lex, swr_only=self.swr_lex)
+                final_lex, used_lex = combine_lex(final_lex, self.sim_lex)
+                self.clean_lex(used_lex, 'sim_lex')
             # If no SWR, merge SIMV2 like normal
             else:
-                final_lex = combine_lex(final_lex, self.sim_lex)
+                final_lex, used_lex = combine_lex(final_lex, self.sim_lex)
+                self.clean_lex(used_lex, 'sim_lex')
         if hasattr(self, "chm_lex"):
             logging.info('##Merging Chemical Inventory into final dictionary')
-            final_lex = combine_lex(final_lex, self.chm_lex)
+            final_lex, used_lex = combine_lex(final_lex, self.chm_lex)
+            self.clean_lex(used_lex, 'chm_lex')
         if hasattr(self, "sac_lex"):
             logging.info('##Merging SAC into final dictionary')
-            final_lex = combine_lex(final_lex, self.sac_lex, liq_only=True)
+            final_lex, used_lex = combine_lex(final_lex, self.sac_lex)
+            self.clean_lex(used_lex, 'sac_lex')
         logging.info('##All primary source data have been merged into a hashed dictionary, proceeding to check.')
         return final_lex
 
@@ -709,6 +722,28 @@ class InvObj:
         else:
             logging.info("##All sites in VZEHSIT have at least one waste stream/water volume time series.")
         return final_lex
+
+    def clean_lex(self, keep_lex, attr_str=''):
+        """
+        This method removes excess sites that did not make it into the final inventory object from the primary source
+        dictionaries. As an example: if site 123-x-4 is present in the red_lex (rerouted sites source) and in sac_lex
+        (for the SAC source), we'd want to keep 123-x-4 in red_lex, and remove it from sac_lex.
+        :param keep_lex:        Dictionary of sites/streams to keep: keep_lex[site]
+        :param attr_str:        The string of the attribute to set/modify
+        :return:
+        """
+        try:
+            assert hasattr(self, attr_str)
+        except AssertionError:
+            logging.exception("The method was not provided a valid attribute string {}".format(attr_str))
+            raise AssertionError
+        new_lex = {}
+        for site in keep_lex.keys():
+            new_lex[site] = {}
+            for copc in keep_lex[site]:
+                new_lex[site][copc] = getattr(self, attr_str)[site][copc]
+        setattr(self, attr_str, new_lex)
+        return
 
 
 def parse_ipp_output(path, copc_list, vzehsit):
@@ -923,10 +958,14 @@ def compare_dfs(df1, df2):
         return False
 
 
-def compare_series(ser1, ser2):
+def compare_series(ser1, ser2, sig_fig=6):
     # Make sure that precision is matched by rounding to 6 significant digits (the expected output format of cie-ipp.pl)
-    ser1 = ser1.apply(lambda x: round_sigfigs(x, 6))
-    ser2 = ser2.apply(lambda x: round_sigfigs(x, 6))
+    # To avoid floating point error issues, first round to 8 sig figs, then to 6 sig figs. Example of this being a
+    # problem is 426.03049999996 rounded to 6th sig fig gives 426.03 rather than 426.031
+    sigfig_list = [sig_fig + 4, sig_fig]
+    for digits in sigfig_list:
+        ser1 = ser1.apply(lambda x: round_sigfigs(x, digits))
+        ser2 = ser2.apply(lambda x: round_sigfigs(x, digits))
     try:
         result = (ser1 == ser2).unique().tolist() == [True]
     except ValueError:
