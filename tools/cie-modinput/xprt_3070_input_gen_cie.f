@@ -46,7 +46,7 @@ c
 c
       nyrend=3070
 c
-      outfile1="input_CIE_XPRT_3070"
+      outfile1="input_XPRT_3070"
 c
       OPEN(20,FILE=outfile1,
      >  STATUS='REPLACE',IOSTAT=IST)
@@ -99,9 +99,9 @@ c
      >  '---------------------------'
 c
       IF(nyrstrt.eq.2018) THEN
-        WRITE(20,"(a34)") 'Restart File, ../cie-xprt/restart,'
+        WRITE(20,"(a35)") 'Restart File, ../xprt-2018/restart,'
       ELSE
-        WRITE(20,"(a38)") 'Restart File, ../cie-xprt-rtd/restart,'
+        WRITE(20,"(a34)") 'Restart File, ../xprt-rtd/restart,'
       ENDIF
 c
       WRITE(20,"(a)") 'Water w/ Patankar Vadose Transport Courant,1.0,'
