@@ -267,7 +267,7 @@ def csv_parser(path, skip_lines, use_cols=None, col_names=None, codec='utf-8'):
     return df
 
 
-def stomp_format_parser(path):
+def stomp_format_parser(path, skip_pattern='241'):
     # Load whole file into memory as dictionary whose levels consist of:
     #   site-name
     #   --->dataframe (with columns for: [year, volume(m^3)]
@@ -281,6 +281,8 @@ def stomp_format_parser(path):
         dup_sites = []
         # Collect sites without data for logging
         no_data_sites = []
+        # Collect sites to be skipped
+        skip_sites = []
         for line in file:
             # Remove line endings in case of mixed input
             line = line.replace('\n', '').replace('\r', '').replace('"', '')
@@ -310,6 +312,9 @@ def stomp_format_parser(path):
                     data_series.append([year, volume])
             # Add the new site and associated water volumes if there's data present, else continue
             if site not in new_lex and len(data_series) > 0:
+                if skip_pattern in site:
+                    skip_sites.append(site)
+                    continue
                 df = pd.DataFrame(data_series, columns=['year', 'WATER(m^3/year)'])
                 new_lex[site] = {'WATER': df}
             # Track all duplicate and no data sites in logger
@@ -326,6 +331,10 @@ def stomp_format_parser(path):
         if len(no_data_sites) > 0:
             logging.info("##SAC Inventory Sites with no Data ({}):".format(len(no_data_sites)))
             for site in sorted(no_data_sites):
+                logging.info(site)
+        if len(skip_sites) > 0:
+            logging.info("##SAC Inventory Sites to be excluded ({}):".format(len(skip_sites)))
+            for site in sorted(skip_sites):
                 logging.info(site)
     return new_lex
 
@@ -522,11 +531,13 @@ class InvObj:
         chm_path = self.inv_args.cheminv
         site_col = 'CIE Site Name'
         year_col = 'Year'
+        water_col = 'Volume Mean [m3]'
         copc_cols = [
             'U-Total [kg]',
             'Cr [kg]',
             'NO3 [kg]',
-            'CN [kg]'
+            'CN [kg]',
+            water_col
         ]
         df = csv_parser(chm_path, skip_lines=[], codec='utf-8')
         not_vzehsit = []
@@ -540,7 +551,10 @@ class InvObj:
                     site_df = df.loc[df[site_col] == site, [year_col, copc]].copy(deep=True)
                     site_df.rename(columns={year_col: 'year'}, inplace=True)
                     # Normalize the column names
-                    new_copc, new_col = normalize_col_names(copc, chm_col=True)
+                    if copc == water_col:
+                        new_copc, new_col = normalize_col_names(copc, water_col=water_col)
+                    else:
+                        new_copc, new_col = normalize_col_names(copc, chm_col=True)
                     site_df[new_col] = site_df[copc]
                     site_df = clean_df(site_df, [copc])
                     # Normalize the site name to only have upper case
@@ -637,36 +651,32 @@ class InvObj:
         # against the ca-ipp output file (comparison done in another function, not included in this class)
         # The order is essential for this given the functional requirements listed at the header of this file. The order
         # for adding the parsed information is as follows:
-        #   1.  Solid Waste Release (swr_lex)
-        #   2.  Rerouted Inventory  (red_lex)
+        #   1.  Rerouted Inventory  (red_lex)
+        #   2.  Solid Waste Release (swr_lex)
         #   3.  SIMV2 Inventory     (sim_inv)
+        #   4.  Chemical Inventory  (chm_lex)
         #   4.  SAC Water Inventory (sac_lex)
         final_lex = self.inv_lex
-        if hasattr(self, "swr_lex"):
-            swr_lex = self.swr_lex
-            logging.info('##Merging SWR into final dictionary')
-            final_lex = combine_lex(final_lex, swr_lex)
         if hasattr(self, "red_lex"):
-            red_lex = self.red_lex
             logging.info('##Merging Rerouted Sites into final dictionary')
-            final_lex = combine_lex(final_lex, red_lex)
-        if hasattr(self, "chm_lex"):
-            chm_lex = self.chm_lex
-            logging.info('##Merging Chemical Inventory into final dictionary')
-            final_lex = combine_lex(final_lex, chm_lex)
+            final_lex = combine_lex(final_lex, self.red_lex)
+        if hasattr(self, "swr_lex"):
+            logging.info('##Merging SWR into final dictionary')
+            final_lex = combine_lex(final_lex, self.swr_lex)
         if hasattr(self, "sim_lex"):
-            sim_lex = self.sim_lex
             logging.info('##Merging SIMV2 into final dictionary')
             # If SWR is included in analysis, make sure SIMV2 dictionary doesn't override the values
             if hasattr(self, "swr_lex"):
-                final_lex = combine_lex(final_lex, sim_lex, swr_only=swr_lex)
+                final_lex = combine_lex(final_lex, self.sim_lex, swr_only=self.swr_lex)
             # If no SWR, merge SIMV2 like normal
             else:
-                final_lex = combine_lex(final_lex, sim_lex)
+                final_lex = combine_lex(final_lex, self.sim_lex)
+        if hasattr(self, "chm_lex"):
+            logging.info('##Merging Chemical Inventory into final dictionary')
+            final_lex = combine_lex(final_lex, self.chm_lex)
         if hasattr(self, "sac_lex"):
-            sac_lex = self.sac_lex
             logging.info('##Merging SAC into final dictionary')
-            final_lex = combine_lex(final_lex, sac_lex, liq_only=True)
+            final_lex = combine_lex(final_lex, self.sac_lex, liq_only=True)
         logging.info('##All primary source data have been merged into a hashed dictionary, proceeding to check.')
         return final_lex
 
@@ -814,6 +824,8 @@ def compare_ipp_output(check_obj, ipp_out):
         site_list = check_obj.sim_lex.keys()
         check_lex = {site: check_obj.inv_lex[site] for site in site_list}
         check_list.append([check_lex, "SIMV2 Check"])
+    # Comprehensive check
+    check_list.append([check_obj.inv_lex, "Comprehensive Check"])
     # Verify that the same waste sites have been used
     unused_sites = set(lex1.keys()) - set(ipp_out.keys())
     # Known exceptions to site list [["missing site", "known exception"]]
@@ -839,13 +851,27 @@ def compare_ipp_output(check_obj, ipp_out):
     for check in check_list:
         lex, src = check
         result = compare_lex(lex, ipp_out)
-        if len(result) > 0:
-            logging.critical("#\n#\n##QA-FAIL ({}): the following differences were found:".format(src))
-            for diff in sorted(result):
-                logging.critical("{:<20}{:<20}".format(diff, result[diff]))
-            logging.critical("#\n#\n")
-        else:
-            logging.info("#\n#\n##QA-PASS ({})\n#\n#".format(src))
+        log_results(result, src)
+    # Reverse the comprehensive check to make sure nothing was missed by the check (i.e. more info in cie-ipp.pl output)
+    result = compare_lex(ipp_out, check_obj.inv_lex)
+    log_results(result, "Comprehensive Check in Reverse")
+    return
+
+
+def log_results(compare_result, fr):
+    """
+    Takes a list of strings and logs them to the logfile
+    :param compare_result:      List of strings
+    :param fr:                  The functional requirement being tested
+    :return:
+    """
+    if len(compare_result) > 0:
+        logging.critical("#\n#\n##QA-FAIL ({}): the following differences were found:".format(fr))
+        for diff in sorted(compare_result):
+            logging.critical("{:<20}{:<20}".format(diff, compare_result[diff]))
+        logging.critical("#\n#\n")
+    else:
+        logging.info("#\n#\n##QA-PASS ({})\n#\n#".format(fr))
     return
 
 
@@ -904,7 +930,7 @@ def compare_series(ser1, ser2):
     try:
         result = (ser1 == ser2).unique().tolist() == [True]
     except ValueError:
-        return True
+        return False
     if result:
         return True
     else:
