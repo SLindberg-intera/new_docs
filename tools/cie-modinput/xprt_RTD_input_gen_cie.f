@@ -36,7 +36,7 @@ c
 c
       nyrend=nyrrtd
 c
-      outfile1="input_CIE_XPRT_RTD"
+      outfile1="input_XPRT_RTD"
 c
       OPEN(20,FILE=outfile1,
      >  STATUS='REPLACE',IOSTAT=IST)
@@ -82,7 +82,7 @@ c
       WRITE(20,"(2a)") '#---------------------------------------',
      >  '---------------------------'
 c
-      WRITE(20,"(a25,a9)") 'Restart File, ../cie-xprt',
+      WRITE(20,"(a26,a9)") 'Restart File, ../xprt-2018',
      >    '/restart,'
 c
       WRITE(20,"(a)") 'Water w/ Patankar Vadose Transport Courant,1.0,'
