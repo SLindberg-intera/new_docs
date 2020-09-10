@@ -35,7 +35,7 @@ c
 c
       nyrend=3070
 c
-      outfile1="input_CIE_XPRT_MB"
+      outfile1="input_XPRT_MB"
 c
       OPEN(20,FILE=outfile1,
      >  STATUS='REPLACE',IOSTAT=IST)
@@ -188,9 +188,25 @@ c
   700 OPEN(12,FILE=infile2,STATUS='OLD'
      >  ,IOSTAT=IST)
 c
+      ifind=0
       READ(12,*)
       READ(12,*)
   710 READ(12,"(a1024)",END=800) line1
+c
+      DO ii=1,1024
+        IF((line1(ii:ii+26).eq.'ZNC Aqueous Volumetric Flux').and.
+     >    (ifind.eq.0)) THEN
+          llen=len(trim(line1))
+          WRITE(frmt,"(i5)") llen
+          WRITE(20,"(a"//frmt//")") line1
+          WRITE(20,"(a2)") '2,'
+          WRITE(20,"(a12)") ' 2018, year,'
+          ifind=1
+          READ(12,*)
+          GOTO 710
+        ENDIF
+      ENDDO
+c
       llen=len(trim(line1))
       IF(llen.eq.0) THEN
         WRITE(20,"(a)")
