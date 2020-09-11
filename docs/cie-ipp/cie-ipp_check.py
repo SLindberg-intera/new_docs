@@ -128,7 +128,7 @@ def normalize_col_names(old_col, water_col=None, chm_col=False):
     return new_copc, new_col
 
 
-def clean_df(df, drop_cols):
+def clean_df(df, drop_cols, val_col=None):
     """
     Removes the unwanted columns, and "NAN" records.
     This will NOT take into account whether all of your records are kept. If a "NAN"  cell is present in the row,
@@ -137,18 +137,22 @@ def clean_df(df, drop_cols):
     the function will return a single year with an sum of the different values of the same year.
     :param df:          Dataframe to be cleaned
     :param drop_cols:   "List" data type containing strings representing column names
+    :param val_col:     String of the column name to filter out rows with a value of zero
     :return:
     """
     try:
         for col in drop_cols:
             df = df.drop(labels=col, axis=1)
         df = df.dropna()
-        df = df.reset_index(drop=True)
     except TypeError:
         raise TypeError("This function expects a dataframe with an iterable")
         exit()
     # Groupby years, then return as dataframe
     df = pd.DataFrame(df.groupby(by='year', as_index=False).sum())
+    # Remove rows with value of zero
+    if val_col is not None and val_col in df.columns:
+        df = df.loc[df[val_col] > 0, :].copy(deep=True)
+    df = df.reset_index(drop=True)
     return df
 
 
@@ -354,17 +358,14 @@ def combine_lex(lex1, lex2):
     """
     used_lex = {}
     for site in lex1:
-        # This conditional statement prevents the function from adding information to a site record where another
-        # primary source has already provided information. An example is if the rerouted sites source has information
-        # for a site, then a subsequent source like SIMv2 should not be allowed to provide any new information for the
-        # same site.
-        if len(lex1[site].keys()) > 0:
-            continue
         # If there is information from the source being added for the site in question...
         if site in lex2:
-            used_lex[site] = []
-            for copc in lex2[site]:
-                used_lex[site].append(copc)
+            # This conditional statement prevents the function from adding information to a site record where another
+            # primary source has already provided information for a given waste stream.
+            used_copcs = list(set(lex2[site].keys()).difference(lex1[site].keys()))
+            if len(used_copcs) > 0:
+                used_lex[site] = used_copcs
+            for copc in used_copcs:
                 lex1[site][copc] = lex2[site][copc]
     return lex1, used_lex
 
@@ -499,7 +500,7 @@ class InvObj:
                         else:
                             new_copc, new_col = normalize_col_names(copc)
                         site_df[new_col] = site_df[copc]
-                        site_df = clean_df(site_df, [copc])
+                        site_df = clean_df(site_df, [copc], new_col)
                         # Verify that there are records in the new dataframe, continue if empty dataframe
                         if len(site_df) == 0:
                             continue
@@ -565,7 +566,7 @@ class InvObj:
                     else:
                         new_copc, new_col = normalize_col_names(copc, chm_col=True)
                     site_df[new_col] = site_df[copc]
-                    site_df = clean_df(site_df, [copc])
+                    site_df = clean_df(site_df, [copc], new_col)
                     # Normalize the site name to only have upper case
                     site = site.upper()
                     if len(site_df) == 0:
@@ -633,8 +634,10 @@ class InvObj:
                         new_copc, new_col = normalize_col_names(copc, water_col=water_col)
                     else:
                         new_copc, new_col = normalize_col_names(copc)
-                    site_df[new_col] = site_df[copc]
-                    site_df = clean_df(site_df, [year_col, copc])
+                    if new_copc.upper() not in self.inv_args.copcs:
+                        continue
+                    site_df.rename(columns={copc: new_col}, inplace=True)
+                    site_df = clean_df(site_df, [year_col], new_col)
                     # Normalize the site name to only have upper case
                     site = site.upper()
                     # Verify that there are records in the new dataframe, continue if empty dataframe
@@ -769,8 +772,11 @@ def parse_ipp_output(path, copc_list, vzehsit):
     while i in header_lines:        # Not concerned about skipping the last of these lines, as we want the units line
         next(ipp_out_text)
         i += 1
+    # Strip the final comma out of the line, remove new line characters, then split into a list
     col_row = next(ipp_out_text)[::-1].replace(',', '', 1)[::-1].replace('\n', '').replace('\r', '').split(',')
     unit_row = next(ipp_out_text)[::-1].replace(',', '', 1)[::-1].replace('\n', '').replace('\r', '').split(',')
+    ipp_out_text.close()
+    del ipp_out_text
     # Compare col_row against the columns
     excluded_copcs = list(set(copc_list).difference(set(col_row)))
     if len(excluded_copcs) > 0:
@@ -801,14 +807,14 @@ def parse_ipp_output(path, copc_list, vzehsit):
                 new_copc, new_col = normalize_col_names(copc, chm_col=True)
             else:
                 new_copc, new_col = normalize_col_names(copc)
-            df[new_col] = df[copc]
+            df.rename(columns={copc: new_col}, inplace=True)
             for site in get_unique_vals(df, site_col):
                 if site.upper() not in vzehsit:
                     # If the site is not in VZEHSIT, then collect it and continue to next site (don't parse non-VZEHSIT)
                     sites_not_vzehsit.append(site.upper())
                     continue
                 site_df = df.loc[df[site_col] == site, ['year', new_col]].copy(deep=True)
-                site_df = clean_df(site_df, [])
+                site_df = clean_df(site_df, [], new_col)
                 # Verify that the dataframe has data (continue if empty dataframe)
                 if len(site_df) == 0:
                     continue
@@ -840,25 +846,20 @@ def compare_ipp_output(check_obj, ipp_out):
     lex1 = check_obj.inv_lex
     check_list = []
     if hasattr(check_obj, "sac_lex"):
-        site_list = check_obj.sac_lex.keys()
-        check_lex = {site: check_obj.inv_lex[site] for site in site_list}
+        check_lex = getattr(check_obj, "sac_lex")
         check_list.append([check_lex, "SAC Check"])
     if hasattr(check_obj, "red_lex"):
-        site_list = check_obj.red_lex.keys()
-        check_lex = {site: check_obj.inv_lex[site] for site in site_list}
+        check_lex = getattr(check_obj, "red_lex")
         check_list.append([check_lex, "Rerouted Sites Check"])
     if hasattr(check_obj, "swr_lex"):
-        site_list = check_obj.swr_lex.keys()
-        check_lex = {site: check_obj.inv_lex[site] for site in site_list}
+        check_lex = getattr(check_obj, "swr_lex")
         check_list.append([check_lex, "Solid Waste Release Check"])
-    if hasattr(check_obj, "chm_lex"):
-        site_list = check_obj.chm_lex.keys()
-        check_lex = {site: check_obj.inv_lex[site] for site in site_list}
-        check_list.append([check_lex, "Chemical Inventory Check"])
     if hasattr(check_obj, "sim_lex"):
-        site_list = check_obj.sim_lex.keys()
-        check_lex = {site: check_obj.inv_lex[site] for site in site_list}
+        check_lex = getattr(check_obj, "sim_lex")
         check_list.append([check_lex, "SIMV2 Check"])
+    if hasattr(check_obj, "chm_lex"):
+        check_lex = getattr(check_obj, "chm_lex")
+        check_list.append([check_lex, "Chemical Inventory Check"])
     # Comprehensive check
     check_list.append([check_obj.inv_lex, "Comprehensive Check"])
     # Verify that the same waste sites have been used
