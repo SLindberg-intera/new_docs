@@ -193,7 +193,11 @@
 		{"name":"CIE Transient Output Card Generator Tool", "command":"OC_TR_gen_cie_linux-intel-64.exe", "description":"qualified on 09.08.2020; this tool creates the Output Control Card portion of a STOMP input file used for mass balance and transport production simulations"
 		},
 		{"name":"CIE 2018 STOMP Input File Generator Tool ", "command":"xprt_2018_input_gen_cie_linux-intel-64.exe", "description":"qualified on 09.08.2020; this tool generates the 1943-2018 STOMP transport input file"
-		}
+		},
+		{"name":"CIE RTD STOMP Input File Generator Tool", "command":"xprt_RTD_input_gen_cie_linux-intel-64.exe", "description":"qualified on 09.15.2020; this tool generates the 2018 – RTD year STOMP transport input file"
+		},
+		{"name":"CIE 3070 STOMP Input File Generator Tool", "command":"xprt_3070_input_gen_cie_linux-intel-64.exe", "description":"qualified on 09.15.2020; this tool generates the 2018 (or RTD year if the model has RTD) - 3070 STOMP transport input file"
+		},
 
   ],
 	"LOGGER":{
