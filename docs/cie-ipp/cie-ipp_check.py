@@ -30,6 +30,8 @@ import pandas as pd
 import logging
 import math
 from copy import deepcopy
+import re
+from decimal import Decimal
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -97,6 +99,16 @@ def round_sigfigs(num, sig_figs):
         return round(num, -int(math.floor(math.log10(abs(num))) - (sig_figs - 1)))
     else:
         return 0  # Can't take the log of 0
+
+
+def round_half_up(n, decimals=0):
+    multiplier = 10 ** decimals
+    return math.floor(n * multiplier + 0.5) / multiplier
+
+
+def round_half_down(n, decimals=0):
+    multiplier = 10 ** decimals
+    return math.ceil(n * multiplier - 0.5) / multiplier
 
 
 def is_integer(mystr):
@@ -249,23 +261,52 @@ args = parser.parse_args()
 # Primary functions
 
 
-def csv_parser(path, skip_lines, use_cols=None, col_names=None, codec='utf-8'):
+def csv_parser(path, skip_lines, use_cols=None, col_names=None, codec='utf-8', prec='high'):
     """
     :param codec:           Encoding to be used when parsing CSV file
     :param path:            Path to CSV file being parsed
     :param skip_lines:      Number of lines to skip at the top of the file, may be integer or list
     :param use_cols:        Columns to be used from the file being parsed
     :param col_names:       Column names to be used in output dataframe
+    :param prec:            The precision engine to use in the parser
     :return:
     """
     if use_cols is None and col_names is None:
-        df = pd.read_csv(path, engine='c', skiprows=skip_lines, encoding=codec)
+        df = pd.read_csv(
+            path,
+            engine='c',
+            skiprows=skip_lines,
+            encoding=codec,
+            float_precision=prec
+        )
     elif use_cols is None:
-        df = pd.read_csv(path, engine='c', skiprows=skip_lines, names=col_names, encoding=codec)
+        df = pd.read_csv(
+            path,
+            engine='c',
+            skiprows=skip_lines,
+            names=col_names,
+            encoding=codec,
+            float_precision=prec
+        )
     elif col_names is None:
-        df = pd.read_csv(path, engine='c', skiprows=skip_lines, usecols=use_cols, encoding=codec)
+        df = pd.read_csv(
+            path,
+            engine='c',
+            skiprows=skip_lines,
+            usecols=use_cols,
+            encoding=codec,
+            float_precision=prec
+        )
     else:
-        df = pd.read_csv(path, engine='c', skiprows=skip_lines, usecols=use_cols, names=col_names, encoding=codec)
+        df = pd.read_csv(
+            path,
+            engine='c',
+            skiprows=skip_lines,
+            usecols=use_cols,
+            names=col_names,
+            encoding=codec,
+            float_precision=prec
+        )
     # Make sure to clean up all trailing spaces for all columns
     for col in df.columns:
         try:
@@ -275,10 +316,18 @@ def csv_parser(path, skip_lines, use_cols=None, col_names=None, codec='utf-8'):
     return df
 
 
-def stomp_format_parser(path, skip_pattern='241'):
-    # Load whole file into memory as dictionary whose levels consist of:
-    #   site-name
-    #   --->dataframe (with columns for: [year, volume(m^3)]
+def stomp_format_parser(path, skip_pattern='241-[^Cc]'):
+    """
+    Load whole file into memory as dictionary whose levels consist of:
+        site-name
+        --->dataframe (with columns for: [year, volume(m^3)]
+    :param path:            STOMP file path
+    :param skip_pattern:    Regex search pattern
+    :return:
+    """
+    #
+    #
+    #
     with open(path, 'r') as file:
         # Skip the header line
         line = next(file).split(',')
@@ -320,7 +369,7 @@ def stomp_format_parser(path, skip_pattern='241'):
                     data_series.append([year, volume])
             # Add the new site and associated water volumes if there's data present, else continue
             if site not in new_lex and len(data_series) > 0:
-                if skip_pattern in site:
+                if re.match(skip_pattern, site) is not None:
                     skip_sites.append(site)
                     continue
                 df = pd.DataFrame(data_series, columns=['year', 'WATER(m^3/year)'])
@@ -904,7 +953,8 @@ def log_results(compare_result, fr):
     if len(compare_result) > 0:
         logging.critical("#\n#\n##QA-FAIL ({}): the following differences were found:".format(fr))
         for diff in sorted(compare_result):
-            logging.critical("{:<20}{:<20}".format(diff, compare_result[diff]))
+            for stream in compare_result[diff]:
+                logging.critical("{:<20}{:<20}".format(diff, stream))
         logging.critical("#\n#\n")
     else:
         logging.info("#\n#\n##QA-PASS ({})\n#\n#".format(fr))
@@ -934,11 +984,12 @@ def compare_lex(lex1, lex2):
                     result = compare_dfs(df1, df2)
                     if result:
                         for diff in result:
-                            try:
-                                mismatched_sites[site] = "Waste Stream Difference (Column  Difference): " \
-                                                     "{:<20}{:<20}".format(*diff)
-                            except IndexError:
-                                mismatched_sites[site] = diff
+                            if site not in mismatched_sites:
+                                mismatched_sites[site] = ["Waste Stream Difference (Column  Difference): "
+                                                          "{:<20}{:<20}".format(*diff)]
+                            else:
+                                mismatched_sites[site] += ["Waste Stream Difference (Column  Difference): "
+                                                           "{:<20}{:<20}".format(*diff)]
     return mismatched_sites
 
 
@@ -960,13 +1011,15 @@ def compare_dfs(df1, df2):
 
 
 def compare_series(ser1, ser2, sig_fig=6):
-    # Make sure that precision is matched by rounding to 6 significant digits (the expected output format of cie-ipp.pl)
-    # To avoid floating point error issues, first round to 8 sig figs, then to 6 sig figs. Example of this being a
-    # problem is 426.03049999996 rounded to 6th sig fig gives 426.03 rather than 426.031
-    sigfig_list = [sig_fig + 4, sig_fig]
-    for digits in sigfig_list:
-        ser1 = ser1.apply(lambda x: round_sigfigs(x, digits))
-        ser2 = ser2.apply(lambda x: round_sigfigs(x, digits))
+    """
+    Round digits to the specified number of significant figures, then compare series
+    :param ser1:
+    :param ser2:
+    :param sig_fig:
+    :return:
+    """
+    ser1 = ser1.apply(lambda x: round_sigfigs(x, sig_fig))
+    ser2 = ser2.apply(lambda x: round_sigfigs(x, sig_fig))
     try:
         result = (ser1 == ser2).unique().tolist() == [True]
     except ValueError:
@@ -974,7 +1027,32 @@ def compare_series(ser1, ser2, sig_fig=6):
     if result:
         return True
     else:
+        # If the error is in the final digit of significance (only), then pass the value
+        diffs = (ser1 == ser2)
+        for val1, val2 in zip(ser1.loc[~diffs], ser2.loc[~diffs]):
+            float_error = check_float_point_err(val1, val2)
+            if float_error is False:
+                return float_error
+        return True
+
+
+def check_float_point_err(val1, val2):
+    """
+    Commpares two numbers and makes sure that the last significant digit is only different by at most '1'
+    :param val1:    Check value (not output, generated separately to check)
+    :param val2:    Output value (to be checked)
+    :return:        Returns True if floating point error, returns False if not floating point error.
+    """
+    assert isinstance(val1, float), "Values must be numeric"
+    assert isinstance(val2, float), "Values must be numeric"
+    remainder = abs(val1 - val2)
+    # Round to first significant digit, then pull the first significant digit of the value for evaluation
+    remainder = round_sigfigs(remainder, 1)
+    remainder = "{:e}".format(remainder)[0]
+    if remainder != '1':
         return False
+    else:
+        return True
 
 
 # ----------------------------------------------------------------------------------------------------------------------

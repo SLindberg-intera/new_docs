@@ -45,10 +45,22 @@
 #	v4.10 - picthing solids and liquid/solids. writing to an excluded file.
 #
 #	v4.11 - combining multiple records for a year (typically a liquid and a entrained solid)
+#
+#	v4-12 - Bug fix.  It was skipping SAC water sources when there were only solid sources
+#		in SIMV2.
+#
+#	v4-14 - modification to adding water from SAC, don't do it for Tanks (241-) and continue
+#		skipping them for only solid sources in SIMV2.
+#
+#	v4-15 - had to add back SAC water sources for C Tanks, fixed rounding errors when summing
+#		multiple records (was rounding every time - now only rounding at the end when writing.
+#	v4-16 - fixed rounding errors when summing multiple records (was rounding every time - now only
+#		rounding at the end when writing.
 
+	
 $dtstamp = localtime();
 
-$vers="8/24/2020 Ver 4.11 by MDWilliams, Intera Inc.";
+$vers="9/14/2020 Ver 4.16 by MDWilliams, Intera Inc.";
 
 #
 $ehsit = shift @ARGV;
@@ -467,8 +479,9 @@ while ($line=<SR>) {
 				$r2=$yl[$sim2volcol];
 			}
 			if (($r1 > 0.0) || ($r2 > 0.0)) {
-				$r1=$r1+$r2;
-				$v = sprintf("%.5e",$r1);
+				$v=$r1+$r2;
+#				$r1=$r1+$r2;
+#				$v = sprintf("%.7e",$r1);
 			}
 			$line=$line.$yl[$sim2sourcecol].",".$v.",";
 		} else {
@@ -500,7 +513,7 @@ while ($line=<SR>) {
                         }
 			if (($r1 > 0.0) || ($r2 > 0.0)) {
 				$tot=$r1+$r2;
-				$tot=sprintf("%.5e",$tot);
+#				$tot=sprintf("%.7e",$tot);
 			}
 			$line=$line.$tot.",";
 			$addcol++;
@@ -581,8 +594,8 @@ printf(OL " - chem volume ignored\n");
 				if ($a[6+$j] > 0.0) {
 				    if ((exists($s[$mergechemcol+$j])) && ($s[$mergechemcol+$j] > 0.0)) {
 					$s[$mergechemcol+$j]=$s[$mergechemcol+$j] + $a[6+$j];
-					$v = $s[$mergechemcol+$j];
-					$s[$mergechemcol+$j]=sprintf("%.5e",$v);
+#					$v = $s[$mergechemcol+$j];
+#					$s[$mergechemcol+$j]=sprintf("%.7e",$v);
 				    } else {
 					 $s[$mergechemcol+$j]=$a[6+$j];
 				    }
@@ -943,8 +956,23 @@ for ($s=0;$s<$nsimsites;$s++) {
 	    printf(OX "$line\n");
 	} else {
 	    $liqflag=1;
-
             # write out line
+	    $rline=$line;
+	    @r=split(",",$rline);
+	    $line=$r[0].",".$r[1].",".$r[2].",".$r[3].",";
+	    $t = sprintf("%.5e,",$r[4]);
+	    $t =~ s/e/E/;
+	    $line=$line.$t.$r[5].",";
+	    # round rest of data to 6 sigfigs		
+	    for ($i=0;$i<scalar(@r)-5;$i++) {
+                        if ((!defined $r[6+$i]) || ($r[6+$i] eq "")) {
+                            $line=$line.",";
+                        } else {
+		            $t=sprintf("%.5e",$r[6+$i]);
+			    $t =~ s/e/E/;
+			    $line=$line.$t.",";
+			}
+            }
             printf(OI "$line\n");
 
             # add to totals
@@ -994,7 +1022,7 @@ for ($s=0;$s<$nsimsites;$s++) {
        printf(OS "%6.1F to %6.1F,",$tottmin, $tottmax);
        for ($i=0;$i<$ntrad+$nchem;$i++) {
         if (defined $tot[6+$i]) {
-            printf(OS "$tot[6+$i],");
+            printf(OS "%.5e,",$tot[6+$i]);
         } else {
             printf(OS ",");
         }
@@ -1113,7 +1141,44 @@ for ($s=0;$s<$nsimsites;$s++) {
 
 # Add any SAC Liquid - if in ehsit but not in SIM
 for ($s=0;$s<$nsac;$s++) {
-	if ((exists $ehsit_hash{$sacname[$s]}) && (!exists $simv2_hash{$sacname[$s]})) {
+    # skip adding for tanks, except for C Tanks
+    if (($sacname[$s] =~ m/241-/)  && (!$sacname[$s] =~ m/241-C-/i)) {
+        printf(OL "Skipped check for SAC water for Tank waste sites (241-) = $sacname[$s]\n");
+    } else {
+	if (exists $ehsit_hash{$sacname[$s]}) {
+	  if (exists $simv2_hash{$sacname[$s]}) {
+# now - skip anything that has an entry in SIMV2
+#		# check SIMV2 for liquid wastes at this year
+#		# add if not
+#                $sl = $simv2_hash{$sacname[$s]};
+#                $nl = $simv2_count{$sacname[$s]};
+#		$mflag = 0;
+#		for($i=0;$i<$sacnyears[$s];$i++) {
+#                    for ($j=0;$j<$nl;$j++) {
+#                        @s = split(",",$slines[$sl+$j]);
+#			printf("$sacname[$s]: SIMTIME = $s[$sim2timecol], SAC = $sacyear[$s][$i] ");
+#			if ($s[$sim2timecol] == $sacyear[$s][$i]) {
+#				printf("Matched\n");
+#			} else {
+#				printf("No Match\n");
+#			}
+#                        if ($s[$sim2timecol] == $sacyear[$s][$i]) {
+#				# matched the year
+#				$mflag=1;
+#				last;
+#			} 
+#	            }
+#		    if ($mflag == 1) {
+#			# don't add this record
+#			printf(OL "Not adding site $sacname[$s] from $liqinv to Inventory (already has a date match from SIMV2)\n");
+#		    } else {
+#			# add record - no date match in SIMV2 for this site
+#			printf(OL "Adding $sacname[$s] from $liqinv to Inventory (in ehsit and SIMV2 but didn't match any dates)\n");
+#			printf(OI "Liquid from $liqinv ($saclunit[$s][$i]),,$sacname[$s],Liquid,$sacliq[$s][$i],$sacyear[$s][$i],,,,,,,,,,,,,,,,,\n");
+#			printf(OS "Liquid from $liqinv ($saclunit[$s][$i]),,$sacname[$s],Liquid,$sacliq[$s][$i],$sacyear[$s][$i],,,,,,,,,,,,,,,,,\n");
+#		    }
+#		}
+	  } else {
 	    printf(OL "Adding $sacname[$s] from $liqinv to Inventory (in ehsit but not in SIMV2)\n");
 	    $sacsum=0;
 	    for ($i=0;$i<$sacnyears[$s];$i++) {
@@ -1123,7 +1188,9 @@ for ($s=0;$s<$nsac;$s++) {
 	    }
 	    $t=$sacnyears[$s]-1;
 	    printf(OS "Total Liquid from $liqinv ($saclunit[$s][0]),,$sacname[$s],Liquid,$sacsum,$sacyear[$s][0] to $sacyear[$s][$t],,,,,,,,,,,,,,,,,\n");
+	  }
 	}
+    } 
 }
 
 close(OI);
