@@ -1,21 +1,33 @@
 """
 Author:         Jacob B Fullerton
 Date:           September 17, 2020
-Company:        Intera Inc.
+Company:        INTERA Inc.
 Usage:          This is an inventory preprocessor whose intent is to generate a summary inventory file from many sources
+
 Functional Req's to verify from ca-ipp:
                 1.  Only include inventory information for sites in the VZEHSIT data set
-                2.  
+                2.  Read all input information provided, filtering out records with no temporal or release data (i.e.
+                    no year provided for release or a zero release for a given year)
+                3.  Option to convert "entrained solids" to be liquid source types (represents precipitated waste)
+                4.  Solid Waste Release types should be assigned the waste type "Solid Release Series"
+                5.  Combine the input files such that waste inventory per waste site is incorporated based on the
+                    following order of prioritization:
+                    a.  Rerouted Inventory
+                    b.  Solid Waste Release
+                    c.  SIMV2 Inventory
+                    d.  Chemical Inventory
+                    e.  SAC Water Inventory
+
 Pseudo Code:    The code in general works in the following manner:
-                1.  Read primary sources used by cie-ipp.pl script:
-                    a.  VZEHSIT
-                    b.  RADINV (SIMV2)
-                    c.  LIQINV (SAC)
-                    d.  CHEMINV (chemical inventory)
-                    e.  REROUTED Sites/Inventory
+                1.  Read primary sources
                 2.  Build dictionary from primary sources
                 3.  Export final output to file
+
+Notes:          1.  This will output 6 significant digits by default, rounding to the 6th significant digit
+                2.  The rounding method will be the "ROUND_HALF_UP" method, settling ties by rounding up
 """
+
+
 import os
 import argparse
 import pandas as pd
@@ -88,7 +100,7 @@ def round_sigfigs(num, sig_figs):
     '0.000988'
     """
     if num != 0:
-        return round(num, -int(math.floor(math.log10(abs(num))) - (sig_figs - 1)))
+        return round_half_up(num, -int(math.floor(math.log10(abs(num))) - (sig_figs - 1)))
     else:
         return 0  # Can't take the log of 0
 
@@ -96,11 +108,6 @@ def round_sigfigs(num, sig_figs):
 def round_half_up(n, decimals=0):
     multiplier = 10 ** decimals
     return math.floor(n * multiplier + 0.5) / multiplier
-
-
-def round_half_down(n, decimals=0):
-    multiplier = 10 ** decimals
-    return math.ceil(n * multiplier - 0.5) / multiplier
 
 
 def is_integer(mystr):
@@ -203,10 +210,11 @@ parser.add_argument('--REROUTE',
                     help='Provide each rerouting work product file (and path) from the ICF, separated by spaces'
                     )
 parser.add_argument('-i', '--ipp_output',
-                    dest='ipp_output',
-                    type=file_path,
-                    help='Provide the file and associated path (can be relative) to the cie-ipp.pl output file being\n'
-                         'verified. This should be a CSV file.'
+                    dest='ipp_name',
+                    type=str,
+                    default='preprocessed_inventory.csv',
+                    help='Name for the inventory file and log. File output will always be a comma-delimited-file\n'
+                         'Default file name is [preprocessed_inventory.csv]'
                    )
 parser.add_argument('--COPCs',
                     dest='copcs',
@@ -238,6 +246,17 @@ parser.add_argument('-o', '--output',
                     type=dir_path,
                     default=os.getcwd(),
                     help='Directory in which to store files'
+                    )
+parser.add_argument('-s', '--sig_figs',
+                    dest='sig_figs',
+                    type=int,
+                    default=6,
+                    help='The number of significant digits to preserve.'
+                    )
+parser.add_argument('--logger',
+                    dest='logger',
+                    default="inventory_pp.log",
+                    help='The name of the log file'
                     )
 parser.add_argument('--verbosity',
                     dest='verbosity',
@@ -790,261 +809,16 @@ class InvObj:
         return
 
 
-def parse_ipp_output(path, copc_list, vzehsit):
-    ipp_out_lex = {}
-    header_lines = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12]
-    # Column names of cie-ipp.pl output to be used throughout parsing
-    year_col = 'Discharge/decay-corrected year'
-    water_col = 'Volume [m3]'
-    site_col = 'CA site name'
-    non_copcs = [
-        'Inventory Module',
-        'SIMV2 site name',
-        site_col,
-        'Source Type',
-        'year'
-    ]
-    # Parse only those columns of interest as specified by the user and necessary ID columns
-    usecols = non_copcs[:-1] + [year_col] + copc_list + [water_col]
-    df = csv_parser(path, skip_lines=header_lines, use_cols=usecols)
-    # Verify whether all copc columns were included from cie-ipp.pl output, also identify chems vs rads
-    ipp_out_text = open(path, 'r')
-    i = 0
-    while i in header_lines:        # Not concerned about skipping the last of these lines, as we want the units line
-        next(ipp_out_text)
-        i += 1
-    # Strip the final comma out of the line, remove new line characters, then split into a list
-    col_row = next(ipp_out_text)[::-1].replace(',', '', 1)[::-1].replace('\n', '').replace('\r', '').split(',')
-    unit_row = next(ipp_out_text)[::-1].replace(',', '', 1)[::-1].replace('\n', '').replace('\r', '').split(',')
-    ipp_out_text.close()
-    del ipp_out_text
-    # Compare col_row against the columns
-    excluded_copcs = list(set(copc_list).difference(set(col_row)))
-    if len(excluded_copcs) > 0:
-        write_str = len(copc_list) * "{:10}"
-        logging.warning("The following COPCs were not included in the analysis, though they are in the IPP output:")
-        logging.warning(write_str.format(*excluded_copcs))
-    # Identify chems vs rads
-    rad_indices = [index for index, value in enumerate(unit_row) if value.lower() == 'ci']
-    chem_indices = [index for index, value in enumerate(unit_row) if value.lower() == 'kg']
-    rad_list = [col_row[i] for i in rad_indices]
-    chem_list = [col_row[i] for i in chem_indices]
-    # Make sure to only pull those rads/chemicals specified by the user
-    rad_list = list(set(rad_list).intersection(set(copc_list)))
-    chem_list = list(set(chem_list).intersection(set(copc_list)))
-    # Drop the old year column and replace with "year"
-    df.rename(columns={year_col: 'year'}, inplace=True)
-    col_names = df.columns
-    # Track all sites that are not in VZEHSIT
-    sites_not_vzehsit = []
-    # Break out each of the waste sites and waste streams into a dictionary of the same format as was done with InvObj
-    for copc in col_names:
-        if copc in non_copcs:
-            continue
-        else:
-            if copc == water_col:
-                new_copc, new_col = normalize_col_names(copc, water_col=water_col)
-            elif copc in chem_list:
-                new_copc, new_col = normalize_col_names(copc, chm_col=True)
-            else:
-                new_copc, new_col = normalize_col_names(copc)
-            df.rename(columns={copc: new_col}, inplace=True)
-            for site in get_unique_vals(df, site_col):
-                if site.upper() not in vzehsit:
-                    # If the site is not in VZEHSIT, then collect it and continue to next site (don't parse non-VZEHSIT)
-                    sites_not_vzehsit.append(site.upper())
-                    continue
-                site_df = df.loc[df[site_col] == site, ['year', new_col]].copy(deep=True)
-                site_df = clean_df(site_df, [], new_col)
-                # Verify that the dataframe has data (continue if empty dataframe)
-                if len(site_df) == 0:
-                    continue
-                # Make sure that the site-naming convention stays upper-case to be consistent with check
-                site = site.upper()
-                if site not in ipp_out_lex:
-                    ipp_out_lex[site] = {
-                        new_copc: site_df
-                    }
-                else:
-                    ipp_out_lex[site][new_copc] = site_df
-    if len(sites_not_vzehsit) > 0:
-        logging.critical(
-            "##QA-FAIL(Waste Site Parse Check): The cie-ipp.pl output has {} site(s) that are not in VZEHSIT:".format(len(sites_not_vzehsit))
-        )
-        for site in sites_not_vzehsit:
-            logging.critical(site)
-    else:
-        logging.info("#\n#\n##QA-PASS (Waste Site Parse Check): The cie-ipp.pl output only has sites listed in the VZEHSIT.\n#\n#")
-    return ipp_out_lex
-
-
-def compare_ipp_output(check_obj, ipp_out):
+def build_inventory_df(inv_dict):
     """
-    :param check_obj:       This is the InvObj object, or in other words, the expected result set
-    :param lex2:            This is the dictionary representation of the cie-ipp.pl output to compare
+    This will merge the small dataframes contained in the inventory dictionary into a single, large dataframe.
+    :param inv_dict:
     :return:
     """
-    lex1 = check_obj.inv_lex
-    check_list = []
-    if hasattr(check_obj, "sac_lex"):
-        check_lex = getattr(check_obj, "sac_lex")
-        check_list.append([check_lex, "SAC Check"])
-    if hasattr(check_obj, "red_lex"):
-        check_lex = getattr(check_obj, "red_lex")
-        check_list.append([check_lex, "Rerouted Sites Check"])
-    if hasattr(check_obj, "swr_lex"):
-        check_lex = getattr(check_obj, "swr_lex")
-        check_list.append([check_lex, "Solid Waste Release Check"])
-    if hasattr(check_obj, "sim_lex"):
-        check_lex = getattr(check_obj, "sim_lex")
-        check_list.append([check_lex, "SIMV2 Check"])
-    if hasattr(check_obj, "chm_lex"):
-        check_lex = getattr(check_obj, "chm_lex")
-        check_list.append([check_lex, "Chemical Inventory Check"])
-    # Comprehensive check
-    check_list.append([check_obj.inv_lex, "Comprehensive Check"])
-    # Verify that the same waste sites have been used
-    unused_sites = set(lex1.keys()) - set(ipp_out.keys())
-    # Known exceptions to site list [["missing site", "known exception"]]
-    site_exceptions = {
-        'T31': '200-W-254',
-        'T34': '200-W-254',
-    }
-    missed_sites = [site for site in unused_sites if
-                        site not in site_exceptions.keys()]
-    site_exceptions = {site_exceptions[site] for site in unused_sites if
-                        site in site_exceptions.keys() and site_exceptions[site] in ipp_out.keys()
-                       }
-    if len(site_exceptions) > 0:
-        logging.info('##The following sites are known exceptions:')
-        write_str = '{:<20}{:<20}'
-        logging.info(write_str.format('Missing Site', 'Mapped Site'))
-        for site in site_exceptions:
-            logging.info(write_str.format(site, site_exceptions[site]))
-    if len(missed_sites) > 0:
-        logging.warning("##Output from cie-ipp.pl does not contain the following sites:")
-        for site in sorted(unused_sites):
-            logging.warning(site)
-    for check in check_list:
-        lex, src = check
-        result = compare_lex(lex, ipp_out)
-        log_results(result, src)
-    # Reverse the comprehensive check to make sure nothing was missed by the check (i.e. more info in cie-ipp.pl output)
-    result = compare_lex(ipp_out, check_obj.inv_lex)
-    log_results(result, "Comprehensive Check in Reverse")
-    return
+    logging.info("Merging inventory dictionary into a single dataframe")
+    for site in inv_dict:
+        for copc in inv_dict[site]:
 
-
-def log_results(compare_result, fr):
-    """
-    Takes a list of strings and logs them to the logfile
-    :param compare_result:      List of strings
-    :param fr:                  The functional requirement being tested
-    :return:
-    """
-    if len(compare_result) > 0:
-        logging.critical("#\n#\n##QA-FAIL ({}): the following differences were found:".format(fr))
-        for diff in sorted(compare_result):
-            for stream in compare_result[diff]:
-                logging.critical("{:<20}{:<20}".format(diff, stream))
-        logging.critical("#\n#\n")
-    else:
-        logging.info("#\n#\n##QA-PASS ({})\n#\n#".format(fr))
-    return
-
-
-def compare_lex(lex1, lex2):
-    """
-    :param lex1:    Primary dictionary to check with
-    :param lex2:    cie-ipp.pl output to verify
-    :return:
-    """
-    mismatched_sites = {}
-    for site in lex1:
-        # Record missing sites
-        if site not in lex2:
-            mismatched_sites[site] = "Waste Site Missing"
-        else:
-            for stream in lex1[site]:
-                # Record missing waste streams/water volumes
-                if stream not in lex2[site]:
-                    mismatched_sites[site] = "Waste Stream Missing: {}".format(stream)
-                else:
-                    # Test that each waste stream is equal to one another
-                    df1 = lex1[site][stream]
-                    df2 = lex2[site][stream]
-                    result = compare_dfs(df1, df2)
-                    if result:
-                        for diff in result:
-                            if site not in mismatched_sites:
-                                mismatched_sites[site] = ["Waste Stream Difference (Column  Difference): "
-                                                          "{:<20}{:<20}".format(*diff)]
-                            else:
-                                mismatched_sites[site] += ["Waste Stream Difference (Column  Difference): "
-                                                           "{:<20}{:<20}".format(*diff)]
-    return mismatched_sites
-
-
-def compare_dfs(df1, df2):
-    diff_cols = list(set(df1.columns).difference(set(df2.columns)))
-    if len(diff_cols) > 0:
-        return [diff_cols, "Column names that don't match"]
-    else:
-        for col in df1.columns:
-            series1 = df1[col]
-            series2 = df2[col]
-            series_check = compare_series(series1, series2)
-            if not series_check:
-                diff_cols.append([col, "Series data do not match"])
-    if len(diff_cols) > 0:
-        return diff_cols
-    else:
-        return False
-
-
-def compare_series(ser1, ser2, sig_fig=6):
-    """
-    Round digits to the specified number of significant figures, then compare series
-    :param ser1:
-    :param ser2:
-    :param sig_fig:
-    :return:
-    """
-    ser1 = ser1.apply(lambda x: round_sigfigs(x, sig_fig))
-    ser2 = ser2.apply(lambda x: round_sigfigs(x, sig_fig))
-    try:
-        result = (ser1 == ser2).unique().tolist() == [True]
-    except ValueError:
-        return False
-    if result:
-        return True
-    else:
-        # If the error is in the final digit of significance (only), then pass the value
-        diffs = (ser1 == ser2)
-        for val1, val2 in zip(ser1.loc[~diffs], ser2.loc[~diffs]):
-            float_error = check_float_point_err(val1, val2)
-            if float_error is False:
-                return float_error
-        return True
-
-
-def check_float_point_err(val1, val2):
-    """
-    Commpares two numbers and makes sure that the last significant digit is only different by at most '1'
-    :param val1:    Check value (not output, generated separately to check)
-    :param val2:    Output value (to be checked)
-    :return:        Returns True if floating point error, returns False if not floating point error.
-    """
-    assert isinstance(val1, float), "Values must be numeric"
-    assert isinstance(val2, float), "Values must be numeric"
-    remainder = abs(val1 - val2)
-    # Round to first significant digit, then pull the first significant digit of the value for evaluation
-    remainder = round_sigfigs(remainder, 1)
-    remainder = "{:e}".format(remainder)[0]
-    if remainder != '1':
-        return False
-    else:
-        return True
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -1054,9 +828,6 @@ if __name__ == '__main__':
     if args.rcaswr_idx is not None and args.rcaswr_dir is not None:
         is_RCASWR_idx(args.rcaswr_idx, args.rcaswr_dir)
     else:
-        logging.debug("No Solid Waste Releases to be considered in this check.")
+        logging.info("No Solid Waste Releases to be considered in this check.")
     inv_check = InvObj(args)
-    # Pass the path to the ipp_output file, whether chemicals should be included, and the list of VZEHSIT sites
-    vz_sites = list(inv_check.parse_vzehsit())
-    ipp_out = parse_ipp_output(args.ipp_output, args.copcs, vz_sites)
-    compare_ipp_output(inv_check, ipp_out)
+
