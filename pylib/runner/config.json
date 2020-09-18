@@ -197,6 +197,8 @@
 		{"name":"CIE RTD STOMP Input File Generator Tool", "command":"xprt_RTD_input_gen_cie_linux-intel-64.exe", "description":"qualified on 09.15.2020; this tool generates the 2018 – RTD year STOMP transport input file"
 		},
 		{"name":"CIE 3070 STOMP Input File Generator Tool", "command":"xprt_3070_input_gen_cie_linux-intel-64.exe", "description":"qualified on 09.15.2020; this tool generates the 2018 (or RTD year if the model has RTD) - 3070 STOMP transport input file"
+		},
+		{"name":"CIE-IPP Tool", "command":"cie-ipp.pl", "description":"qualified on 09.18.2020; this tool generates a comprehensive data set consisting of radionuclide and chemical aqueous volume releases as a function of time for Central Plateau sites"
 		}
 
   ],
