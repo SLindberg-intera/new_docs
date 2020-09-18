@@ -231,15 +231,7 @@ parser.add_argument('--COPCs',
                         'CN'
                     ],
                     help='This flag allows you to define which constituents/analytes to include in the check. Call\n'
-                         'the flag in the commandline for as many COPCs that need to be checked.'
-                    )
-parser.add_argument('--exclude_solids',
-                    dest='exclude_solids',
-                    type=bool,
-                    default=True,
-                    help='This flag allows you to specify whether to include solids. Liquids will always be included,\n'
-                         'and any "entrained solids" will be treated as liquids. Default is [True], meaning that \n'
-                         'solids will not be included (solid sources that are not "entrained solids").'
+                         'the flag in the commandline for as many COPCs that need to be included.'
                     )
 parser.add_argument('-o', '--output',
                     dest='output',
@@ -672,12 +664,7 @@ class InvObj:
         df = csv_parser(path, skip_lines=3, codec='iso-8859-1')
         # Convert all waste stream types (solid vs liquid) to liquid if inventory module is "Entrained Solids"
         df.loc[df[waste_mod] == 'SIM-v2 entrained solids', waste_type] = 'Liquid'
-        # Exclude inventory records that are waste_type = 'solid' if in solid waste release
-        # Only necessary if solid waste release sites are included in the analysis/check
-        if hasattr(self, "swr_lex"):
-            df = df.loc[~((df[site_col].isin(self.swr_lex)) & (df[waste_type] == 'Solids')), :]
-        if self.inv_args.exclude_solids:
-            df = df.loc[df[waste_type] == 'Liquid', :]
+        df = df.loc[df[waste_type] == 'Liquid', :]
         # Split by waste site and stream and store in dictionary
         for copc in df.columns:
             if copc in non_copcs:
@@ -809,16 +796,71 @@ class InvObj:
         return
 
 
-def build_inventory_df(inv_dict):
+def build_inventory_df(inv_dict, copc_list):
     """
     This will merge the small dataframes contained in the inventory dictionary into a single, large dataframe.
-    :param inv_dict:
+    :param inv_dict:    Python dictionary structured as follows: inv_dict[site][copc], which has a value of a Pandas
+                        dataframe object. The dataframe must have a 'year' column and a corresponding COPC column
+    :param copc_list:   The user argument contianing the contaminants to include in the output.
+    :return:            The raw Pandas dataframe
+    """
+    logging.info("##Merging inventory dictionary into a single dataframe")
+    logging.info("SITE, COPC1, COPC2, ..., COPC#")
+    df = pd.DataFrame()
+    # Check which COPC's actually made it into the final dataframe
+    fin_copcs = []
+    for site in sorted(inv_dict.keys()):
+        copcs = list(sorted(inv_dict[site]))
+        fin_copcs = list(set(fin_copcs + copcs))
+        site_log = ', '.join([site] + copcs)
+        logging.info(site_log)
+        site_df = pd.DataFrame()
+        for copc in inv_dict[site]:
+            if 'year' not in site_df.columns:
+                site_df = pd.concat([site_df, inv_dict[site][copc]], sort=True)
+            else:
+                site_df = site_df.merge(inv_dict[site][copc], on='year', sort=True)
+        site_df['SITE_NAME'] = site
+        df = pd.concat([df, site_df], sort=False)
+    # Format the columns based on the user's column list (in order)
+    use_copcs = [copc for copc in copc_list if copc.upper() in fin_copcs]
+    # Log whether all COPC's made it into the final list
+    unused_copcs = set(use_copcs).difference(set(copc_list))
+    if len(unused_copcs) > 0:
+        logging.warning("##The following COPC's were not included in final output/not present in source files:")
+        unused_str = '{:<10}'*len(unused_copcs)
+        logging.warning(unused_str.format(*unused_copcs))
+    else:
+        logging.info("##All COPC's requested by the user were included in the final output file:")
+        write_str = '{:<10}'*len(use_copcs)
+        logging.info(write_str.format(*use_copcs))
+    # Get the column names from the dataframe and add them
+    copc_cols = []
+    for copc in use_copcs:
+        # I don't have the information to determine if the column is chemical or radionuclide, test for both
+        chm_col = normalize_col_names(copc, chm_col=True)[1]
+        rad_col = normalize_col_names(copc)[1]
+        if chm_col in df.columns:
+            copc_cols.append(chm_col)
+        elif rad_col in df.columns:
+            copc_cols.append(rad_col)
+        else:
+            logging.critical("The following copc provided cannot be matched with the dataframe column set: {}".format(copc))
+    col_order = ['SITE_NAME', 'year'] + use_copcs
+    df = df[col_order]
+    return df
+
+
+def format_numerics(df, num_cols, prec):
+    """
+    Expects a dataframe
+    :param df:          Pandas dataframe
+    :param num_cols:    Numeric columns to format (list of column names)
+    :param prec:        Number of significant digits to preserve
     :return:
     """
-    logging.info("Merging inventory dictionary into a single dataframe")
-    for site in inv_dict:
-        for copc in inv_dict[site]:
-
+    df[num_cols] = df[num_cols].apply(lambda x: round_sigfigs(x, prec))
+    return df
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -830,4 +872,7 @@ if __name__ == '__main__':
     else:
         logging.info("No Solid Waste Releases to be considered in this check.")
     inv_check = InvObj(args)
-
+    # Unpack dictionary into Pandas dataframe
+    ipp_df = build_inventory_df(inv_check.inv_lex, args.copcs)
+    # Format all numeric values to selected number of significant figures
+    ipp_df = format_numerics(ipp_df, ipp_df.columns[:2], args.sig_figs)
