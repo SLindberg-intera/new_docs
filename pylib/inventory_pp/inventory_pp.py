@@ -846,7 +846,7 @@ def build_inventory_df(inv_dict, copc_list):
             copc_cols.append(rad_col)
         else:
             logging.critical("The following copc provided cannot be matched with the dataframe column set: {}".format(copc))
-    col_order = ['SITE_NAME', 'year'] + use_copcs
+    col_order = ['SITE_NAME', 'year'] + copc_cols
     df = df[col_order]
     return df
 
