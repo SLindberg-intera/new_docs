@@ -35,6 +35,7 @@ import logging
 from copy import deepcopy
 import re
 import math
+from pathlib import Path
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -906,5 +907,8 @@ if __name__ == '__main__':
     logging.info("Rounding all waste stream values to {} significant digits".format(args.sig_figs))
     for col in ipp_df.columns[2:]:
         ipp_df = format_numerics(ipp_df, col, args.sig_figs)
+    # Clear out rows that have all NaN values
+    ipp_df.dropna(axis=0, how='all', subset=ipp_df.columns[2:], inplace=True)
     # Write out to file
-    
+    out_file = Path(args.output, args.ipp_name)
+    ipp_df.to_csv(path_or_buf=out_file, index=False)
