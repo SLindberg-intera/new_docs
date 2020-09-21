@@ -32,10 +32,9 @@ import os
 import argparse
 import pandas as pd
 import logging
-import math
 from copy import deepcopy
 import re
-from decimal import Decimal
+import math
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -99,15 +98,37 @@ def round_sigfigs(num, sig_figs):
     >>> '{0:.6}'.format(round_sigfigs(0.00098765, sig_figs=3))
     '0.000988'
     """
+    # Exclude non-numeric values from the calculation
+    if not is_numeric(num) or isNaN(num):
+        return num
     if num != 0:
         return round_half_up(num, -int(math.floor(math.log10(abs(num))) - (sig_figs - 1)))
     else:
         return 0  # Can't take the log of 0
 
 
+def isNaN(num):
+    return num != num
+
+
 def round_half_up(n, decimals=0):
     multiplier = 10 ** decimals
     return math.floor(n * multiplier + 0.5) / multiplier
+
+
+def is_numeric(mystr):
+    if is_float(mystr) or is_integer(mystr):
+        return True
+    else:
+        return False
+
+
+def is_float(mystr):
+    try:
+        float(mystr)
+        return True
+    except:
+        return False
 
 
 def is_integer(mystr):
@@ -848,18 +869,25 @@ def build_inventory_df(inv_dict, copc_list):
             logging.critical("The following copc provided cannot be matched with the dataframe column set: {}".format(copc))
     col_order = ['SITE_NAME', 'year'] + copc_cols
     df = df[col_order]
+    # Reset index of dataframe
+    df.reset_index(drop=True, inplace=True)
     return df
 
 
-def format_numerics(df, num_cols, prec):
+def format_numerics(df, num_col, prec):
     """
-    Expects a dataframe
+    Will iterate over all values and attempt to round each value to the indicated number of significant digits. To help
+    mitigate floating point error, the method will first round the number to the specified precision + 2 extra digits.
+    Then, the method will round to the specified number of significant digits. An example of how this would work is if
+    a value 3.69820499999999997 is given and we want to represent this to 6 significant digits, the method would first
+    round to 3.6982050, then to 3.69821 (following the round-half-up rule).
     :param df:          Pandas dataframe
-    :param num_cols:    Numeric columns to format (list of column names)
+    :param num_col:     Numeric columns to format (list of column names)
     :param prec:        Number of significant digits to preserve
     :return:
     """
-    df[num_cols] = df[num_cols].apply(lambda x: round_sigfigs(x, prec))
+    df[num_col] = df[num_col].apply(lambda x: round_sigfigs(x, prec + 2))
+    df[num_col] = df[num_col].apply(lambda x: round_sigfigs(x, prec))
     return df
 
 
@@ -875,4 +903,8 @@ if __name__ == '__main__':
     # Unpack dictionary into Pandas dataframe
     ipp_df = build_inventory_df(inv_check.inv_lex, args.copcs)
     # Format all numeric values to selected number of significant figures
-    ipp_df = format_numerics(ipp_df, ipp_df.columns[:2], args.sig_figs)
+    logging.info("Rounding all waste stream values to {} significant digits".format(args.sig_figs))
+    for col in ipp_df.columns[2:]:
+        ipp_df = format_numerics(ipp_df, col, args.sig_figs)
+    # Write out to file
+    
