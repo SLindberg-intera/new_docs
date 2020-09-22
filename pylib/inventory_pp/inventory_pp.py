@@ -253,7 +253,8 @@ parser.add_argument('--COPCs',
                         'CN'
                     ],
                     help='This flag allows you to define which constituents/analytes to include in the check. Call\n'
-                         'the flag in the commandline for as many COPCs that need to be included.'
+                         'the flag in the commandline for as many COPCs that need to be included. Water will always\n'
+                         'be included.'
                     )
 parser.add_argument('-o', '--output',
                     dest='output',
@@ -762,7 +763,7 @@ class InvObj:
             logging.info('##Merging SAC into final dictionary')
             final_lex, used_lex = combine_lex(final_lex, self.sac_lex)
             self.clean_lex(used_lex, 'sac_lex')
-        logging.info('##All primary source data have been merged into a hashed dictionary, proceeding to check.')
+        logging.info('##All primary source data have been merged into a hashed dictionary.')
         return final_lex
 
     def clean_inv(self):
@@ -782,7 +783,7 @@ class InvObj:
         # final_lex = {site: self.inv_lex[site] for site in self.inv_lex if len(self.inv_lex[site].keys()) > 0}
         # Log the final waste streams to be included in the analysis
         copc_list = sorted(list(set(copc_list)))
-        logging.info("##Waste streams to be considered for this check:")
+        logging.info("##Waste streams to be considered:")
         write_str = len(copc_list) * "{:<10}"
         logging.info(write_str.format(*copc_list))
         # Log the waste sites that have no inventory for evaluation after excluding the extraneous information
@@ -820,7 +821,8 @@ class InvObj:
 
 def build_inventory_df(inv_dict, copc_list):
     """
-    This will merge the small dataframes contained in the inventory dictionary into a single, large dataframe.
+    This will merge the small dataframes contained in the inventory dictionary into a single, large dataframe. When
+    including the user-provided COPC list, always include water (even if not included by user explicitly).
     :param inv_dict:    Python dictionary structured as follows: inv_dict[site][copc], which has a value of a Pandas
                         dataframe object. The dataframe must have a 'year' column and a corresponding COPC column
     :param copc_list:   The user argument contianing the contaminants to include in the output.
@@ -829,6 +831,8 @@ def build_inventory_df(inv_dict, copc_list):
     logging.info("##Merging inventory dictionary into a single dataframe")
     logging.info("SITE, COPC1, COPC2, ..., COPC#")
     df = pd.DataFrame()
+    # Always include water
+    copc_list.append('WATER')
     # Check which COPC's actually made it into the final dataframe
     fin_copcs = []
     for site in sorted(inv_dict.keys()):
@@ -862,10 +866,13 @@ def build_inventory_df(inv_dict, copc_list):
         # I don't have the information to determine if the column is chemical or radionuclide, test for both
         chm_col = normalize_col_names(copc, chm_col=True)[1]
         rad_col = normalize_col_names(copc)[1]
+        wat_col = normalize_col_names(copc, water_col=copc)[1]
         if chm_col in df.columns:
             copc_cols.append(chm_col)
         elif rad_col in df.columns:
             copc_cols.append(rad_col)
+        elif wat_col in df.columns:
+            copc_cols.append(wat_col)
         else:
             logging.critical("The following copc provided cannot be matched with the dataframe column set: {}".format(copc))
     col_order = ['SITE_NAME', 'year'] + copc_cols
@@ -895,7 +902,7 @@ def format_numerics(df, num_col, prec):
 # ----------------------------------------------------------------------------------------------------------------------
 # Main Program
 if __name__ == '__main__':
-    configure_logger(os.path.join(args.output, "ipp_check.log"), args.verbosity)
+    configure_logger(os.path.join(args.output, args.logger), args.verbosity)
     if args.rcaswr_idx is not None and args.rcaswr_dir is not None:
         is_RCASWR_idx(args.rcaswr_idx, args.rcaswr_dir)
     else:
