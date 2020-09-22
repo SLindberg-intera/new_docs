@@ -243,6 +243,7 @@ parser.add_argument('--COPCs',
                     nargs='+',
                     type=str,
                     default=[
+                        'Water',
                         'H-3',
                         'I-129',
                         'Sr-90',
@@ -253,8 +254,7 @@ parser.add_argument('--COPCs',
                         'CN'
                     ],
                     help='This flag allows you to define which constituents/analytes to include in the check. Call\n'
-                         'the flag in the commandline for as many COPCs that need to be included. Water will always\n'
-                         'be included.'
+                         'the flag in the commandline for as many COPCs that need to be included.'
                     )
 parser.add_argument('-o', '--output',
                     dest='output',
@@ -821,8 +821,7 @@ class InvObj:
 
 def build_inventory_df(inv_dict, copc_list):
     """
-    This will merge the small dataframes contained in the inventory dictionary into a single, large dataframe. When
-    including the user-provided COPC list, always include water (even if not included by user explicitly).
+    This will merge the small dataframes contained in the inventory dictionary into a single, large dataframe.
     :param inv_dict:    Python dictionary structured as follows: inv_dict[site][copc], which has a value of a Pandas
                         dataframe object. The dataframe must have a 'year' column and a corresponding COPC column
     :param copc_list:   The user argument contianing the contaminants to include in the output.
@@ -831,8 +830,6 @@ def build_inventory_df(inv_dict, copc_list):
     logging.info("##Merging inventory dictionary into a single dataframe")
     logging.info("SITE, COPC1, COPC2, ..., COPC#")
     df = pd.DataFrame()
-    # Always include water
-    copc_list.append('WATER')
     # Check which COPC's actually made it into the final dataframe
     fin_copcs = []
     for site in sorted(inv_dict.keys()):
@@ -915,7 +912,9 @@ if __name__ == '__main__':
     for col in ipp_df.columns[2:]:
         ipp_df = format_numerics(ipp_df, col, args.sig_figs)
     # Clear out rows that have all NaN values
+    logging.info("##Excluding rows with no data")
     ipp_df.dropna(axis=0, how='all', subset=ipp_df.columns[2:], inplace=True)
     # Write out to file
     out_file = Path(args.output, args.ipp_name)
+    logging.info("##Writing preprocessed inventory file to the following path: {}".format(str(out_file)))
     ipp_df.to_csv(path_or_buf=out_file, index=False)
