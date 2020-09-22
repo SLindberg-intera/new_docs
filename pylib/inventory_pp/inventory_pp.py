@@ -740,29 +740,23 @@ class InvObj:
         if hasattr(self, "red_lex"):
             logging.info('##Merging Rerouted Sites into final dictionary')
             final_lex, used_lex = combine_lex(final_lex, self.red_lex)
-            self.clean_lex(used_lex, 'red_lex')
         if hasattr(self, "swr_lex"):
             logging.info('##Merging SWR into final dictionary')
             final_lex, used_lex = combine_lex(final_lex, self.swr_lex)
-            self.clean_lex(used_lex, 'swr_lex')
         if hasattr(self, "sim_lex"):
             logging.info('##Merging SIMV2 into final dictionary')
             # If SWR is included in analysis, make sure SIMV2 dictionary doesn't override the values
             if hasattr(self, "swr_lex"):
                 final_lex, used_lex = combine_lex(final_lex, self.sim_lex)
-                self.clean_lex(used_lex, 'sim_lex')
             # If no SWR, merge SIMV2 like normal
             else:
                 final_lex, used_lex = combine_lex(final_lex, self.sim_lex)
-                self.clean_lex(used_lex, 'sim_lex')
         if hasattr(self, "chm_lex"):
             logging.info('##Merging Chemical Inventory into final dictionary')
             final_lex, used_lex = combine_lex(final_lex, self.chm_lex)
-            self.clean_lex(used_lex, 'chm_lex')
         if hasattr(self, "sac_lex"):
             logging.info('##Merging SAC into final dictionary')
             final_lex, used_lex = combine_lex(final_lex, self.sac_lex)
-            self.clean_lex(used_lex, 'sac_lex')
         logging.info('##All primary source data have been merged into a hashed dictionary.')
         return final_lex
 
@@ -796,28 +790,6 @@ class InvObj:
             logging.info("##All sites in VZEHSIT have at least one waste stream/water volume time series.")
         return final_lex
 
-    def clean_lex(self, keep_lex, attr_str=''):
-        """
-        This method removes excess sites that did not make it into the final inventory object from the primary source
-        dictionaries. As an example: if site 123-x-4 is present in the red_lex (rerouted sites source) and in sac_lex
-        (for the SAC source), we'd want to keep 123-x-4 in red_lex, and remove it from sac_lex.
-        :param keep_lex:        Dictionary of sites/streams to keep: keep_lex[site]
-        :param attr_str:        The string of the attribute to set/modify
-        :return:
-        """
-        try:
-            assert hasattr(self, attr_str)
-        except AssertionError:
-            logging.exception("The method was not provided a valid attribute string {}".format(attr_str))
-            raise AssertionError
-        new_lex = {}
-        for site in keep_lex.keys():
-            new_lex[site] = {}
-            for copc in keep_lex[site]:
-                new_lex[site][copc] = getattr(self, attr_str)[site][copc]
-        setattr(self, attr_str, new_lex)
-        return
-
 
 def build_inventory_df(inv_dict, copc_list):
     """
@@ -842,7 +814,7 @@ def build_inventory_df(inv_dict, copc_list):
             if 'year' not in site_df.columns:
                 site_df = pd.concat([site_df, inv_dict[site][copc]], sort=True)
             else:
-                site_df = site_df.merge(inv_dict[site][copc], on='year', sort=True)
+                site_df = site_df.merge(inv_dict[site][copc], on='year', sort=True, how='outer')
         site_df['SITE_NAME'] = site
         df = pd.concat([df, site_df], sort=False)
     # Format the columns based on the user's column list (in order)
