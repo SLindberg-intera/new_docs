@@ -229,7 +229,9 @@ parser.add_argument('--REROUTE',
                     dest='reroute',
                     nargs='+',
                     type=file_path,
-                    help='Provide each rerouting work product file (and path) from the ICF, separated by spaces'
+                    help='Provide each rerouting work product file (and path) from the ICF, separated by spaces.\n'
+                         'Each rerouted source file must have a site column that matches either "CA site name" or \n'
+                         '"CIE site name" (case-sensitive).'
                     )
 parser.add_argument('-i', '--ipp_output',
                     dest='ipp_name',
@@ -238,7 +240,7 @@ parser.add_argument('-i', '--ipp_output',
                     help='Name for the inventory file and log. File output will always be a comma-delimited-file\n'
                          'Default file name is [preprocessed_inventory.csv]'
                    )
-parser.add_argument('--COPCs',
+parser.add_argument('--COPC',
                     dest='copcs',
                     nargs='+',
                     type=str,
@@ -253,8 +255,8 @@ parser.add_argument('--COPCs',
                         'NO3',
                         'CN'
                     ],
-                    help='This flag allows you to define which constituents/analytes to include in the check. Call\n'
-                         'the flag in the commandline for as many COPCs that need to be included.'
+                    help='This flag allows you to define which constituents/analytes to include in the check.\n'
+                         'Separate each COPC by spaces after calling the flag.'
                     )
 parser.add_argument('-o', '--output',
                     dest='output',
@@ -505,13 +507,19 @@ class InvObj:
         return new_lex
 
     def parse_swr(self):
+        """
+        This function assumes that solid waste release:
+        1.  Has no water release
+        2.  Only includes readionuclides (affects dataframe column naming and parsing)
+        :return:
+        """
         # Pulls all files but the index file and parses them into corresponding entries in the master dictionary
         swr_dir = self.inv_args.rcaswr_dir
         new_lex = {}
         not_vzehsit = []
         site_counter = 0
         for swr_file in next(os.walk(swr_dir))[2]:
-            if swr_file != self.inv_args.rcaswr_idx:
+            if swr_file != Path(self.inv_args.rcaswr_idx).name:
                 # All files except for the index file are delimited by '_', so splitting yields a list of:
                 #   [waste site, waste stream]
                 site_name, copc = swr_file.upper().replace('.CSV', '').split('_')
@@ -519,17 +527,18 @@ class InvObj:
                     not_vzehsit.append(site_name)
                 path = os.path.join(swr_dir, swr_file)
                 site_df = csv_parser(path, 4)
-                # Rename the columns to be consistent with the rest of the check
+                # Rename the columns to be consistent with the rest
+                new_copc, new_col = normalize_col_names(copc)
+                site_df[new_col] = site_df["Reduced Activity Release Rate (Ci/year)"]
                 site_df['year'] = site_df["Reduced Year"]
-                site_df['{}(ci/year)'.format(copc)] = site_df["Reduced Activity Release Rate (Ci/year)"]
-                site_df = clean_df(site_df, ["Reduced Year", "Reduced Activity Release Rate (Ci/year)"])
+                site_df = clean_df(site_df, ["Reduced Year", "Reduced Activity Release Rate (Ci/year)"], new_col)
                 if len(site_df) == 0:
                     continue
                 if site_name not in new_lex:
                     site_counter += 1
-                    new_lex[site_name] = {copc: site_df}
+                    new_lex[site_name] = {new_copc: site_df}
                 else:
-                    new_lex[site_name][copc] = site_df
+                    new_lex[site_name][new_copc] = site_df
         if len(not_vzehsit) > 0:
             logging.debug("##Solid Waste Release sites NOT in VZEHSIT")
             for site in not_vzehsit:
@@ -541,15 +550,17 @@ class InvObj:
 
     def parse_red(self):
         new_lex = {}
-        # Waste site column to use for building dictionary
-        site_col = "CIE site name"
+        # Possible waste site column to use for building dictionary
+        cie_site_col = "CIE site name"
+        ca_site_col = "CA site name"
         year_col = 'Discharge/decay-corrected year'
         water_col = 'Volume [m3]'
         # Ignore the following columns when evaluating for copc's
         non_copcs = [
             'Inventory Module',
             'SIMV2 site name',
-            site_col,
+            cie_site_col,
+            ca_site_col,
             'Source Type',
             year_col,
             'year',
@@ -564,6 +575,10 @@ class InvObj:
                 if copc in non_copcs:
                     continue
                 else:
+                    if cie_site_col in df.columns:
+                        site_col = cie_site_col
+                    elif ca_site_col in df.columns:
+                        site_col = ca_site_col
                     for site in get_unique_vals(df, site_col):
                         if site not in self.inv_lex:
                             not_vzehsit.append(site)
@@ -736,27 +751,27 @@ class InvObj:
         #   3.  SIMV2 Inventory     (sim_inv)
         #   4.  Chemical Inventory  (chm_lex)
         #   4.  SAC Water Inventory (sac_lex)
-        final_lex = self.inv_lex
+        final_lex = {site: {'Source': ''} for site in self.inv_lex}
         if hasattr(self, "red_lex"):
             logging.info('##Merging Rerouted Sites into final dictionary')
             final_lex, used_lex = combine_lex(final_lex, self.red_lex)
+            final_lex = self.add_source(final_lex, used_lex.keys(), "Rerouted-Site")
         if hasattr(self, "swr_lex"):
             logging.info('##Merging SWR into final dictionary')
             final_lex, used_lex = combine_lex(final_lex, self.swr_lex)
+            final_lex = self.add_source(final_lex, used_lex.keys(), "Solid-Waste-Release")
         if hasattr(self, "sim_lex"):
             logging.info('##Merging SIMV2 into final dictionary')
-            # If SWR is included in analysis, make sure SIMV2 dictionary doesn't override the values
-            if hasattr(self, "swr_lex"):
-                final_lex, used_lex = combine_lex(final_lex, self.sim_lex)
-            # If no SWR, merge SIMV2 like normal
-            else:
-                final_lex, used_lex = combine_lex(final_lex, self.sim_lex)
+            final_lex, used_lex = combine_lex(final_lex, self.sim_lex)
+            final_lex = self.add_source(final_lex, used_lex.keys(), "SIMV2")
         if hasattr(self, "chm_lex"):
             logging.info('##Merging Chemical Inventory into final dictionary')
             final_lex, used_lex = combine_lex(final_lex, self.chm_lex)
+            final_lex = self.add_source(final_lex, used_lex.keys(), "Chemical-Inventory")
         if hasattr(self, "sac_lex"):
             logging.info('##Merging SAC into final dictionary')
             final_lex, used_lex = combine_lex(final_lex, self.sac_lex)
+            final_lex = self.add_source(final_lex, used_lex.keys(), "SAC-Water")
         logging.info('##All primary source data have been merged into a hashed dictionary.')
         return final_lex
 
@@ -789,6 +804,23 @@ class InvObj:
         else:
             logging.info("##All sites in VZEHSIT have at least one waste stream/water volume time series.")
         return final_lex
+
+    def add_source(self, mod_lex, site_list, source):
+        """
+        Takes a dictionary, a list of keys to modify, and the source to append (expects a key called "Source" in the
+        site sub dictionary.
+        :param mod_lex:     Dictionary to be modified/add source information to
+        :param site_list:   List of keys in the dictionary to add source information to
+        :param source:      The source to append to each site in the list
+        :return:
+        """
+        for site in site_list:
+            source_list = mod_lex[site]['Source']
+            if len(source_list) > 0:
+                mod_lex[site]['Source'] = '{}_{}'.format(source_list, source)
+            else:
+                mod_lex[site]['Source'] = source
+        return mod_lex
 
 
 def build_inventory_df(inv_dict, copc_list):
