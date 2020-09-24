@@ -16,8 +16,8 @@ namespace stomp_extrap_modflow.framework
     {
         public Dictionary<string, SortedDictionary<decimal, decimal>> f_data;
         public Dictionary<string, SortedDictionary<decimal, decimal>> c_data;
-        public Dictionary<string, Dictionary<int, decimal>> year_data;
-        public void convert_time_yearly(Dictionary<int,decimal[]> data, List<columns> column_def,bool useCumulative)
+        public Dictionary<string, Dictionary<decimal, decimal>> year_data;
+        public void convert_time_yearly(Dictionary<int,decimal[]> data, List<columns> column_def,bool useCumulative, bool step_wise = false)
         {
             f_data = new Dictionary<string, SortedDictionary<decimal, decimal>>();
             c_data = new Dictionary<string, SortedDictionary<decimal, decimal>>();
@@ -105,7 +105,7 @@ namespace stomp_extrap_modflow.framework
             {
                 process_cumulative();
             }
-            interpolate_years();
+            interpolate_years(step_wise);
         }
 
         private void process_cumulative()
@@ -131,7 +131,7 @@ namespace stomp_extrap_modflow.framework
                 }
             }
         }
-        private void interp_single_year(string key, int cur_year,decimal min,decimal max)
+        private void interp_single_year(string key, decimal cur_year,decimal min,decimal max)
         {
             //define year before the one to be interpolated
             decimal prev_year = cur_year;
@@ -157,16 +157,16 @@ namespace stomp_extrap_modflow.framework
             decimal interp_cum = prev_val + (((cur_year - prev_year) / (next_year - prev_year)) * (next_val - prev_val));
             c_data[key].Add(cur_year, interp_cum);
         }
-        private void interpolate_years()
+        private void interpolate_years(bool step_wise = false)
         {
             //year_data will hold the final yearly rate
-            year_data = new Dictionary<string, Dictionary<int, decimal>>();
+            year_data = new Dictionary<string, Dictionary<decimal, decimal>>();
             //use the column names from c_data
             
             foreach (string key in c_data.Keys)
             {
                 SortedDictionary<decimal, decimal> data = c_data[key];
-                year_data.Add(key, new Dictionary<int, decimal>());
+                year_data.Add(key, new Dictionary<decimal, decimal>());
                 //get min/max year for data
                 int max = (int)Math.Floor(data.Keys.ToList().Max());
                 int min = (int)Math.Floor(data.Keys.ToList().Min());
@@ -192,117 +192,126 @@ namespace stomp_extrap_modflow.framework
                     cur_val = c_data[key][cur_year];
                     val2 = c_data[key][year2];
                     year_data[key].Add(cur_year, val2 - cur_val);
+                    //if stepwise add the same value on the last day of the year
+                    //this fixes mass balance issues Trapazoidal Cumulative calculations  
+                    //as there are some incompatibilities between Trapz and straight sum
+                    //of mass balance (which is how STOMP outputs are built)
+                    if (step_wise)
+                    {                        
+                        decimal step_year = Convert.ToDecimal(cur_year) + Convert.ToDecimal("0.9999999");
+                        year_data[key].Add(step_year, val2 - cur_val);
+                    }
                 }
             }
         }
-        private void interpolate_years_old()
-        {
-            year_data = new Dictionary<string, Dictionary<int, decimal>>();
-            foreach (string key in f_data.Keys)
-            {
-                SortedDictionary<decimal, decimal> data = f_data[key];
-                year_data.Add(key, new Dictionary<int, decimal>());
-                int max = (int)Math.Floor(data.Keys.ToList().Max());
-                if(max > 15000)
-                {
-                    max = 15000;
-                }
-                int min = (int)Math.Floor(data.Keys.ToList().Min());
-                for(int i = min; i <= max; i++)
-                {
-                    if(data.ContainsKey(i))
-                    {
-                        if (i == min || i == max)
-                            year_data[key].Add(i, data[i]);
-                        else
-                        {
-                            decimal year1 = c_data[key].Keys.ToList().Where(k => k < i).Max();
-                            if (c_data[key].ContainsKey(i - 1))
-                            {
-                                year1 = i - 1;
-                            }
-                            decimal val1 = c_data[key][year1];
-                            decimal val2 = c_data[key][i];
-                            decimal x = val2 - val1;
-                            year_data[key].Add(i, x);
-                        }
-                    }
-                    else
-                    {
-                        decimal year1 = i;
+        //private void interpolate_years_old()
+        //{
+        //    year_data = new Dictionary<string, Dictionary<int, decimal>>();
+        //    foreach (string key in f_data.Keys)
+        //    {
+        //        SortedDictionary<decimal, decimal> data = f_data[key];
+        //        year_data.Add(key, new Dictionary<int, decimal>());
+        //        int max = (int)Math.Floor(data.Keys.ToList().Max());
+        //        if(max > 15000)
+        //        {
+        //            max = 15000;
+        //        }
+        //        int min = (int)Math.Floor(data.Keys.ToList().Min());
+        //        for(int i = min; i <= max; i++)
+        //        {
+        //            if(data.ContainsKey(i))
+        //            {
+        //                if (i == min || i == max)
+        //                    year_data[key].Add(i, data[i]);
+        //                else
+        //                {
+        //                    decimal year1 = c_data[key].Keys.ToList().Where(k => k < i).Max();
+        //                    if (c_data[key].ContainsKey(i - 1))
+        //                    {
+        //                        year1 = i - 1;
+        //                    }
+        //                    decimal val1 = c_data[key][year1];
+        //                    decimal val2 = c_data[key][i];
+        //                    decimal x = val2 - val1;
+        //                    year_data[key].Add(i, x);
+        //                }
+        //            }
+        //            else
+        //            {
+        //                decimal year1 = i;
                         
-                        if (i != min)
-                            year1 = c_data[key].Keys.ToList().Where(k => k < i).Max();
+        //                if (i != min)
+        //                    year1 = c_data[key].Keys.ToList().Where(k => k < i).Max();
 
                         
-                        if(c_data[key].ContainsKey(i-1))
-                        {
-                            year1 = i-1;
-                        }
+        //                if(c_data[key].ContainsKey(i-1))
+        //                {
+        //                    year1 = i-1;
+        //                }
 
-                        decimal val1 = 0;
-                        if (i != min)
-                        {
-                            val1 = c_data[key][year1];
-                        }
-                        decimal year2 = c_data[key].Keys.ToList().Where(k => k > i).Min();
-                        decimal val2 = c_data[key][year2];
-                        decimal x = 0;
-                        //if (i == 12011)
-                        //    x = x;
-                        if (val1 != 0 || val2 != 0)
-                        {
+        //                decimal val1 = 0;
+        //                if (i != min)
+        //                {
+        //                    val1 = c_data[key][year1];
+        //                }
+        //                decimal year2 = c_data[key].Keys.ToList().Where(k => k > i).Min();
+        //                decimal val2 = c_data[key][year2];
+        //                decimal x = 0;
+        //                //if (i == 12011)
+        //                //    x = x;
+        //                if (val1 != 0 || val2 != 0)
+        //                {
                             
-                            x = val1 + (((i - year1) / (year2 - year1)) * (val2 - val1));
-                            c_data[key].Add(i, x);
-                            x -= val1;
-                            //decimal x1 = i - year1;
-                            //decimal x2 = year2 - year1;
-                            //decimal x3 = x1 / x2;
-                            //decimal x4 = val2 - val1;
-                            //decimal x5 = x4 * x3;
-                            //decimal x6 = val1 + x5;
-                            //decimal x7 = val1 + (x1 / x2) * x4;
-                        }
+        //                    x = val1 + (((i - year1) / (year2 - year1)) * (val2 - val1));
+        //                    c_data[key].Add(i, x);
+        //                    x -= val1;
+        //                    //decimal x1 = i - year1;
+        //                    //decimal x2 = year2 - year1;
+        //                    //decimal x3 = x1 / x2;
+        //                    //decimal x4 = val2 - val1;
+        //                    //decimal x5 = x4 * x3;
+        //                    //decimal x6 = val1 + x5;
+        //                    //decimal x7 = val1 + (x1 / x2) * x4;
+        //                }
 
-                        year_data[key].Add(i, x);
-                    }
-                }
-                //int max = (int)Math.Round(data.Keys.ToList().Max(), 0);
-                //int min = (int)Math.Floor(data.Keys.ToList().Min());
-                //decimal last_year = min;
-                //foreach(decimal year in data.Keys.ToList().OrderBy(d => d))
-                //{
-                //    if (Math.Round(year,0) == min)
-                //    {
-                //        if (Math.Round(last_year, 0) == Math.Round(year, 0) && year_data[key].ContainsKey(min))
-                //        {
+        //                year_data[key].Add(i, x);
+        //            }
+        //        }
+        //        //int max = (int)Math.Round(data.Keys.ToList().Max(), 0);
+        //        //int min = (int)Math.Floor(data.Keys.ToList().Min());
+        //        //decimal last_year = min;
+        //        //foreach(decimal year in data.Keys.ToList().OrderBy(d => d))
+        //        //{
+        //        //    if (Math.Round(year,0) == min)
+        //        //    {
+        //        //        if (Math.Round(last_year, 0) == Math.Round(year, 0) && year_data[key].ContainsKey(min))
+        //        //        {
 
-                    //            year_data[key][min] += data[year];
-                    //        }
-                    //        else
-                    //        {
-                    //            year_data[key].Add(min, data[year]);
-                    //            last_year = year;
-                    //            min++;
-                    //        }
-                    //    }                    
-                    //    else if (min < year)
-                    //    {
-                    //        decimal dif = year - last_year;
-                    //        //if(dif >= 1)
-                    //        //{
-                    //        while (min <= year)
-                    //        {
-                    //            year_data[key].Add(min, data[year] / dif);
-                    //            last_year = year;
-                    //            min++;
-                    //        }
-                    //    }
-                    //}
-            }
+        //            //            year_data[key][min] += data[year];
+        //            //        }
+        //            //        else
+        //            //        {
+        //            //            year_data[key].Add(min, data[year]);
+        //            //            last_year = year;
+        //            //            min++;
+        //            //        }
+        //            //    }                    
+        //            //    else if (min < year)
+        //            //    {
+        //            //        decimal dif = year - last_year;
+        //            //        //if(dif >= 1)
+        //            //        //{
+        //            //        while (min <= year)
+        //            //        {
+        //            //            year_data[key].Add(min, data[year] / dif);
+        //            //            last_year = year;
+        //            //            min++;
+        //            //        }
+        //            //    }
+        //            //}
+        //    }
 
-        }
+        //}
 
     }
 }

@@ -194,11 +194,16 @@ namespace stomp_extrap_modflow.gui
                     srf.process_file(fileName, delim);
                     //srf.data = srf.data;
                     bool useCum = false;
+                    bool stepwise = false;
                     if (ckbx_cumulative.IsChecked == true)
                     {
                         useCum = true;
                     }
-                    interp.convert_time_yearly(srf.data, colSet.column_def, useCum);
+                    if (ckbx_stepwise.IsChecked == true)
+                    {
+                        stepwise = true;
+                    }
+                    interp.convert_time_yearly(srf.data, colSet.column_def, useCum, stepwise);
 
                     //outfile.build_ecf(interp.year_data, interp.f_data, path);
                     //outfile.build_yearly_csv_by_def(interp.year_data, path, "\t");
