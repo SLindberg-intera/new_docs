@@ -781,7 +781,7 @@ class InvObj:
         copc_list = []
         for site in self.inv_lex.keys():
             for copc in self.inv_lex[site].keys():
-                if copc in self.inv_args.copcs:
+                if copc in self.inv_args.copcs or copc == 'Source':
                     copc_list.append(copc)
                     if site in final_lex:
                         final_lex[site][copc] = self.inv_lex[site][copc]
@@ -838,16 +838,19 @@ def build_inventory_df(inv_dict, copc_list):
     fin_copcs = []
     for site in sorted(inv_dict.keys()):
         copcs = list(sorted(inv_dict[site]))
+        # Pull out the Source column information, it's a string and will need to be treated differently
+        copcs.remove('Source')
         fin_copcs = list(set(fin_copcs + copcs))
         site_log = ', '.join([site] + copcs)
         logging.info(site_log)
         site_df = pd.DataFrame()
-        for copc in inv_dict[site]:
+        for copc in copcs:
             if 'year' not in site_df.columns:
                 site_df = pd.concat([site_df, inv_dict[site][copc]], sort=True)
             else:
                 site_df = site_df.merge(inv_dict[site][copc], on='year', sort=True, how='outer')
         site_df['SITE_NAME'] = site
+        site_df['Source'] = inv_dict[site]['Source']
         df = pd.concat([df, site_df], sort=False)
     # Format the columns based on the user's column list (in order)
     use_copcs = [copc for copc in copc_list if copc.upper() in fin_copcs]
@@ -876,7 +879,7 @@ def build_inventory_df(inv_dict, copc_list):
             copc_cols.append(wat_col)
         else:
             logging.critical("The following copc provided cannot be matched with the dataframe column set: {}".format(copc))
-    col_order = ['SITE_NAME', 'year'] + copc_cols
+    col_order = ['SITE_NAME', 'Source', 'year'] + copc_cols
     df = df[col_order]
     # Reset index of dataframe
     df.reset_index(drop=True, inplace=True)
