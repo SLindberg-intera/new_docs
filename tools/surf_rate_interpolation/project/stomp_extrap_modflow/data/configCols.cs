@@ -19,9 +19,13 @@ namespace surf_rate_interp.data
         public char delim { get; set; }
         public bool use_cumulative { get; set; }
         public bool consolidate_file { get; set; }
+<<<<<<< HEAD
         public bool step_wise { get; set; }
         public string path_out { get; set; }
         public Dictionary<int,string> columns { get; set; }
+=======
+        public string path_out { get; set; }
+>>>>>>> 34796230d42aba5da76e46f7c6e4fd1080c3a964
         public event PropertyChangedEventHandler PropertyChanged;
     }
 }

@@ -6,9 +6,12 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "surf_rate_interp", "stomp_extrap_modflow\surf_rate_interp.csproj", "{60547004-5CAB-427A-8F50-9B3CB9788CA2}"
 EndProject
 Global
+<<<<<<< HEAD
 	GlobalSection(Performance) = preSolution
 		HasPerformanceSessions = true
 	EndGlobalSection
+=======
+>>>>>>> 34796230d42aba5da76e46f7c6e4fd1080c3a964
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
