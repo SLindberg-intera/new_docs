@@ -27,7 +27,6 @@ Notes:          1.  This will output 6 significant digits by default, rounding t
                 2.  The rounding method will be the "ROUND_HALF_UP" method, settling ties by rounding up
 """
 
-
 import os
 import argparse
 import pandas as pd
@@ -239,7 +238,7 @@ parser.add_argument('-i', '--ipp_output',
                     default='preprocessed_inventory.csv',
                     help='Name for the inventory file and log. File output will always be a comma-delimited-file\n'
                          'Default file name is [preprocessed_inventory.csv]'
-                   )
+                    )
 parser.add_argument('--COPC',
                     dest='copcs',
                     nargs='+',
@@ -401,6 +400,8 @@ def stomp_format_parser(path, skip_pattern='241-[^Cc]'):
                     skip_sites.append(site)
                     continue
                 df = pd.DataFrame(data_series, columns=['year', 'WATER(m^3/year)'])
+                # Add a source column to the dataframe
+                df['Source'] = "SAC-Water"
                 new_lex[site] = {'WATER': df}
             # Track all duplicate and no data sites in logger
             elif site in new_lex:
@@ -449,29 +450,29 @@ def combine_lex(lex1, lex2):
 
 class InvObj:
     def __init__(self, user_args):
-        self.inv_args = deepcopy(user_args)         # User arguments passed from namespace as namespace
-        if hasattr(self.inv_args, "copcs"):         # Make all copc's uppercase for consistency
+        self.inv_args = deepcopy(user_args)  # User arguments passed from namespace as namespace
+        if hasattr(self.inv_args, "copcs"):  # Make all copc's uppercase for consistency
             self.inv_args.copcs = [c.upper() for c in self.inv_args.copcs] + ['WATER']
-        self.vz_sites = self.parse_vzehsit()        # Parse list of accepted waste sites as generator
-        self.inv_lex = self.init_lex()              # Initialize final inventory dictionary
-        self.chm_cols = {                           # Chemical columns (general match for input files, no uppercase)
+        self.vz_sites = self.parse_vzehsit()  # Parse list of accepted waste sites as generator
+        self.inv_lex = self.init_lex()  # Initialize final inventory dictionary
+        self.chm_cols = {  # Chemical columns (general match for input files, no uppercase)
             'Cr',
             'NO3',
             'U',
             'CN'
         }
         if self.inv_args.rcaswr_dir is not None or self.inv_args.rcaswr_idx is not None:
-            self.swr_lex = self.parse_swr()         # Solid waste release dictionary
+            self.swr_lex = self.parse_swr()  # Solid waste release dictionary
         if self.inv_args.reroute is not None:
-            self.red_lex = self.parse_red()         # Rerouted waste releases dictionary
+            self.red_lex = self.parse_red()  # Rerouted waste releases dictionary
         if self.inv_args.cleaninv is not None:
-            self.sac_lex = self.parse_sac()         # SAC liquid-only inventory
+            self.sac_lex = self.parse_sac()  # SAC liquid-only inventory
         if self.inv_args.cheminv is not None:
-            self.chm_lex = self.parse_chm()         # Chemical Inventory
+            self.chm_lex = self.parse_chm()  # Chemical Inventory
         if self.inv_args.vzinv is not None:
-            self.sim_lex = self.parse_sim()         # SIMV2 RAD inventory
-        self.inv_lex = self.build_inv()             # Populate final inventory dictionary
-        self.inv_lex = self.clean_inv()             # Clean up any sites that don't have any waste streams/water sources
+            self.sim_lex = self.parse_sim()  # SIMV2 RAD inventory
+        self.inv_lex = self.build_inv()  # Populate final inventory dictionary
+        self.inv_lex = self.clean_inv()  # Clean up any sites that don't have any waste streams/water sources
 
     def parse_vzehsit(self):
         path = self.inv_args.vzehsit
@@ -532,6 +533,8 @@ class InvObj:
                 site_df[new_col] = site_df["Reduced Activity Release Rate (Ci/year)"]
                 site_df['year'] = site_df["Reduced Year"]
                 site_df = clean_df(site_df, ["Reduced Year", "Reduced Activity Release Rate (Ci/year)"], new_col)
+                # Add a source column to the dataframe
+                site_df['Source'] = "Solid-Waste-Release"
                 if len(site_df) == 0:
                     continue
                 if site_name not in new_lex:
@@ -591,6 +594,8 @@ class InvObj:
                             new_copc, new_col = normalize_col_names(copc)
                         site_df[new_col] = site_df[copc]
                         site_df = clean_df(site_df, [copc], new_col)
+                        # Add a source column to the dataframe
+                        site_df['Source'] = "Rerouted-Site"
                         # Verify that there are records in the new dataframe, continue if empty dataframe
                         if len(site_df) == 0:
                             continue
@@ -657,6 +662,8 @@ class InvObj:
                         new_copc, new_col = normalize_col_names(copc, chm_col=True)
                     site_df[new_col] = site_df[copc]
                     site_df = clean_df(site_df, [copc], new_col)
+                    # Add a source column to the dataframe
+                    site_df['Source'] = "Chemical-Inventory"
                     # Normalize the site name to only have upper case
                     site = site.upper()
                     if len(site_df) == 0:
@@ -723,6 +730,8 @@ class InvObj:
                         continue
                     site_df.rename(columns={copc: new_col}, inplace=True)
                     site_df = clean_df(site_df, [year_col], new_col)
+                    # Add a source column to the dataframe
+                    site_df['Source'] = "SIMV2"
                     # Normalize the site name to only have upper case
                     site = site.upper()
                     # Verify that there are records in the new dataframe, continue if empty dataframe
@@ -751,27 +760,27 @@ class InvObj:
         #   3.  SIMV2 Inventory     (sim_inv)
         #   4.  Chemical Inventory  (chm_lex)
         #   4.  SAC Water Inventory (sac_lex)
-        final_lex = {site: {'Source': ''} for site in self.inv_lex}
+        final_lex = self.inv_lex
         if hasattr(self, "red_lex"):
             logging.info('##Merging Rerouted Sites into final dictionary')
             final_lex, used_lex = combine_lex(final_lex, self.red_lex)
-            final_lex = self.add_source(final_lex, used_lex.keys(), "Rerouted-Site")
+            # final_lex = self.add_source(final_lex, used_lex.keys(), "Rerouted-Site")
         if hasattr(self, "swr_lex"):
             logging.info('##Merging SWR into final dictionary')
             final_lex, used_lex = combine_lex(final_lex, self.swr_lex)
-            final_lex = self.add_source(final_lex, used_lex.keys(), "Solid-Waste-Release")
+            # final_lex = self.add_source(final_lex, used_lex.keys(), "Solid-Waste-Release")
         if hasattr(self, "sim_lex"):
             logging.info('##Merging SIMV2 into final dictionary')
             final_lex, used_lex = combine_lex(final_lex, self.sim_lex)
-            final_lex = self.add_source(final_lex, used_lex.keys(), "SIMV2")
+            # final_lex = self.add_source(final_lex, used_lex.keys(), "SIMV2")
         if hasattr(self, "chm_lex"):
             logging.info('##Merging Chemical Inventory into final dictionary')
             final_lex, used_lex = combine_lex(final_lex, self.chm_lex)
-            final_lex = self.add_source(final_lex, used_lex.keys(), "Chemical-Inventory")
+            # final_lex = self.add_source(final_lex, used_lex.keys(), "Chemical-Inventory")
         if hasattr(self, "sac_lex"):
             logging.info('##Merging SAC into final dictionary')
             final_lex, used_lex = combine_lex(final_lex, self.sac_lex)
-            final_lex = self.add_source(final_lex, used_lex.keys(), "SAC-Water")
+            # final_lex = self.add_source(final_lex, used_lex.keys(), "SAC-Water")
         logging.info('##All primary source data have been merged into a hashed dictionary.')
         return final_lex
 
@@ -781,7 +790,7 @@ class InvObj:
         copc_list = []
         for site in self.inv_lex.keys():
             for copc in self.inv_lex[site].keys():
-                if copc in self.inv_args.copcs or copc == 'Source':
+                if copc in self.inv_args.copcs:
                     copc_list.append(copc)
                     if site in final_lex:
                         final_lex[site][copc] = self.inv_lex[site][copc]
@@ -805,23 +814,6 @@ class InvObj:
             logging.info("##All sites in VZEHSIT have at least one waste stream/water volume time series.")
         return final_lex
 
-    def add_source(self, mod_lex, site_list, source):
-        """
-        Takes a dictionary, a list of keys to modify, and the source to append (expects a key called "Source" in the
-        site sub dictionary.
-        :param mod_lex:     Dictionary to be modified/add source information to
-        :param site_list:   List of keys in the dictionary to add source information to
-        :param source:      The source to append to each site in the list
-        :return:
-        """
-        for site in site_list:
-            source_list = mod_lex[site]['Source']
-            if len(source_list) > 0:
-                mod_lex[site]['Source'] = '{}_{}'.format(source_list, source)
-            else:
-                mod_lex[site]['Source'] = source
-        return mod_lex
-
 
 def build_inventory_df(inv_dict, copc_list):
     """
@@ -838,8 +830,6 @@ def build_inventory_df(inv_dict, copc_list):
     fin_copcs = []
     for site in sorted(inv_dict.keys()):
         copcs = list(sorted(inv_dict[site]))
-        # Pull out the Source column information, it's a string and will need to be treated differently
-        copcs.remove('Source')
         fin_copcs = list(set(fin_copcs + copcs))
         site_log = ', '.join([site] + copcs)
         logging.info(site_log)
@@ -849,8 +839,28 @@ def build_inventory_df(inv_dict, copc_list):
                 site_df = pd.concat([site_df, inv_dict[site][copc]], sort=True)
             else:
                 site_df = site_df.merge(inv_dict[site][copc], on='year', sort=True, how='outer')
+                if 'Source_x' in site_df.columns and 'Source_y' in site_df.columns:
+                    # Find out if the source column already has the "new" source in it (prevent situations from arising
+                    # like "SIMV2_SIMV2_SAC-Water_SIMV2")
+                    y_str = inv_dict[site][copc]['Source'].unique()[0]
+                    if len(inv_dict[site][copc]['Source'].unique()) > 0:
+                        logging.warning(
+                            "{} for {} has more than one source: {}".format(
+                                site, copc, ','.join(inv_dict[site][copc]['Source'])
+                            )
+                        )
+                    # Initialize the new "Source" column with None and populate based on condition where new source
+                    # is or is not present in the old Source column
+                    site_df['Source'] = None
+                    new_in_old = (site_df['Source_x'].str.contains(y_str))
+                    # If the original source contains the new source, set the Source column to its original state
+                    site_df.loc[new_in_old, 'Source'] = site_df.loc[new_in_old, 'Source_x']
+                    # If the original source does not contain the new source, concatenate the old and new with "_"
+                    site_df.loc[~new_in_old, 'Source'] = site_df.loc[~new_in_old, 'Source_x'].astype(str) + '_' + \
+                                                         site_df.loc[~new_in_old, 'Source_y'].astype(str)
+                    # Drop the excess columns
+                    site_df.drop(columns=['Source_x', 'Source_y'], inplace=True)
         site_df['SITE_NAME'] = site
-        site_df['Source'] = inv_dict[site]['Source']
         df = pd.concat([df, site_df], sort=False)
     # Format the columns based on the user's column list (in order)
     use_copcs = [copc for copc in copc_list if copc.upper() in fin_copcs]
@@ -858,11 +868,11 @@ def build_inventory_df(inv_dict, copc_list):
     unused_copcs = set(use_copcs).difference(set(copc_list))
     if len(unused_copcs) > 0:
         logging.warning("##The following COPC's were not included in final output/not present in source files:")
-        unused_str = '{:<10}'*len(unused_copcs)
+        unused_str = '{:<10}' * len(unused_copcs)
         logging.warning(unused_str.format(*unused_copcs))
     else:
         logging.info("##All COPC's requested by the user were included in the final output file:")
-        write_str = '{:<10}'*len(use_copcs)
+        write_str = '{:<10}' * len(use_copcs)
         logging.info(write_str.format(*use_copcs))
     # Get the column names from the dataframe and add them
     copc_cols = []
@@ -878,8 +888,9 @@ def build_inventory_df(inv_dict, copc_list):
         elif wat_col in df.columns:
             copc_cols.append(wat_col)
         else:
-            logging.critical("The following copc provided cannot be matched with the dataframe column set: {}".format(copc))
-    col_order = ['SITE_NAME', 'Source', 'year'] + copc_cols
+            logging.critical(
+                "The following copc provided cannot be matched with the dataframe column set: {}".format(copc))
+    col_order = ['Source', 'SITE_NAME', 'year'] + copc_cols
     df = df[col_order]
     # Reset index of dataframe
     df.reset_index(drop=True, inplace=True)
