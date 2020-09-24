@@ -21,10 +21,7 @@ c:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_mod
 c:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\win64\surf_rate_interp.Properties.Resources.resources
 c:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\win64\surf_rate_interp.csproj.GenerateResource.Cache
 c:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\win64\surf_rate_interp_win_intel_64.exe
-<<<<<<< HEAD
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\win64\gui\columnConfig.g.cs
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\win64\gui\config_interp.g.cs
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\win64\gui\columnConfig.baml
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\win64\gui\config_interp.baml
-=======
->>>>>>> 34796230d42aba5da76e46f7c6e4fd1080c3a964

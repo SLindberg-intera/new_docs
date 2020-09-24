@@ -10,19 +10,11 @@ none
 false
 
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\App.xaml
-<<<<<<< HEAD
 8-836891189
 
 31274135178
 16-1567509728
 gui\buildHSS.xaml;gui\columnConfig.xaml;gui\columnSetting.xaml;gui\gridSettings.xaml;gui\config_interp.xaml;gui\Interpolate.xaml;gui\largeWindow.xaml;MainWindow.xaml;
-=======
-61233194650
-
-27470793302
-16-1567509728
-gui\buildHSS.xaml;gui\columnSetting.xaml;gui\gridSettings.xaml;gui\Interpolate.xaml;gui\largeWindow.xaml;MainWindow.xaml;
->>>>>>> 34796230d42aba5da76e46f7c6e4fd1080c3a964
 
 False
 

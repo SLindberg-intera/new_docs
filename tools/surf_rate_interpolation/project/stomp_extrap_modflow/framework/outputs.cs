@@ -56,11 +56,7 @@ namespace stomp_extrap_modflow.framework
                 return;
             }
         }
-<<<<<<< HEAD
         public void build_yearly_csv_by_def(Dictionary<string, Dictionary<decimal, decimal>> data,string path,string sep,string o_file)
-=======
-        public void build_yearly_csv_by_def(Dictionary<string, Dictionary<int, decimal>> data,string path,string sep,string o_file)
->>>>>>> 34796230d42aba5da76e46f7c6e4fd1080c3a964
         {
             string ext = "csv";
             if(sep == "\t")
@@ -81,11 +77,7 @@ namespace stomp_extrap_modflow.framework
                 write_output(fileName, csv);                
             }
         }
-<<<<<<< HEAD
         public void build_yearly_csv_single_file(Dictionary<string, Dictionary<decimal, decimal>> data, string path, string sep, string o_file)
-=======
-        public void build_yearly_csv_single_file(Dictionary<string, Dictionary<int, decimal>> data, string path, string sep, string o_file)
->>>>>>> 34796230d42aba5da76e46f7c6e4fd1080c3a964
         {
             string ext = "csv";
             if (sep == "\t")
@@ -97,21 +89,12 @@ namespace stomp_extrap_modflow.framework
             csv += Environment.NewLine + "Time" +sep;
             csv += String.Join(sep,data.Keys.Select(d => d));
             csv += Environment.NewLine + "Year";
-<<<<<<< HEAD
             Dictionary<decimal,List<decimal>> c_data = new Dictionary<decimal, List<decimal>>();
             foreach (string key in data.Keys.ToArray())
             {
                 csv += sep + units;
                 //int len = data[key].Keys.Count;
                 foreach (Decimal year in data[key].Keys.ToArray())
-=======
-            Dictionary<int,List<decimal>> c_data = new Dictionary<int, List<decimal>>();
-            foreach (string key in data.Keys.ToArray())
-            {
-                csv += sep + units;
-                int len = data[key].Keys.Count;
-                foreach (int year in data[key].Keys.ToArray())
->>>>>>> 34796230d42aba5da76e46f7c6e4fd1080c3a964
                 {
                     if (!c_data.Keys.Contains(year))
                     {

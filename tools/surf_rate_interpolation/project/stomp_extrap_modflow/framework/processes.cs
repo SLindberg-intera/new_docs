@@ -12,11 +12,8 @@ using surf_rate_interp.data;
 //using surf_rate_interp.framework;
 using System.Xml;
 using System.Windows;
-<<<<<<< HEAD
 using System.Text.RegularExpressions;
 
-=======
->>>>>>> 34796230d42aba5da76e46f7c6e4fd1080c3a964
 namespace surf_rate_interp.framework
 {
     class processes
@@ -35,11 +32,8 @@ namespace surf_rate_interp.framework
             string use_cumulative = "true";
             string consolidate_file = "true";
             string path_out = "";
-<<<<<<< HEAD
             string step_wise = "false";
             Dictionary<int, string> cols = new Dictionary<int, string>();
-=======
->>>>>>> 34796230d42aba5da76e46f7c6e4fd1080c3a964
             //string cols;
             
 
@@ -71,10 +65,7 @@ namespace surf_rate_interp.framework
                                     {
                                         files.Add(file);
                                     }
-<<<<<<< HEAD
                                     
-=======
->>>>>>> 34796230d42aba5da76e46f7c6e4fd1080c3a964
                                 }
                                 else
                                 {
@@ -93,7 +84,6 @@ namespace surf_rate_interp.framework
                                     temp.delim = Convert.ToChar(delim);
                                     temp.use_cumulative = Convert.ToBoolean(use_cumulative);
                                     temp.consolidate_file = Convert.ToBoolean(consolidate_file);
-<<<<<<< HEAD
                                     temp.step_wise = Convert.ToBoolean(step_wise);
                                     temp.path_out = path_out;
                                     temp.columns = cols;
@@ -102,21 +92,16 @@ namespace surf_rate_interp.framework
                                     proc_files.Add(temp);
                                     
                                 }
-                                units = "";
-                                conv_factor = "";
-                                first_header = "";
-                                last_header = "";
-                                delim = "";
-                                use_cumulative = "";
-                                consolidate_file = "";
-                                step_wise = "false";
+                                units = "1/year";
+                                conv_factor = "1";
+                                first_header = "1";
+                                last_header = "1";
+                                delim = ",";
+                                use_cumulative = "true";
+                                consolidate_file = "true";
                                 path_out = "";
-
-=======
-                                    temp.path_out = path_out;
-                                    proc_files.Add(temp);
-                                }
->>>>>>> 34796230d42aba5da76e46f7c6e4fd1080c3a964
+                                step_wise = "false";
+                                cols = new Dictionary<int, string>();
                             }
                             else
                             {
@@ -155,7 +140,6 @@ namespace surf_rate_interp.framework
                         case "path_out":
                             path_out = reader.ReadString();
                             break;
-<<<<<<< HEAD
                         case "step_wise":
                             step_wise = reader.ReadString();
                             break;
@@ -167,11 +151,6 @@ namespace surf_rate_interp.framework
                                 cols[index] = reader.ReadString();
                             }
                             break;
-=======
-                        //case "cols":
-                        //    cols = reader.ReadString();
-                        //    break;
->>>>>>> 34796230d42aba5da76e46f7c6e4fd1080c3a964
                     }
                 }
                 //process_file(units, dir, fileName, conv_factor, first_header,last_header, delim, use_cumulative,consolidate_file,path_out);
@@ -187,7 +166,6 @@ namespace surf_rate_interp.framework
             int.TryParse(s.Replace(" ", ""), out x);
             return x;
         }
-<<<<<<< HEAD
         private List<columns> build_custom_cols(Dictionary<int,string> custom, decimal conv_factor)
         {
             List<columns> cols = new List<columns>();
@@ -224,35 +202,6 @@ namespace surf_rate_interp.framework
             
             List<columns> cols = new List<columns>();
             for (int i = 0; i < header1.Length; i++)
-=======
-        public void process_file(configCols rec)//string units, string dir, string file, decimal conv_factor, 
-                                  //int first_header, int last_header, char delim, bool use_cumulative,
-                                  //bool consolidate_file, string path_out)
-        {
-            //List<string> files = new List<string>();
-            //MessageBox.Show("data: \n" + fileName);
-            //if (fileName.ToLower() == "all")
-            //{
-            //    foreach (string file in Directory.GetFiles(dir))
-            //    {
-            //        files.Add(file);
-            //    }
-            //}
-            //else
-            //{
-            //    string fullPath = Path.Combine(dir,fileName);
-            //    files.Add(fullPath);
-            //}
-            //MessageBox.Show("File: \n\n" + files[0]);
-            //foreach (string file in files)
-            //{
-            process_srf srf = new process_srf();
-            srf.h1 = rec.first_header;
-            srf.h2 = rec.last_header;
-            srf.process_header(rec.file, rec.delim);
-            List<columns> cols = new List<columns>();
-            for (int i = 0; i < srf.line_header1.Length; i++)
->>>>>>> 34796230d42aba5da76e46f7c6e4fd1080c3a964
             {
                 columns temp = new columns();
                 temp.column_num = i + 1;
@@ -260,21 +209,12 @@ namespace surf_rate_interp.framework
                 //    temp.title = String.Format("{0} {1}", header1[i], header2[i]);
                 //else
                 //    temp.title = header1[i];
-<<<<<<< HEAD
                 temp.title = header1[i];
 
                 temp.definition = "";
                 temp.conv_factor = conv_factor;
 
                 if (header1[i].ToLower() == "time")
-=======
-                temp.title = srf.line_header1[i];
-
-                temp.definition = "";
-                temp.conv_factor = rec.conv_factor;
-
-                if (srf.line_header1[i].ToLower() == "time")
->>>>>>> 34796230d42aba5da76e46f7c6e4fd1080c3a964
                 {
                     temp.time = true;
                     temp.definition = "year";
@@ -283,20 +223,16 @@ namespace surf_rate_interp.framework
                 {
                     temp.definition = temp.title.Substring(8);
                 }
-<<<<<<< HEAD
                 else if (r.IsMatch(temp.title))
                 {
                     temp.definition = temp.title;
                 }
-=======
->>>>>>> 34796230d42aba5da76e46f7c6e4fd1080c3a964
                 else
                 {
                     temp.definition = "";
                 }
                 cols.Add(temp);
             }
-<<<<<<< HEAD
             return cols;
         }
         //build  columns and initiate interpolation process for a give file.
@@ -321,19 +257,13 @@ namespace surf_rate_interp.framework
                 cols = build_orig_cols(srf.line_header1, rec.conv_factor);
             }
 
-=======
->>>>>>> 34796230d42aba5da76e46f7c6e4fd1080c3a964
             interpolate_data interp = new interpolate_data();
 
             outputs outfile = new outputs(rec.units);
 
             srf.process_file(rec.file, rec.delim);
 
-<<<<<<< HEAD
             interp.convert_time_yearly(srf.data, cols, rec.use_cumulative, rec.step_wise);
-=======
-            interp.convert_time_yearly(srf.data, cols, rec.use_cumulative);
->>>>>>> 34796230d42aba5da76e46f7c6e4fd1080c3a964
 
             if (rec.consolidate_file == false)
             {
@@ -345,12 +275,6 @@ namespace surf_rate_interp.framework
                 outfile.build_yearly_csv_single_file(interp.year_data, rec.path_out, ",", rec.file);
                 outfile.build_cum_csv_by_single_file(interp.c_data, rec.path_out, rec.file);
             }
-<<<<<<< HEAD
         }
-=======
-            //}
-        }
-        
->>>>>>> 34796230d42aba5da76e46f7c6e4fd1080c3a964
     }
 }

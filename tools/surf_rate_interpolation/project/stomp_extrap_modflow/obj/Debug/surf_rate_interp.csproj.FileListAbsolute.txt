@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\bin\Debug\surf_rate_interp_win_intel_64.exe.config
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\bin\Debug\surf_rate_interp_win_intel_64.exe
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\bin\Debug\surf_rate_interp_win_intel_64.pdb
@@ -11,11 +10,6 @@ C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_mod
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\gui\columnSetting.g.cs
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\gui\gridSettings.g.cs
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\gui\config_interp.g.cs
-=======
-C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\gui\buildHSS.g.cs
-C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\gui\columnSetting.g.cs
-C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\gui\gridSettings.g.cs
->>>>>>> 34796230d42aba5da76e46f7c6e4fd1080c3a964
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\gui\Interpolate.g.cs
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\gui\largeWindow.g.cs
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\MainWindow.g.cs
@@ -23,24 +17,11 @@ C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_mod
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\GeneratedInternalTypeHelper.g.cs
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\surf_rate_interp_win_intel_64_MarkupCompile.cache
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\surf_rate_interp_win_intel_64_MarkupCompile.lref
-<<<<<<< HEAD
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\gui\buildHSS.baml
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\gui\columnConfig.baml
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\gui\columnSetting.baml
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\gui\gridSettings.baml
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\gui\config_interp.baml
-=======
-C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\bin\Debug\surf_rate_interp_win_intel_64.exe.config
-C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\bin\Debug\surf_rate_interp_win_intel_64.exe
-C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\bin\Debug\surf_rate_interp_win_intel_64.pdb
-C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\bin\Debug\Microsoft.WindowsAPICodePack.dll
-C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\bin\Debug\Microsoft.WindowsAPICodePack.Shell.dll
-C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\bin\Debug\Microsoft.WindowsAPICodePack.xml
-C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\bin\Debug\Microsoft.WindowsAPICodePack.Shell.xml
-C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\gui\buildHSS.baml
-C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\gui\columnSetting.baml
-C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\gui\gridSettings.baml
->>>>>>> 34796230d42aba5da76e46f7c6e4fd1080c3a964
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\gui\Interpolate.baml
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\gui\largeWindow.baml
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\MainWindow.baml
@@ -49,11 +30,3 @@ C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_mod
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\surf_rate_interp.csproj.GenerateResource.Cache
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\surf_rate_interp_win_intel_64.exe
 C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\surf_rate_interp_win_intel_64.pdb
-<<<<<<< HEAD
-=======
-C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\gui\columnConfig.g.cs
-C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\gui\config_interp.g.cs
-C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\gui\columnConfig.baml
-C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\gui\config_interp.baml
-C:\tools\ca-cie-tools\SCT\tools\surf_rate_interpolation\project\stomp_extrap_modflow\obj\Debug\surf_rate_interp.csprojResolveAssemblyReference.cache
->>>>>>> 34796230d42aba5da76e46f7c6e4fd1080c3a964
