@@ -428,24 +428,29 @@ def stomp_format_parser(path, skip_pattern='241-[^Cc]'):
 def combine_lex(lex1, lex2):
     """
     This will combine site records from lex2 into lex1 if (*IF*) lex1[site].keys() == 0 (i.e. has not received other
-    information from another primary source)
+    information from another primary source) at the year level (i.e. even if a rerouted site has information for a
+    COPC from 1943-1951, but SIMV2 has information from 1943-1960, we want to include the years not covered by the
+    previous source, resulting in information for the example COPC from 1943-1960, but not overwriting any information).
     :param lex1:        Dictionary to combine information into, should start out as a dictionary with sites and no
                         other nested keys (i.e. len(lex1[site].keys()) = 0 should yield True)
     :param lex2:        Dictionary of site records from a primary source to be combined into lex1
     :return:            Combined dictionary, dictionary of sites and streams used from primary source
     """
-    used_lex = {}
     for site in lex1:
         # If there is information from the source being added for the site in question...
         if site in lex2:
-            # This conditional statement prevents the function from adding information to a site record where another
-            # primary source has already provided information for a given waste stream.
-            used_copcs = list(set(lex2[site].keys()).difference(lex1[site].keys()))
-            if len(used_copcs) > 0:
-                used_lex[site] = used_copcs
-            for copc in used_copcs:
-                lex1[site][copc] = lex2[site][copc]
-    return lex1, used_lex
+            for copc in lex2[site].keys():
+                if copc not in lex1[site]:
+                    lex1[site][copc] = lex2[site][copc]
+                else:
+                    # This will check to see if there's information from a different source that provides more years
+                    # of information. WILL NOT OVERWRITE INFORMATION FROM PREVIOUS SOURCES!!
+                    df1 = deepcopy(lex1[site][copc])
+                    df2 = deepcopy(lex2[site][copc])
+                    df3 = df2.loc[~df2['year'].isin(df1['year']), :]
+                    df1 = pd.concat([df1, df3], ignore_index=True)
+                    lex1[site][copc] = df1
+    return lex1
 
 
 class InvObj:
@@ -763,24 +768,19 @@ class InvObj:
         final_lex = self.inv_lex
         if hasattr(self, "red_lex"):
             logging.info('##Merging Rerouted Sites into final dictionary')
-            final_lex, used_lex = combine_lex(final_lex, self.red_lex)
-            # final_lex = self.add_source(final_lex, used_lex.keys(), "Rerouted-Site")
+            final_lex = combine_lex(final_lex, self.red_lex)
         if hasattr(self, "swr_lex"):
             logging.info('##Merging SWR into final dictionary')
-            final_lex, used_lex = combine_lex(final_lex, self.swr_lex)
-            # final_lex = self.add_source(final_lex, used_lex.keys(), "Solid-Waste-Release")
+            final_lex = combine_lex(final_lex, self.swr_lex)
         if hasattr(self, "sim_lex"):
             logging.info('##Merging SIMV2 into final dictionary')
-            final_lex, used_lex = combine_lex(final_lex, self.sim_lex)
-            # final_lex = self.add_source(final_lex, used_lex.keys(), "SIMV2")
+            final_lex = combine_lex(final_lex, self.sim_lex)
         if hasattr(self, "chm_lex"):
             logging.info('##Merging Chemical Inventory into final dictionary')
-            final_lex, used_lex = combine_lex(final_lex, self.chm_lex)
-            # final_lex = self.add_source(final_lex, used_lex.keys(), "Chemical-Inventory")
+            final_lex = combine_lex(final_lex, self.chm_lex)
         if hasattr(self, "sac_lex"):
             logging.info('##Merging SAC into final dictionary')
-            final_lex, used_lex = combine_lex(final_lex, self.sac_lex)
-            # final_lex = self.add_source(final_lex, used_lex.keys(), "SAC-Water")
+            final_lex = combine_lex(final_lex, self.sac_lex)
         logging.info('##All primary source data have been merged into a hashed dictionary.')
         return final_lex
 
@@ -842,22 +842,24 @@ def build_inventory_df(inv_dict, copc_list):
                 if 'Source_x' in site_df.columns and 'Source_y' in site_df.columns:
                     # Find out if the source column already has the "new" source in it (prevent situations from arising
                     # like "SIMV2_SIMV2_SAC-Water_SIMV2")
-                    y_str = inv_dict[site][copc]['Source'].unique()[0]
-                    if len(inv_dict[site][copc]['Source'].unique()) > 0:
-                        logging.warning(
-                            "{} for {} has more than one source: {}".format(
-                                site, copc, ','.join(inv_dict[site][copc]['Source'])
-                            )
-                        )
                     # Initialize the new "Source" column with None and populate based on condition where new source
                     # is or is not present in the old Source column
                     site_df['Source'] = None
-                    new_in_old = (site_df['Source_x'].str.contains(y_str))
-                    # If the original source contains the new source, set the Source column to its original state
-                    site_df.loc[new_in_old, 'Source'] = site_df.loc[new_in_old, 'Source_x']
-                    # If the original source does not contain the new source, concatenate the old and new with "_"
-                    site_df.loc[~new_in_old, 'Source'] = site_df.loc[~new_in_old, 'Source_x'].astype(str) + '_' + \
-                                                         site_df.loc[~new_in_old, 'Source_y'].astype(str)
+                    site_df['Source_x'] = site_df['Source_x'].fillna(value='')
+                    for y_str in inv_dict[site][copc]['Source'].unique():
+                        # Filter the affected rows
+                        y_str_rows = site_df['Source_y'] == y_str
+                        # In the case of adding new years, the original source columns (Source_x) may be NaN, replace
+                        # these with the new source of the recent df merge.
+                        affected_rows = y_str_rows & (site_df['Source_x'] == '')
+                        site_df.loc[affected_rows, 'Source_x'] = y_str
+                        src_in_old = site_df['Source_x'].str.contains(y_str)
+                        # If the original source contains the new source, set the Source column to its original state
+                        affected_rows = y_str_rows & src_in_old
+                        site_df.loc[affected_rows, 'Source'] = site_df.loc[affected_rows, 'Source_x']
+                        # If the original source does not contain the new source, concatenate the old and new with "_"
+                        affected_rows = y_str_rows & ~src_in_old
+                        site_df.loc[affected_rows, 'Source'] = site_df.loc[affected_rows, 'Source_x'].astype(str) + '_' + site_df.loc[affected_rows, 'Source_y'].astype(str)
                     # Drop the excess columns
                     site_df.drop(columns=['Source_x', 'Source_y'], inplace=True)
         site_df['SITE_NAME'] = site
@@ -926,12 +928,15 @@ if __name__ == '__main__':
     # Unpack dictionary into Pandas dataframe
     ipp_df = build_inventory_df(inv_check.inv_lex, args.copcs)
     # Format all numeric values to selected number of significant figures
-    logging.info("Rounding all waste stream values to {} significant digits".format(args.sig_figs))
+    logging.info("##Rounding all waste stream values to {} significant digits".format(args.sig_figs))
     for col in ipp_df.columns[2:]:
         ipp_df = format_numerics(ipp_df, col, args.sig_figs)
     # Clear out rows that have all NaN values
-    logging.info("##Excluding rows with no data")
     ipp_df.dropna(axis=0, how='all', subset=ipp_df.columns[2:], inplace=True)
+    no_data_sites = set(ipp_df['SITE_NAME']).difference(inv_check.inv_lex.keys())
+    if len(no_data_sites) > 0:
+        logging.info("##Excluding rows with no data")
+        logging.info('{}'.format('\n'.join(no_data_sites)))
     # Write out to file
     out_file = Path(args.output, args.ipp_name)
     logging.info("##Writing preprocessed inventory file to the following path: {}".format(str(out_file)))
