@@ -107,26 +107,38 @@ def build_pkg(file):
 
                 i = 0
                 dat_output = ""
+                step_output = ""
                 cell_logger.info("Building dat file: {0}".format(file.outputFileName))
 
                 count = 0
 
                 #output data for cell
-                consolidate = False
-                c_data = 0
+                #consolidate = False
+                #c_data = 0
                 #pc_data = 0
-                c_count = 0
-                first = True
-                prev_data = []
+                #c_count = 0
+                #first = True
+                #prev_data = []
                 cell_logger.info("timeseries:")
+                prev_rate = -1.0
                 for rec in segs:
                     count += 1
                     cell_logger.info("{0} 0 {1}".format(rec[0],rec[1]))
-                    dat_output += "{0} 0 {1}\n".format(hssm_obj.format_e(rec[0]),hssm_obj.format_e(rec[1]))
 
+                    dat_output += "{0} 0 {1}\n".format(hssm_obj.format_e(rec[0]),hssm_obj.format_e(rec[1]))
+                    if prev_rate >= 0:
+                        step_output += "{0} 0 {1}\n".format(hssm_obj.format_e(rec[0]),hssm_obj.format_e(prev_rate))
+                    step_output += "{0} 0 {1}\n".format(hssm_obj.format_e(rec[0]),hssm_obj.format_e(rec[1]))
+                    prev_rate = rec[1]
 
                 with open("{0}".format(file.outputFileName),"w") as outfile:
                     outfile.write(dat_output)
+                #build stepped data file
+                if file.stepwise == True:
+                    path, fileN = os.path.split(file.outputFileName)
+                    fileName = os.path.join(path,'step_format',fileN)
+                    with open(fileName,"w") as outfile:
+                        outfile.write(step_output)
                 cell_logger.info("finished dat file: {0}".format(file.outputFileName))
                 #if count > max_steps:
                 #    max_steps = count +1
@@ -142,7 +154,7 @@ def build_pkg(file):
 # Individual cell object
 class hss_file():#data_reduction):
     def __init__(self, ofn,fn, k, i, j, sn, c,tol,sy,log_p,min_steps,flux_floor,
-                max_tm_error,units,graph_name,copc,dr=True):
+                max_tm_error,units,graph_name,copc,stepwise, dr=True,):
 
         #data_reduction.__init__(self,i,j)
         self.version = 0.1
@@ -169,6 +181,7 @@ class hss_file():#data_reduction):
         self.flux = []
         self.copc = copc
         self.graph_name = graph_name
+        self.stepwise = stepwise
     def set_min_step(self, ms, day_unit):
         self.min_step = Decimal(ms)
         self.day_unit = day_unit
@@ -362,10 +375,13 @@ class hssm_obj:
         self.data_reduction = params["data_reduction"]
         self.graph_name = params["graph_name"]
         self.copc = params["copc"]
+        self.HSSpath = "./hss/"
         if "HSSpath" in params.keys():
             self.HSSpath = params["HSSpath"]
-        else:
-            self.HSSpath = "./hss/"
+
+        self.stepwise = False
+        if "stepwise" in params.keys():
+            self.stepwise = params["stepwise"]
 
     #---------------------------------------------------------------------------
     #break a dataframe of cells down into individual cell objects (this is used to
@@ -416,7 +432,7 @@ class hssm_obj:
                             rec = hss_file(out_fileName,HSSFileName,k,i_ind,j_ind,1,self.head[i],
                                             self.tolerance,self.start_year,self.log_path,
                                             self.min_reduction_steps,self.flux_floor,
-                                            self.max_tm_error,self.units,self.graph_name,self.copc,self.data_reduction)
+                                            self.max_tm_error,self.units,self.graph_name,self.copc,self.stepwise,self.data_reduction)
 
 
                             rec.build_array_fill_empty(days[0],days[-1],lay_days.tolist(), lay_vals.tolist())
@@ -429,7 +445,7 @@ class hssm_obj:
                     rec = hss_file(out_fileName,HSSFileName,k,i_ind,j_ind,1,self.head[i],
                                     self.tolerance,self.start_year,self.log_path,
                                     self.min_reduction_steps,self.flux_floor,
-                                    self.max_tm_error,self.units,self.graph_name,self.copc,self.data_reduction)
+                                    self.max_tm_error,self.units,self.graph_name,self.copc,self.stepwise,self.data_reduction)
 
                     rec.build_array(days,values)
                     data.append(rec)
@@ -511,9 +527,15 @@ class hssm_obj:
         output = "{0} {1} {2} NoRunHSSM\n".format(num_files, 1,max_steps)
         output += "{0} {1} {2}\n".format(1, 1, 1)
         output += "{0}\n{1}".format(num_files,file_str)
-        with open("{0}mt3d.hss".format(self.path),"w") as outfile:
+        with open(os.path.join(self.path,"mt3d.hss"),"w") as outfile:
             outfile.write(output)
-
+        #stepped format mt3d file
+        if self.stepwise:
+            output = "{0} {1} {2} NoRunHSSM\n".format(num_files, 1,max_steps*2)
+            output += "{0} {1} {2}\n".format(1, 1, 1)
+            output += "{0}\n{1}".format(num_files,file_str)
+            with open(os.path.join(self.path,"step_format","mt3d.hss"),"w") as outfile:
+                outfile.write(output)
         #self.misc_files()
         if layered:
             self.misc_files(self.reduced_data,'cell_error_by_layer.csv',True)
@@ -904,7 +926,9 @@ class hssm_obj:
                         flux = Decimal(self.cells.loc[int(year),ij]*365.25)
                         r_flux = cur_rec[1] * Decimal('365.25')
                         error = (flux-r_flux)
-                        if abs(error) > 0:
+                        if flux == 0 and abs(error)> 0:
+                            error = 100
+                        elif abs(error) > 0:
                             error = (error/flux)*100
                         if error > .001:
                             error_str += "{0},{1},{2},{3},".format(year,flux,r_flux,error)

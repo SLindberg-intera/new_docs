@@ -119,6 +119,7 @@ def main():
 
     log_dir = os.path.join(params['output'], 'log')
     misc_dir = os.path.join(params['output'], 'misc')
+    step_dir = os.path.join(params['output'], 'step_format')
     if os.path.isdir(params["output"]):
         print('Invalid output directory: {0} '.format(params["output"]))
         print('                Directory Already Exists!')
@@ -127,6 +128,8 @@ def main():
         os.mkdir(params["output"])
         os.mkdir(log_dir)
         os.mkdir(misc_dir)
+        if ("stepwise" in params.keys() and params['stepwise']):
+            os.mkdir(step_dir)
     except OSError:
         print("Creation of the directory %s failed" % params["output"])
     else:
