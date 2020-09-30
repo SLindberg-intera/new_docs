@@ -46,7 +46,7 @@ c
 c
       nyrend=3070
 c
-      outfile1="input_XPRT_3070"
+      outfile1="input_XPRT-3070"
 c
       OPEN(20,FILE=outfile1,
      >  STATUS='REPLACE',IOSTAT=IST)
