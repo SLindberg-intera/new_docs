@@ -16,7 +16,7 @@ namespace stomp_extrap_modflow
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             MainWindow wnd;
-            if (e.Args.Length == 1)
+            if (e.Args.Length == 1  && e.Args[0].Length > 0)
             {
                  wnd = new MainWindow(e.Args[0]);
             }
