@@ -412,44 +412,37 @@ def stomp_format_parser(path, skip_pattern='241-[^Cc]'):
         logging.info("##Number of sites with data from SAC: {}".format(len(new_lex)))
         if len(dup_sites) > 0:
             logging.debug("##SAC Inventory has duplicate entries for the following sites ({}):".format(len(dup_sites)))
-            for site in sorted(dup_sites):
-                logging.debug(site)
+            logging.info('{}'.format('\n'.join(sorted(dup_sites))))
         if len(no_data_sites) > 0:
             logging.info("##SAC Inventory Sites with no Data ({}):".format(len(no_data_sites)))
-            for site in sorted(no_data_sites):
-                logging.info(site)
+            logging.info('{}'.format('\n'.join(sorted(no_data_sites))))
         if len(skip_sites) > 0:
-            logging.info("##SAC Inventory Sites to be excluded ({}):".format(len(skip_sites)))
-            for site in sorted(skip_sites):
-                logging.info(site)
+            logging.info("##Excluded sites with a substring of '241-' except for '241-C' ({}):".format(len(skip_sites)))
+            logging.info('{}'.format('\n'.join(sorted(skip_sites))))
     return new_lex
 
 
 def combine_lex(lex1, lex2):
     """
     This will combine site records from lex2 into lex1 if (*IF*) lex1[site].keys() == 0 (i.e. has not received other
-    information from another primary source) at the year level (i.e. even if a rerouted site has information for a
-    COPC from 1943-1951, but SIMV2 has information from 1943-1960, we want to include the years not covered by the
-    previous source, resulting in information for the example COPC from 1943-1960, but not overwriting any information).
+    information from another primary source)
     :param lex1:        Dictionary to combine information into, should start out as a dictionary with sites and no
                         other nested keys (i.e. len(lex1[site].keys()) = 0 should yield True)
     :param lex2:        Dictionary of site records from a primary source to be combined into lex1
     :return:            Combined dictionary, dictionary of sites and streams used from primary source
     """
+    used_lex = {}
     for site in lex1:
         # If there is information from the source being added for the site in question...
         if site in lex2:
-            for copc in lex2[site].keys():
-                if copc not in lex1[site]:
-                    lex1[site][copc] = lex2[site][copc]
-                else:
-                    # This will check to see if there's information from a different source that provides more years
-                    # of information. WILL NOT OVERWRITE INFORMATION FROM PREVIOUS SOURCES!!
-                    df1 = deepcopy(lex1[site][copc])
-                    df2 = deepcopy(lex2[site][copc])
-                    df3 = df2.loc[~df2['year'].isin(df1['year']), :]
-                    df1 = pd.concat([df1, df3], ignore_index=True)
-                    lex1[site][copc] = df1
+            # This conditional statement prevents the function from adding information to a site record where another
+            # primary source has already provided information for a given waste stream.
+            used_copcs = list(set(lex2[site].keys()).difference(lex1[site].keys()))
+            if len(used_copcs) > 0:
+                used_lex[site] = used_copcs
+            for copc in used_copcs:
+                lex1[site][copc] = lex2[site][copc]
+    logging.info("Sites included from data package: \n{}".format('\n'.join(sorted(used_lex.keys()))))
     return lex1
 
 
