@@ -1,23 +1,23 @@
 c       ************************ PROGRAM reroute_source.f ****************************
 c          Read SIM-V2 csv file and CIE chemical source csv file. Output rerouted CIE 
-c          sources for the U-10 system and B-3 pond sites.
+c          sources for the U-10 system, B-3 pond and T-4 Pond sites.
 c
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
 c
       INTEGER yr
-      DIMENSION val(17),sitevals(250,10,9),outvals(250,10,9)
-      DIMENSION sitevol(250,10),totvol(250),ditvol(250)
-      DIMENSION ditinf(250,4),pondinf(250)
-      DIMENSION fracinf(250,4),area(12)
-      DIMENSION fracrate(250,10)
+      DIMENSION val(17),sitevals(250,15,9),outvals(250,15,9)
+      DIMENSION sitevol(250,15),totvol(250),ditvol(250)
+      DIMENSION ditinf(250,4)
+      DIMENSION fracinf(250,4),area(8)
+      DIMENSION fracrate(250,15)
       DIMENSION ditval(250,4)
       DIMENSION u10(250),u10ovf(250),ovflow(250)
       DIMENSION ovfu9(250),ovfu11(250)
       CHARACTER infile1*256,infile2*256,infile3*256
       CHARACTER outfile1*80,outfile2*80,outfile3*80,outfile4*80
       CHARACTER im*80,simsite*80,casite*80,ciesite*80,st*80
-      CHARACTER line*1024,sites(10)*12,dum1*8
-      CHARACTER sitedat(10,4)*80,sitename*20,frmt*4
+      CHARACTER line*1024,sites(15)*15,dum1*8
+      CHARACTER sitedat(15,4)*80,sitename*20,frmt*4
       CHARACTER(len=256), DIMENSION(:), allocatable :: args
 c
       sitedat=""
@@ -25,7 +25,6 @@ c
       ditvol=0.0_8
       totvol=0.0_8
       ditinf=0.0_8
-      pondinf=0.0_8
       fracinf=0.0_8
       fracrate=0.0_8
       sitevals=0.0_8
@@ -58,45 +57,50 @@ c
       READ(args(2),"(a256)") infile2
       WRITE(*,*) ' CIE chemical csv file = ',infile2
 c
-c --- Read B-3 Pond fractions filename
+c --- Read B-3 Pond and T-4 Pond fractions filename
 c
       READ(args(3),"(a256)") infile3
-      WRITE(*,*) ' B-3 Pond fractions file = ',infile3
+      WRITE(*,*) ' B-3 Pond and T-4 Pond fractions file = ',infile3
 c
 c --- Reroute sites
 c
       sites=(/"216-Z-11","216-Z-19","216-Z-1D","216-U-14",
      >  "216-U-10","216-U-11","216-B-3 ","216-B-3A-RAD",
-     >  "216-B-3B-RAD","216-B-3C-RAD"/)
+     >  "216-B-3B-RAD","216-B-3C-RAD","216-T-4A","216-T-4-1",
+     >  "216-T-4B","216-T-4-2","216-T-4-2-SOUTH"/)
 c
 c --- Site areas for (in order): 216-Z-11,216-Z-19,216-Z-1Dtot,216-U-14tot,
-c       216-U-10,216-U-11,216-Z-1Dsouth,216-U-14south,
-c       216-B-3,216-B-3A-RAD,216-B-3B-RAD,216-B-3C-RAD
+c       216-U-10,216-U-11,216-Z-1Dsouth,216-U-14south
 c
       area=(/658.304592447,650.081659045,4163.16491928,41007.6853106,
-     >  194229.402893,67237.8559196,2144.24717683,20959.2514744,
-     >  146094.747,44332.226,62630.25,17600.00/)
+     >  194229.402893,67237.8559196,2144.24717683,20959.2514744/)
 c
-      outfile1="U-10_B-3_CIE_reroute_in.dat"
-      outfile2="U-10_B-3_CIE_reroute_fractions.dat"
-      outfile3="U-10_B-3_CIE_reroute_rates.dat"
-      outfile4="U-10_B-3_CIE_reroute_rates.csv"
+      outfile1="U-10_B-3_T-4_CIE_reroute_in.dat"
+      outfile2="U-10_B-3_T-4_CIE_reroute_fractions.dat"
+      outfile3="U-10_B-3_T-4_CIE_reroute_rates.dat"
+      outfile4="U-10_B-3_T-4_CIE_reroute_rates.csv"
 c
-c --- Read yearly fractional rates for B-3 Pond sites.
+c --- Read yearly fractional rates for B-3 Pond sites and T-4 Pond sites.
 c
       OPEN(13,FILE=infile3,STATUS='OLD'
      >  ,IOSTAT=IST)
       npyr=0
       READ(13,*)
-   50 READ(13,*,END=60) ipyr,b3f,b3af,b3bf,b3cf
+   50 READ(13,*,END=60)ipyr,b3f,b3af,b3bf,b3cf,t4af,t41f,t4bf,t42f,t42sf
       npyr=ipyr-1943
       fracrate(npyr,7)=b3f
       fracrate(npyr,8)=b3af
       fracrate(npyr,9)=b3bf
       fracrate(npyr,10)=b3cf
+      fracrate(npyr,11)=t4af
+      fracrate(npyr,12)=t41f
+      fracrate(npyr,13)=t4bf
+      fracrate(npyr,14)=t42f
+      fracrate(npyr,15)=t42sf
+c
       GOTO 50
 c
-c --- Read SIMV2 rates for U-10 system sites and 216-B-3.
+c --- Read SIMV2 rates for U-10 system sites, 216-B-3 and 216-T-4A.
 c
    60 OPEN(11,FILE=infile1,STATUS='OLD'
      >  ,IOSTAT=IST)
@@ -122,7 +126,7 @@ c
       val=0.0_8
       READ(line,*) im,simsite,casite,st,val(1),yr,(val(ird),ird=2,17)
       keep=0
-      DO ius=1,7
+      DO ius=1,15
         dum1=TRIM(casite)
         IF(dum1.eq.sites(ius)) keep=ius
       ENDDO
@@ -134,18 +138,18 @@ c
       sitedat(keep,2)=simsite
       sitedat(keep,3)=casite
       sitedat(keep,4)=st
-      sitevol(indyr,keep)=val(1)
+      sitevol(indyr,keep)=sitevol(indyr,keep)+val(1)
       totvol(indyr)=totvol(indyr)+val(1)
 c
-      sitevals(indyr,keep,1)=val(1)
-      sitevals(indyr,keep,2)=val(4)
-      sitevals(indyr,keep,3)=val(5)
-      sitevals(indyr,keep,4)=val(8)
-      sitevals(indyr,keep,5)=val(9)
+      sitevals(indyr,keep,1)=sitevals(indyr,keep,1)+val(1)
+      sitevals(indyr,keep,2)=sitevals(indyr,keep,2)+val(4)
+      sitevals(indyr,keep,3)=sitevals(indyr,keep,3)+val(5)
+      sitevals(indyr,keep,4)=sitevals(indyr,keep,4)+val(8)
+      sitevals(indyr,keep,5)=sitevals(indyr,keep,5)+val(9)
 c
       GOTO 100
 c
-c --- Read CIE chemical rates for U-10 system sites and 216-B-3.
+c --- Read CIE chemical rates for U-10 system sites, 216-B-3 and 216-T-4A.
 c
   150 OPEN(12,FILE=infile2,STATUS='OLD'
      >  ,IOSTAT=IST)
@@ -167,7 +171,7 @@ c
       val=0.0_8
       READ(line,*) im,simsite,ciesite,st,yr,(val(ird),ird=1,5)
       keep=0
-      DO ius=1,7
+      DO ius=1,15
         dum1=TRIM(ciesite)
         IF(dum1.eq.sites(ius)) keep=ius
       ENDDO
@@ -178,16 +182,11 @@ c
      >    TRIM(ciesite),TRIM(sitedat(keep,3))
         GOTO 9999
       ENDIF
-      IF(TRIM(sitedat(keep,4)).ne.TRIM(st)) THEN
-        WRITE(*,"(a30,2a20)") ' Unmatched Source Type name - ',
-     >    TRIM(st),TRIM(sitedat(keep,4))
-        GOTO 9999
-      ENDIF
 c
-      sitevals(indyr,keep,6)=val(4)
-      sitevals(indyr,keep,7)=val(2)
-      sitevals(indyr,keep,8)=val(3)
-      sitevals(indyr,keep,9)=val(5)
+      sitevals(indyr,keep,6)=sitevals(indyr,keep,6)+val(4)
+      sitevals(indyr,keep,7)=sitevals(indyr,keep,7)+val(2)
+      sitevals(indyr,keep,8)=sitevals(indyr,keep,8)+val(3)
+      sitevals(indyr,keep,9)=sitevals(indyr,keep,9)+val(5)
 c
       GOTO 200
 c
@@ -207,10 +206,12 @@ c
 c
       OPEN(21,FILE=outfile2,
      >  STATUS='REPLACE',IOSTAT=IST)
-      WRITE(21,"(4a)") '    ny    yr   Z-11_frac_infilt',
+      WRITE(21,"(6a)") '    ny    yr   Z-11_frac_infilt',
      >  '   Z-19_frac_infilt   Z-1d_frac_infilt   U-14_frac_infilt',
      >  '   U-10_infilt_frac   U-11_infilt_frac    B-3_infilt_frac',
-     >  '   B-3A_infilt_frac   B-3B_infilt_frac   B-3C_infilt_frac'
+     >  '   B-3A_infilt_frac   B-3B_infilt_frac   B-3C_infilt_frac',
+     >  '   T-4A_infilt_frac  T-4-1_infilt_frac   T-4B_infilt_frac',
+     >  '  T-4-2_infilt_frac  T-4-2-S_infilt_frac'
 c
       DO iyr=minyr,maxyr
         iiy=iyr-1943
@@ -221,8 +222,7 @@ c
         ditinf(iiy,2)=sitevol(iiy,2)
         ditinf(iiy,3)=sitevol(iiy,3)
         ditinf(iiy,4)=sitevol(iiy,4)+sitevol(iiy,5)
-        pondinf(iiy)=sitevol(iiy,7)
-        ditvol(iiy)=totvol(iiy)-pondinf(iiy)
+        ditvol(iiy)=totvol(iiy)-sitevol(iiy,7)-sitevol(iiy,11)
         sumfrac=0.0_8
         DO ifr=1,4
           fracinf(iiy,ifr)=ditinf(iiy,ifr)/ditvol(iiy)
@@ -230,13 +230,15 @@ c
         ENDDO
         IF(ABS(1.0-sumfrac).gt.1e-10) THEN
           WRITE(20,*) ' Ditch influent fractions do not sum to 1.0: ',
-     >      sumfrac
+     >      sumfrac,iyr,iiy,ditinf(iiy,1),ditinf(iiy,2),ditinf(iiy,3),
+     >      ditinf(iiy,4),ditvol(iiy)
           GOTO 9999
         ENDIF
-        fracB3=pondinf(iiy)/totvol(iiy)
+        fracB3=sitevol(iiy,7)/totvol(iiy)
+        fracT4=sitevol(iiy,11)/totvol(iiy)
         fracdit=(ditinf(iiy,1)+ditinf(iiy,2)+ditinf(iiy,3)+
      >    ditinf(iiy,4))/totvol(iiy)
-        sumfrac=fracdit+fracB3
+        sumfrac=fracdit+fracB3+fracT4
         IF(ABS(1.0-sumfrac).gt.1e-10) THEN
           WRITE(20,*) ' Influent fractions do not sum to 1.0: ',sumfrac
           GOTO 9999
@@ -325,7 +327,7 @@ c
 c
 c --- Write out fractions
 c
-        WRITE(21,"(2i6,10es19.9)") iiy,iyr,(fracrate(iiy,irc),irc=1,10)
+        WRITE(21,"(2i6,15es19.9)") iiy,iyr,(fracrate(iiy,irc),irc=1,15)
 c
       ENDDO
 c
@@ -359,8 +361,9 @@ c
           totval=  ditval(iiy,1)+ditval(iiy,2)+ditval(iiy,3)+
      >      ditval(iiy,4)
 c
-c --- Set up output array: In order (1-10) - "216-Z-11","216-Z-19","216-Z-1D","216-U-14",
-c       "216-U-10","216-U-11","216-B-3","216-B-3A-RAD","216-B-3B-RAD","216-B-3C-RAD"
+c --- Set up output array: In order (1-15) - "216-Z-11","216-Z-19","216-Z-1D","216-U-14",
+c       "216-U-10","216-U-11","216-B-3","216-B-3A-RAD","216-B-3B-RAD","216-B-3C-RAD",
+c       "216-T-4A","216-T-4-1","216-T-4B","216-T-4-2","216-T-4-2-SOUTH"
 c
           sumdit=0.0_8
 c --- 216-Z-11
@@ -388,13 +391,23 @@ c --- 216-B-3B-RAD
           outvals(iiy,9,ival)=sitevals(iiy,7,ival)*fracrate(iiy,9)
 c --- 216-B-3C-RAD
           outvals(iiy,10,ival)=sitevals(iiy,7,ival)*fracrate(iiy,10)
+c --- 216-T-4A
+          outvals(iiy,11,ival)=sitevals(iiy,11,ival)*fracrate(iiy,11)
+c --- 216-T-4-1
+          outvals(iiy,12,ival)=sitevals(iiy,11,ival)*fracrate(iiy,12)
+c --- 216-T-4B
+          outvals(iiy,13,ival)=sitevals(iiy,11,ival)*fracrate(iiy,13)
+c --- 216-T-4-2
+          outvals(iiy,14,ival)=sitevals(iiy,11,ival)*fracrate(iiy,14)
+c --- 216-T-4-2-SOUTH
+          outvals(iiy,15,ival)=sitevals(iiy,11,ival)*fracrate(iiy,15)
 c
         ENDDO
       ENDDO
 c
 c --- Write out reroute rates
 c
-      DO ius=1,10
+      DO ius=1,15
         DO iyr=minyr,maxyr
           iiy=iyr-1943
           sitename=sites(ius)
@@ -412,7 +425,7 @@ c
      >        (outvals(iiy,ius,ival),ival=2,9)
 c
             line=""
-            WRITE(line,"(a9,a20,a12,es19.9,a1,i7,16(a1,es19.9))")
+            WRITE(line,"(a9,a20,a15,es19.9,a1,i7,16(a1,es19.9))")
      >        'reroute,,',sitename,",Liquid,",outvals(iiy,ius,1),",",
      >        iyr,(",",outvals(iiy,ius,ival),ival=2,9)
             icw=1
