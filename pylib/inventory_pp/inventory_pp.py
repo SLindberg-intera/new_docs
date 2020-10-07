@@ -840,30 +840,16 @@ def build_inventory_df(inv_dict, copc_list):
             else:
                 site_df = site_df.merge(inv_dict[site][copc], on='year', sort=True, how='outer')
                 if 'Source_x' in site_df.columns and 'Source_y' in site_df.columns:
-                    # Find out if the source column already has the "new" source in it (prevent situations from arising
-                    # like "SIMV2_SIMV2_SAC-Water_SIMV2")
-                    # Initialize the new "Source" column with None and populate based on condition where new source
-                    # is or is not present in the old Source column
-                    site_df['Source'] = None
-                    site_df['Source_x'] = site_df['Source_x'].fillna(value='')
-                    for y_str in inv_dict[site][copc]['Source'].unique():
-                        # Filter the affected rows
-                        y_str_rows = site_df['Source_y'] == y_str
-                        # In the case of adding new years, the original source columns (Source_x) may be NaN, replace
-                        # these with the new source of the recent df merge.
-                        affected_rows = y_str_rows & (site_df['Source_x'] == '')
-                        site_df.loc[affected_rows, 'Source_x'] = y_str
-                        src_in_old = site_df['Source_x'].str.contains(y_str)
-                        # If the original source contains the new source, set the Source column to its original state
-                        affected_rows = y_str_rows & src_in_old
-                        site_df.loc[affected_rows, 'Source'] = site_df.loc[affected_rows, 'Source_x']
-                        # If the original source does not contain the new source, concatenate the old and new with "_"
-                        affected_rows = y_str_rows & ~src_in_old
-                        site_df.loc[affected_rows, 'Source'] = site_df.loc[affected_rows, 'Source_x'].astype(str) + '_' + site_df.loc[affected_rows, 'Source_y'].astype(str)
+                    site_df['Source_x'] = site_df['Source_x'].fillna(value=' ')
+                    site_df['Source_y'] = site_df['Source_y'].fillna(value=' ')
+                    site_df['Source_x'] = site_df['Source_x'].str.cat(site_df['Source_y'], sep='_')
+                    site_df['Source'] = site_df['Source_x'].str.replace('_ ', '').str.replace(' _', '')
                     # Drop the excess columns
                     site_df.drop(columns=['Source_x', 'Source_y'], inplace=True)
         site_df['SITE_NAME'] = site
         df = pd.concat([df, site_df], sort=False)
+    # Simplify the "Source" column by removing duplicates
+    df['Source'] = df['Source'].apply(lambda x: '_'.join(set(x.split('_'))))
     # Format the columns based on the user's column list (in order)
     use_copcs = [copc for copc in copc_list if copc.upper() in fin_copcs]
     # Log whether all COPC's made it into the final list
