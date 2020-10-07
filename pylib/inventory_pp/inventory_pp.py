@@ -422,10 +422,11 @@ def stomp_format_parser(path, skip_pattern='241-[^Cc]'):
     return new_lex
 
 
-def combine_lex(lex1, lex2):
+def combine_lex(lex1, lex2, level='Site'):
     """
     This will combine site records from lex2 into lex1 if (*IF*) lex1[site].keys() == 0 (i.e. has not received other
     information from another primary source)
+    :param level:       The level at which to combine (at the site level or the year level)
     :param lex1:        Dictionary to combine information into, should start out as a dictionary with sites and no
                         other nested keys (i.e. len(lex1[site].keys()) = 0 should yield True)
     :param lex2:        Dictionary of site records from a primary source to be combined into lex1
@@ -435,14 +436,28 @@ def combine_lex(lex1, lex2):
     for site in lex1:
         # If there is information from the source being added for the site in question...
         if site in lex2:
-            # This conditional statement prevents the function from adding information to a site record where another
-            # primary source has already provided information for a given waste stream.
-            used_copcs = list(set(lex2[site].keys()).difference(lex1[site].keys()))
-            if len(used_copcs) > 0:
-                used_lex[site] = used_copcs
-            for copc in used_copcs:
-                lex1[site][copc] = lex2[site][copc]
-    logging.info("Sites included from data package: \n{}".format('\n'.join(sorted(used_lex.keys()))))
+            if level.lower() == 'site':
+                # This conditional statement prevents the function from adding information to a site record where another
+                # primary source has already provided information for a given waste stream.
+                used_copcs = list(set(lex2[site].keys()).difference(lex1[site].keys()))
+                if len(used_copcs) > 0:
+                    used_lex[site] = used_copcs
+                for copc in used_copcs:
+                    lex1[site][copc] = lex2[site][copc]
+            elif level.lower() == 'year':
+                used_lex[site] = lex2[site].keys()
+                for copc in lex2[site].keys():
+                    if copc not in lex1[site]:
+                        lex1[site][copc] = lex2[site][copc]
+                    else:
+                        # This will check to see if there's information from a different source that provides more years
+                        # of information. WILL NOT OVERWRITE INFORMATION FROM PREVIOUS SOURCES!!
+                        df1 = deepcopy(lex1[site][copc])
+                        df2 = deepcopy(lex2[site][copc])
+                        df3 = df2.loc[~df2['year'].isin(df1['year']), :]
+                        df1 = pd.concat([df1, df3], ignore_index=True)
+                        lex1[site][copc] = df1
+    logging.info("Site information included from data package: \n{}".format('\n'.join(sorted(used_lex.keys()))))
     return lex1
 
 
