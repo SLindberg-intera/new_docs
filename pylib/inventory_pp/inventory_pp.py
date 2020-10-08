@@ -422,30 +422,36 @@ def stomp_format_parser(path, skip_pattern='241-[^Cc]'):
     return new_lex
 
 
-def combine_lex(lex1, lex2, level='Site'):
+def combine_lex(lex1, lex2, level='year', exclude=None, return_site_list=False):
     """
     This will combine site records from lex2 into lex1 if (*IF*) lex1[site].keys() == 0 (i.e. has not received other
     information from another primary source)
-    :param level:       The level at which to combine (at the site level or the year level)
-    :param lex1:        Dictionary to combine information into, should start out as a dictionary with sites and no
-                        other nested keys (i.e. len(lex1[site].keys()) = 0 should yield True)
-    :param lex2:        Dictionary of site records from a primary source to be combined into lex1
-    :return:            Combined dictionary, dictionary of sites and streams used from primary source
+    :param lex1:             Dictionary to combine information into, should start out as a dictionary with sites and no
+                             other nested keys (i.e. len(lex1[site].keys()) = 0 should yield True)
+    :param lex2:             Dictionary of site records from a primary source to be combined into lex1
+    :param level:            The level at which to combine (at the site level or the year level)
+    :param exclude:          Sites to exclude
+    :param return_site_list: Return the list of sites included from lex2 (sites merged into lex1)
+    :return:                 Combined dictionary, dictionary of sites and streams used from primary source
     """
-    used_lex = {}
+    if exclude is None:
+        exclude = []
+    used_sites = []
     for site in lex1:
+        if site in exclude:
+            continue
         # If there is information from the source being added for the site in question...
         if site in lex2:
             if level.lower() == 'site':
-                # This conditional statement prevents the function from adding information to a site record where another
-                # primary source has already provided information for a given waste stream.
-                used_copcs = list(set(lex2[site].keys()).difference(lex1[site].keys()))
-                if len(used_copcs) > 0:
-                    used_lex[site] = used_copcs
-                for copc in used_copcs:
-                    lex1[site][copc] = lex2[site][copc]
+                # If the site already has a COPC list, then don't add any information. If no COPC's are included, add
+                # the information available
+                if len(lex1[site].keys()) > 0:
+                    continue
+                else:
+                    for copc in lex2[site].keys():
+                        lex1[site][copc] = lex2[site][copc]
             elif level.lower() == 'year':
-                used_lex[site] = lex2[site].keys()
+                used_sites.append(site)
                 for copc in lex2[site].keys():
                     if copc not in lex1[site]:
                         lex1[site][copc] = lex2[site][copc]
@@ -457,8 +463,11 @@ def combine_lex(lex1, lex2, level='Site'):
                         df3 = df2.loc[~df2['year'].isin(df1['year']), :]
                         df1 = pd.concat([df1, df3], ignore_index=True)
                         lex1[site][copc] = df1
-    logging.info("Site information included from data package: \n{}".format('\n'.join(sorted(used_lex.keys()))))
-    return lex1
+    logging.info("Site information included from data package: \n{}".format('\n'.join(sorted(used_sites))))
+    if return_site_list is False:
+        return lex1
+    else:
+        return lex1, used_sites
 
 
 class InvObj:
@@ -776,19 +785,19 @@ class InvObj:
         final_lex = self.inv_lex
         if hasattr(self, "red_lex"):
             logging.info('##Merging Rerouted Sites into final dictionary')
-            final_lex = combine_lex(final_lex, self.red_lex)
+            final_lex, red_sites = combine_lex(final_lex, self.red_lex, return_site_list=True)
         if hasattr(self, "swr_lex"):
             logging.info('##Merging SWR into final dictionary')
-            final_lex = combine_lex(final_lex, self.swr_lex)
+            final_lex = combine_lex(final_lex, self.swr_lex, exclude=red_sites)
         if hasattr(self, "sim_lex"):
             logging.info('##Merging SIMV2 into final dictionary')
-            final_lex = combine_lex(final_lex, self.sim_lex)
+            final_lex = combine_lex(final_lex, self.sim_lex, exclude=red_sites)
         if hasattr(self, "chm_lex"):
             logging.info('##Merging Chemical Inventory into final dictionary')
-            final_lex = combine_lex(final_lex, self.chm_lex)
+            final_lex = combine_lex(final_lex, self.chm_lex, exclude=red_sites)
         if hasattr(self, "sac_lex"):
             logging.info('##Merging SAC into final dictionary')
-            final_lex = combine_lex(final_lex, self.sac_lex)
+            final_lex = combine_lex(final_lex, self.sac_lex, level='site')
         logging.info('##All primary source data have been merged into a hashed dictionary.')
         return final_lex
 
