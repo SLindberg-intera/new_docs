@@ -188,6 +188,31 @@ def clean_df(df, drop_cols, val_col=None):
     return df
 
 
+def legacy_col_formatter(col_str, year_col=None, water_col=None):
+    """
+    Reformats the column header to be the expected format for the legacy script to function properly. Example:
+        Input (inside quotes):  "SR-90(ci/year)"
+        Output (2 strings):     "Sr-90", "Ci"
+    Also reformats header columns 
+    :param col_str:     The column header string to be reformatted
+    :param year_col:    The year column has a specific designation in the legacy tool: Discharge/decay-corrected year
+    :param water_col:   The water column is also specific in the legacy tool:
+    :return:
+    """
+    if year_col is True:
+        new_col, units = 'Discharge/decay-corrected year', 'year'
+    elif water_col is True:
+        new_col, units = 'Volume [m3]', 'm^3'
+    else:
+        col_str = col_str.lower()
+        # Strip out the unwanted characters
+        col_str = col_str.replace('/year', '').replace(')', '')
+        # Split and capitalize, but don't capitalize the string if it is "kg"
+        new_col, units = [substr.capitalize() if substr != 'kg' else substr for substr in col_str.split('(')]
+    return new_col, units
+
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # User Input (Parser)
 
@@ -280,6 +305,13 @@ parser.add_argument('--verbosity',
                     default="ALL",
                     help='Set the verbosity to produce more/less output in the log file.\n'
                          '"ALL" is equivalent to "NOTSET" when setting the logger and will print all messages.'
+                    )
+parser.add_argument('--legacy',
+                    dest='legacy',
+                    type=bool,
+                    default=True,
+                    help='This option spans the code difference, producing an output compatible with the legacy\n'
+                         'source-to-stomp tool written for the first iteration of the CA modeling effort.'
                     )
 args = parser.parse_args()
 
@@ -919,6 +951,26 @@ def format_numerics(df, num_col, prec):
     return df
 
 
+def write_legacy_output(df, write_path):
+    """
+    This function is solely written for the purpose of making this tool rewrite compatible with its immediate downstream
+    legacy tool: src-2-stomp.pl
+    It'll add a couple of expected columns, reformat the headers, and add in header rows to accommodate the older script
+    Importantly, this will change the "Source" column entirely, changing it to be "Liquid/Solid Waste Series" as the
+    source column in the legacy version specified the waste type, not the originating data source (as with the latest
+    rewrite).
+    :param df:              The preprocessed inventory to write to file
+    :param write_path:      The path to save the output to.
+    :return:
+    """
+    # Add a new row to the dataframe for the unit row
+    df.index += 1
+    df.loc[0, :] = ''
+    col_order = list(df.columns())
+    # Add new columns and assign appropriate values
+
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Main Program
 if __name__ == '__main__':
@@ -943,4 +995,7 @@ if __name__ == '__main__':
     # Write out to file
     out_file = Path(args.output, args.ipp_name)
     logging.info("##Writing preprocessed inventory file to the following path: {}".format(str(out_file)))
-    ipp_df.to_csv(path_or_buf=out_file, index=False)
+    if args.legacy is False:
+        ipp_df.to_csv(path_or_buf=out_file, index=False)
+    else:
+        write_legacy_output(ipp_df, out_file)
