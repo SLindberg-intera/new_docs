@@ -65,7 +65,9 @@ class mass_obj:
         #    self.logger.debug("example1 aft: {0}".format(self.cells.loc[start_y,self.cells.columns[1]]))
         #    self.logger.debug("example2 aft: {0}".format(self.cells.loc[end_y,self.cells.columns[1]]))
         row_count = self.cells.index.size
-        self.cells['days'] = np.arange(0.0,float(row_count)*365.25, 365.25)
+        #self.cells['days'] = np.arange(0.0,float(row_count)*365.25, 365.25)
+        self.cells['days'] = self.cells.index
+        self.cells['days'] = self.cells['days'].diff().cumsum()*365.25
         #self.cells['days'] = np.arange(0.0,(float(end_y-start_y)*365.25)+366, 365.25)
         self.logger.debug("days       : \n {0}".format(self.cells['days']))
 

@@ -106,6 +106,7 @@ def remove_begin_end_zero_flux(days,vals,flux_floor,min_reduction_steps):
     non_zero_ind = np.concatenate((np.array([0]),np.where(np.logical_and(days >=pre_data, days<=post_data))[0],np.array([days.size -1])))
 
     return non_zero_ind,zero_ind
+
 #-------------------------------------------------------------------------------
 # take an array of indexes from unreduced data and add them back into the reduced data set.
 # array should contain first and last indexes, other points are point before mass,
@@ -114,21 +115,24 @@ def retain_min_years(r_ts,o_ts,o_mass,min_years_ind):
 
     years = o_ts.times[min_years_ind]
     if r_ts.times[0] != years[0]:
-        r_ts.times = np.insert(r_ts.times,0,years[0])
-        r_ts.values = np.insert(r_ts.values,0,o_ts.values[min_years_ind[0]])
+        r_ts.times, r_ts.values = insert_point(r_ts.times, r_ts.values,years[0],o_ts.values[min_years_ind[0]])
+        #r_ts.times = np.insert(r_ts.times,0,years[0])
+        #r_ts.values = np.insert(r_ts.values,0,o_ts.values[min_years_ind[0]])
     if len(years) > 2:
         for ind in range(1,len(years-2)):
             if not np.any(r_ts.times == years[ind]):
-                pos = np.where(r_ts.times > years[ind])[0][0]
-                if pos < 0:
-                    pos = np.where(r_ts.times < years[ind])[0][-1]
-                r_ts.times = np.insert(r_ts.times,pos,years[ind])
-                r_ts.values = np.insert(r_ts.values,pos,o_ts.values[min_years_ind[ind]])
+                #pos = np.where(r_ts.times > years[ind])[0][0]
+                #if pos < 0:
+                #    pos = np.where(r_ts.times < years[ind])[0][-1]
+                r_ts.times, r_ts.values = insert_point(r_ts.times, r_ts.values,years[ind],o_ts.values[min_years_ind[ind]])
+                #r_ts.times = np.insert(r_ts.times,pos,years[ind])
+                #r_ts.values = np.insert(r_ts.values,pos,o_ts.values[min_years_ind[ind]])
 
     if r_ts.times[-1] != years[-1]:
         ind = r_ts.times.size-1
-        r_ts.times = np.insert(r_ts.times,ind,years[-1])
-        r_ts.values = np.insert(r_ts.values,ind,o_ts.values[min_years_ind[-1]])
+        r_ts.times, r_ts.values = insert_point(r_ts.times, r_ts.values,years[-1],o_ts.values[min_years_ind[-1]])
+        #r_ts.times = np.insert(r_ts.times,ind,years[-1])
+        #r_ts.values = np.insert(r_ts.values,ind,o_ts.values[min_years_ind[-1]])
     reduced_mass = tsmath.integrate(r_ts)
     return ReductionResult(
             flux=o_ts,
@@ -324,9 +328,11 @@ def add_zero_markers(o_ts,r_ts,flux_floor):
 #-------------------------------------------------------------------------------
 #
 def insert_point(times, values,time,value):
-    times = np.append(times,time)
-    times.sort(kind='mergesort')
-    ind = np.where(times == time)[0][0]
-    values2 = np.insert(values,ind,value)
-
+    if not np.any(times==time):
+        times = np.append(times,time)
+        times.sort(kind='mergesort')
+        ind = np.where(times == time)[0][0]
+        values2 = np.insert(values,ind,value)
+    else:
+        return times, values
     return times, values2
