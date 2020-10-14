@@ -71,8 +71,6 @@ def build_pkg(file):
                 new_data = ["i{}j{}k{}".format(file.iSource,file.jSource,file.kSource),o_ts]
             else:
                 #check if allowing any steps greater than flux_floor yearly is below min_reduction_steps
-                #non_zero_ind = file.remove_zero_flux()
-                #non_zero_ind = rgt.remove_zero_flux(file.days,file.vals,file.flux_floor,file.min_reduction_steps)
                 non_zero_ind, min_zero_years = rgt.remove_begin_end_zero_flux(file.days,file.vals,file.flux_floor,file.min_reduction_steps)
 
                 ix = 0
@@ -84,32 +82,10 @@ def build_pkg(file):
                     days = file.days[non_zero_ind]
                     vals = file.vals[non_zero_ind]
 
-    #                    segs, error = file.build_hssm_data(days,vals)
-    #                    num_peaks, _ = sig.find_peaks(vals,width=3,rel_height=1)
-    #                    if num_peaks.size == 0:
-    #                        num_peaks, _ = sig.find_peaks(vals,width=2,rel_height=1)
-    #                        if num_peaks.size == 0:
-    #                            num_peaks, _ = sig.find_peaks(vals,width=1,rel_height=1)
-    #                    num_peaks = num_peaks.size
-    #                    r_ts = TimeSeries(days,vals,None,None)
-                #if (flux never rises above flux_floor and there are more than min_reduction_steps) or o_mass == 0 skip.
-                #  This is due to splitting cells into layers you may have less than 200 years in a single layer, and removing
-                #  the layer can have adverse consequences to the overall cell error if removed.
-                #elif file.has_data == False:
-                #    msg_str = ("Skipping Cell i{0}-j{1}; k{4}: total mass={5}; flux never exceeds {2} {3}/day".format(file.iSource,file.jSource,file.flux_floor, file.units,file.kSource,file.vals.sum()*365.25))
-                #    file.logger.info(msg_str)
-                #    print(msg_str)
-                #    return ["i{}j{}k{}".format(file.iSource,file.jSource,file.kSource),o_ts]
                 elif len(file.data) > file.min_reduction_steps and file.reduce_data:
                     days, vals,error,num_peaks,ix = rgt.reduce_dataset(file.days, file.vals, file.flux_floor, file.max_tm_error, file.min_reduction_steps)
-                    #if file.days[min_zero_years[0]] not in days or file.days[min_zero_years[1]] not in days or file.days[min_zero_years[2]] not in days or file.days[min_zero_years[3]] not in days:
-                        #print(file.HSSFileName)
-                        #print(file.days[min_zero_years])
-                    #segs, _ = file.build_hssm_data(days,vals)
-                    #r_ts = TimeSeries(days,vals,None,None)
-    #                else:
-    #                    num_peaks=None
-    #                    segs, error = file.build_hssm_data(file.days,file.vals)
+
+
                 segs, error = file.build_hssm_data(days,vals)
                 if num_peaks == None:
                     num_peaks, _ = sig.find_peaks(vals,width=3,rel_height=1)
@@ -131,26 +107,38 @@ def build_pkg(file):
 
                 i = 0
                 dat_output = ""
+                step_output = ""
                 cell_logger.info("Building dat file: {0}".format(file.outputFileName))
 
                 count = 0
 
                 #output data for cell
-                consolidate = False
-                c_data = 0
+                #consolidate = False
+                #c_data = 0
                 #pc_data = 0
-                c_count = 0
-                first = True
-                prev_data = []
+                #c_count = 0
+                #first = True
+                #prev_data = []
                 cell_logger.info("timeseries:")
+                prev_rate = -1.0
                 for rec in segs:
                     count += 1
                     cell_logger.info("{0} 0 {1}".format(rec[0],rec[1]))
-                    dat_output += "{0} 0 {1}\n".format(hssm_obj.format_e(rec[0]),hssm_obj.format_e(rec[1]))
 
+                    dat_output += "{0} 0 {1}\n".format(hssm_obj.format_e(rec[0]),hssm_obj.format_e(rec[1]))
+                    if prev_rate >= 0:
+                        step_output += "{0} 0 {1}\n".format(hssm_obj.format_e(rec[0]),hssm_obj.format_e(prev_rate))
+                    step_output += "{0} 0 {1}\n".format(hssm_obj.format_e(rec[0]),hssm_obj.format_e(rec[1]))
+                    prev_rate = rec[1]
 
                 with open("{0}".format(file.outputFileName),"w") as outfile:
                     outfile.write(dat_output)
+                #build stepped data file
+                if file.stepwise == True:
+                    path, fileN = os.path.split(file.outputFileName)
+                    fileName = os.path.join(path,'step_format',fileN)
+                    with open(fileName,"w") as outfile:
+                        outfile.write(step_output)
                 cell_logger.info("finished dat file: {0}".format(file.outputFileName))
                 #if count > max_steps:
                 #    max_steps = count +1
@@ -166,7 +154,7 @@ def build_pkg(file):
 # Individual cell object
 class hss_file():#data_reduction):
     def __init__(self, ofn,fn, k, i, j, sn, c,tol,sy,log_p,min_steps,flux_floor,
-                max_tm_error,units,graph_name,copc,dr=True):
+                max_tm_error,units,graph_name,copc,stepwise, dr=True,):
 
         #data_reduction.__init__(self,i,j)
         self.version = 0.1
@@ -193,6 +181,7 @@ class hss_file():#data_reduction):
         self.flux = []
         self.copc = copc
         self.graph_name = graph_name
+        self.stepwise = stepwise
     def set_min_step(self, ms, day_unit):
         self.min_step = Decimal(ms)
         self.day_unit = day_unit
@@ -386,10 +375,13 @@ class hssm_obj:
         self.data_reduction = params["data_reduction"]
         self.graph_name = params["graph_name"]
         self.copc = params["copc"]
+        self.HSSpath = "./hss/"
         if "HSSpath" in params.keys():
             self.HSSpath = params["HSSpath"]
-        else:
-            self.HSSpath = "./hss/"
+
+        self.stepwise = False
+        if "stepwise" in params.keys():
+            self.stepwise = params["stepwise"]
 
     #---------------------------------------------------------------------------
     #break a dataframe of cells down into individual cell objects (this is used to
@@ -440,7 +432,7 @@ class hssm_obj:
                             rec = hss_file(out_fileName,HSSFileName,k,i_ind,j_ind,1,self.head[i],
                                             self.tolerance,self.start_year,self.log_path,
                                             self.min_reduction_steps,self.flux_floor,
-                                            self.max_tm_error,self.units,self.graph_name,self.copc,self.data_reduction)
+                                            self.max_tm_error,self.units,self.graph_name,self.copc,self.stepwise,self.data_reduction)
 
 
                             rec.build_array_fill_empty(days[0],days[-1],lay_days.tolist(), lay_vals.tolist())
@@ -453,7 +445,7 @@ class hssm_obj:
                     rec = hss_file(out_fileName,HSSFileName,k,i_ind,j_ind,1,self.head[i],
                                     self.tolerance,self.start_year,self.log_path,
                                     self.min_reduction_steps,self.flux_floor,
-                                    self.max_tm_error,self.units,self.graph_name,self.copc,self.data_reduction)
+                                    self.max_tm_error,self.units,self.graph_name,self.copc,self.stepwise,self.data_reduction)
 
                     rec.build_array(days,values)
                     data.append(rec)
@@ -507,7 +499,7 @@ class hssm_obj:
     #-------------------------------------------------------------------------------
     # process each cell object (reduce data), then create a HSSM package from the
     #  reduced cells and cell meta data
-    def write_data(self):
+    def write_data(self,layered=True):
 
         time_arr = []
         new_data = []
@@ -535,11 +527,18 @@ class hssm_obj:
         output = "{0} {1} {2} NoRunHSSM\n".format(num_files, 1,max_steps)
         output += "{0} {1} {2}\n".format(1, 1, 1)
         output += "{0}\n{1}".format(num_files,file_str)
-        with open("{0}mt3d.hss".format(self.path),"w") as outfile:
+        with open(os.path.join(self.path,"mt3d.hss"),"w") as outfile:
             outfile.write(output)
-
+        #stepped format mt3d file
+        if self.stepwise:
+            output = "{0} {1} {2} NoRunHSSM\n".format(num_files, 1,max_steps*2)
+            output += "{0} {1} {2}\n".format(1, 1, 1)
+            output += "{0}\n{1}".format(num_files,file_str)
+            with open(os.path.join(self.path,"step_format","mt3d.hss"),"w") as outfile:
+                outfile.write(output)
         #self.misc_files()
-        self.misc_files(self.reduced_data,'cell_error_by_layer.csv',True)
+        if layered:
+            self.misc_files(self.reduced_data,'cell_error_by_layer.csv',True)
         self.consolidate_multi_layer_cells()
         self.misc_file_generation()
         self.misc_files(self.reduced_data_c,'cell_error.csv')
@@ -781,6 +780,7 @@ class hssm_obj:
                                 #cell = pd.concat([cell,temp],axis=1,sort=False)
 
                                 #original
+
                                 for yrec in y[1]:
 
                                     found = False
@@ -799,10 +799,13 @@ class hssm_obj:
                                         # is greater then yrec is likely where the mass ends
                                         # for that layer. which means the next layer will have
                                         # the correct value for this day
-                                        if yrec[1] == 0:
+                                        #exception if its the last time period then add it.
+                                        if yrec[1] == 0 and yrec[0] != o_ts.times[-1]:
+                                        #if yrec[1] == 0:
                                             ind = np.where(o_ts.times == yrec[0])[0]
                                             if o_ts.values[ind] < self.flux_floor:
                                                 segs.append(yrec)
+
                                         else:
                                             segs.append(yrec)
                                     #end of original
@@ -811,7 +814,6 @@ class hssm_obj:
                                     #    r_ts = y[6]
                                     #else:
                                     #    r_ts.values = np.add(r_ts.values,y[6].values)
-
                     segs.sort(key = sort_first_field)
                     ###u, c =
                     days = [float(i[0]) for i in segs]
@@ -924,7 +926,9 @@ class hssm_obj:
                         flux = Decimal(self.cells.loc[int(year),ij]*365.25)
                         r_flux = cur_rec[1] * Decimal('365.25')
                         error = (flux-r_flux)
-                        if abs(error) > 0:
+                        if flux == 0 and abs(error)> 0:
+                            error = 100
+                        elif abs(error) > 0:
                             error = (error/flux)*100
                         if error > .001:
                             error_str += "{0},{1},{2},{3},".format(year,flux,r_flux,error)
