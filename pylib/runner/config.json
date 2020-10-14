@@ -176,7 +176,7 @@
 
 		{
 
-		"name":"HSSM Builder", "command":"build_hssm.py", "description":"qualified on 06.08.2020; This tool builds a Hydrocarbon Spill Screening Model (HSSM) package for MT3D modeling purposes"
+		"name":"HSSM Builder", "command":"build_hssm.py", "description":"v1.2 qualified on 10.14.2020; This tool builds a Hydrocarbon Spill Screening Model (HSSM) package for MT3D modeling purposes; v1.2 added toggle stepwise functionality and resolved issue in checking file"
 
 		},
 	{"name":"CalcDose", "command":"calcDose.py", "description":"qualified on 07.27.2020.  Update on 08.10.2020; This tool calculates the dose given dose factors and groundwater concentrations "},
