@@ -262,6 +262,13 @@ parser.add_argument('--REROUTE',
                          'Each rerouted source file must have a site column that matches either "CA site name" or \n'
                          '"CIE site name" (case-sensitive).'
                     )
+parser.add_argument('--Site_Specific',
+                    dest='site_specific',
+                    nargs='+',
+                    type=file_path,
+                    help='If site-specific information is provided, it will supersede any other supersede other\n'
+                         'sources at the site level (e.g. a site-specific source will be incorporated over SIMV2).\n'
+                    )
 parser.add_argument('-i', '--ipp_output',
                     dest='ipp_name',
                     type=str,
@@ -325,7 +332,7 @@ args = parser.parse_args()
 # Primary functions
 
 
-def csv_parser(path, skip_lines, use_cols=None, col_names=None, codec='utf-8', prec='high'):
+def csv_parser(path, skip_lines, use_cols=None, col_names=None, codec='utf-8', prec='high', comment_line='#'):
     """
     :param codec:           Encoding to be used when parsing CSV file
     :param path:            Path to CSV file being parsed
@@ -333,6 +340,7 @@ def csv_parser(path, skip_lines, use_cols=None, col_names=None, codec='utf-8', p
     :param use_cols:        Columns to be used from the file being parsed
     :param col_names:       Column names to be used in output dataframe
     :param prec:            The precision engine to use in the parser
+    :param comment_line:    The lines to skip as headers/comments
     :return:
     """
     if use_cols is None and col_names is None:
@@ -341,7 +349,8 @@ def csv_parser(path, skip_lines, use_cols=None, col_names=None, codec='utf-8', p
             engine='c',
             skiprows=skip_lines,
             encoding=codec,
-            float_precision=prec
+            float_precision=prec,
+            comment=comment_line
         )
     elif use_cols is None:
         df = pd.read_csv(
@@ -350,7 +359,8 @@ def csv_parser(path, skip_lines, use_cols=None, col_names=None, codec='utf-8', p
             skiprows=skip_lines,
             names=col_names,
             encoding=codec,
-            float_precision=prec
+            float_precision=prec,
+            comment=comment_line
         )
     elif col_names is None:
         df = pd.read_csv(
@@ -359,7 +369,8 @@ def csv_parser(path, skip_lines, use_cols=None, col_names=None, codec='utf-8', p
             skiprows=skip_lines,
             usecols=use_cols,
             encoding=codec,
-            float_precision=prec
+            float_precision=prec,
+            comment=comment_line
         )
     else:
         df = pd.read_csv(
@@ -369,7 +380,8 @@ def csv_parser(path, skip_lines, use_cols=None, col_names=None, codec='utf-8', p
             usecols=use_cols,
             names=col_names,
             encoding=codec,
-            float_precision=prec
+            float_precision=prec,
+            comment=comment_line
         )
     # Make sure to clean up all trailing spaces for all columns
     for col in df.columns:
@@ -524,6 +536,8 @@ class InvObj:
             self.swr_lex = self.parse_swr()  # Solid waste release dictionary
         if self.inv_args.reroute is not None:
             self.red_lex = self.parse_red()  # Rerouted waste releases dictionary
+        if self.inv_args.site_specific is not None:
+            self.ssi_lex = self.parse_ssi()         # Site specific dictionary
         if self.inv_args.cleaninv is not None:
             self.sac_lex = self.parse_sac()  # SAC liquid-only inventory
         if self.inv_args.cheminv is not None:
@@ -675,6 +689,18 @@ class InvObj:
             write_str = "{:<40}" + len(copc_list) * "{:10}"
             site += ':'
             logging.info(write_str.format(site, *copc_list))
+        return new_lex
+
+    def parse_ssi(self):
+        """
+        Header lines with a "#" sign will be skipped.
+        Expects a CSV file with at least 3 columns: SITE_NAME, YEAR, [COPC]
+        The column headers are read in a case-insensitive way, but the names should be maintained (replacing the [COPC]
+        as-applicable for the circumstance). Extra columns may be added for additional COPC's as-necessary (no limit).
+        :return:
+        """
+        new_lex = {}
+
         return new_lex
 
     def parse_sac(self):
