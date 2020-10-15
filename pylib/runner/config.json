@@ -170,7 +170,7 @@
 
 		{
 
-		"name":"Surface Rate Interpolator", "command":"surf_rate_interp_win_intel_64.exe", "description":"qualified on 05.20.2020; This tool takes STOMP output or other time series data with similar format and extrapolates the time series into a uniform yearly format"
+		"name":"Surface Rate Interpolator", "command":"surf_rate_interp_win_intel_64.exe", "description":"v1.1 qualified on 10.15.2020; This tool takes STOMP output or other time series data with similar format and extrapolates the time series into a uniform yearly format; v1.1 updates include command line execution and stepwise functionality"
 
 		},
 
