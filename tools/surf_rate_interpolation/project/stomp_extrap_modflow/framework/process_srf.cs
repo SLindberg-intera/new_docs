@@ -25,23 +25,6 @@ namespace stomp_extrap_modflow.framework
         public void process_header(string fileName,char delim)
         {
             IEnumerable<string> lines = new List<string>();
-            try
-            {
-                lines = File.ReadLines(fileName);
-            }
-            catch (IOException)
-            {
-                // Initializes the variables to pass to the MessageBox.Show method.
-                string message = "Cannot open file ("+fileName+")."+ Environment.NewLine + Environment.NewLine + "The file may already be open by another application or user.";
-                string caption = "Error Detected in Input";
-                MessageBoxButton buttons = MessageBoxButton.OK;
-
-                // Displays the MessageBox.
-                MessageBox.Show(message, caption, buttons);
-                line_header1 = null;
-                line_header2 = null;
-                return;
-            }
             int i = 1;
             bool h1_set = false;
             bool h2_set = false;
@@ -53,99 +36,118 @@ namespace stomp_extrap_modflow.framework
             string[] last_line2 = new string[1];
             line_header1 = null;
             line_header2 = null;
-            foreach(string line in lines)
+            try
             {
-                string temp = remove_extra_spaces(line.Trim(' '));
-                if (h1_set && line_header1 == null)
+                lines = File.ReadLines(fileName);
+                foreach (string line in lines)
                 {
-                    if (i == h1)
+                    string temp = remove_extra_spaces(line.Trim(' '));
+                    if (h1_set && line_header1 == null)
                     {
-                        last_line1 = temp.Split(new[] { delim }, StringSplitOptions.None);
-                    }
+                        if (i == h1)
+                        {
+                            last_line1 = temp.Split(new[] { delim }, StringSplitOptions.None);
+                        }
 
-                }
-                //else if (h1 == 0 && line.Length > 5)
-                //{
+                    }
+                    //else if (h1 == 0 && line.Length > 5)
+                    //{
 
 
-                //    //if (line.Trim(' ').Substring(0, 5).ToLower() == "time " || line.Trim(' ').Substring(0, 5).ToLower() == "year ")
-                //    //{
-                //    //string temp = remove_extra_spaces(line.Trim(' '));
-                //    line_header1 = temp.Split(new[] { delim }, StringSplitOptions.None);
-                //    h1 = i;
-                //    h2 = i + 1;
-                //    //}
-                //}
-                else if (h2_set)
-                {
-                    if (i == h2)
+                    //    //if (line.Trim(' ').Substring(0, 5).ToLower() == "time " || line.Trim(' ').Substring(0, 5).ToLower() == "year ")
+                    //    //{
+                    //    //string temp = remove_extra_spaces(line.Trim(' '));
+                    //    line_header1 = temp.Split(new[] { delim }, StringSplitOptions.None);
+                    //    h1 = i;
+                    //    h2 = i + 1;
+                    //    //}
+                    //}
+                    else if (h2_set)
                     {
-                        last_line2 = temp.Split(new[] { delim }, StringSplitOptions.None);
-                        break;
+                        if (i == h2)
+                        {
+                            last_line2 = temp.Split(new[] { delim }, StringSplitOptions.None);
+                            break;
+                        }
                     }
-                }
-                ////else if (h1 > 0 && h2 == 0 && line.Length > 5)
-                //else if (h2 == i)
-                //{
+                    ////else if (h1 > 0 && h2 == 0 && line.Length > 5)
+                    //else if (h2 == i)
+                    //{
 
-                //    if (line.Trim(' ').Substring(0,1) == "[")
-                //    {
-                //        line_header2 = temp.Split(new[] { delim }, StringSplitOptions.None);
-                //        h2 = i;
-                //    }
-                //}
-                else
-                {
-                    // if the line has data then we have passed the headers
-                    if (_regex.IsMatch(temp.Split(new[] { delim }, StringSplitOptions.None)[0]) && _regex.IsMatch(temp.Split(new[] { delim }, StringSplitOptions.None)[1]))
-                    {
-                        
-                        break;
-                    }
-                    //check if there is a first line yet. if not set it
-                    else if (last_line1.Length < 2)
-                    {
-                        last_line1 = temp.Split(new[] { delim }, StringSplitOptions.None);
-                        h1 = i;
-                    }
-                    //if first line exists check if the second line has be set.
-                    else if (last_line2.Length < 2)
-                    {
-                        last_line2 = temp.Split(new[] { delim }, StringSplitOptions.None);
-                        h2 = i;
-                    }
-                    
-                    //As the new line is not data, move line2 to line1 and set line2 as the current line.
+                    //    if (line.Trim(' ').Substring(0,1) == "[")
+                    //    {
+                    //        line_header2 = temp.Split(new[] { delim }, StringSplitOptions.None);
+                    //        h2 = i;
+                    //    }
+                    //}
                     else
                     {
-                        if (last_line1[0].ToLower() != "time")
+                        // if the line has data then we have passed the headers
+                        if (_regex.IsMatch(temp.Split(new[] { delim }, StringSplitOptions.None)[0]) && _regex.IsMatch(temp.Split(new[] { delim }, StringSplitOptions.None)[1]))
                         {
-                            last_line1 = last_line2;
-                            h1 = i - 1;
+
+                            break;
                         }
-                        last_line2 = temp.Split(new[] { delim }, StringSplitOptions.None);
-                        h2 = i;
+                        //check if there is a first line yet. if not set it
+                        else if (last_line1.Length < 2)
+                        {
+                            last_line1 = temp.Split(new[] { delim }, StringSplitOptions.None);
+                            h1 = i;
+                        }
+                        //if first line exists check if the second line has be set.
+                        else if (last_line2.Length < 2)
+                        {
+                            last_line2 = temp.Split(new[] { delim }, StringSplitOptions.None);
+                            h2 = i;
+                        }
+
+                        //As the new line is not data, move line2 to line1 and set line2 as the current line.
+                        else
+                        {
+                            if (last_line1[0].ToLower() != "time")
+                            {
+                                last_line1 = last_line2;
+                                h1 = i - 1;
+                            }
+                            last_line2 = temp.Split(new[] { delim }, StringSplitOptions.None);
+                            h2 = i;
+                        }
                     }
+                    i++;
                 }
-                i++;
+                if (last_line1.Length < 2)
+                {
+                    line_header1 = new string[0];
+                }
+                else
+                {
+                    line_header1 = last_line1;
+                }
+                if (last_line2.Length < 2)
+                {
+                    line_header2 = new string[0];
+                }
+                else
+                {
+                    line_header2 = last_line2;
+                }
             }
-            if (last_line1.Length < 2 )
+            catch (Exception ex)
             {
-                line_header1 = new string[0];
-            }
-            else
-            {
-                line_header1 = last_line1;
-            }
-            if (last_line2.Length < 2)
-            {
-                line_header2 = new string[0];
-            }
-            else
-            {
-                line_header2 = last_line2;
+                // Initializes the variables to pass to the MessageBox.Show method.
+                string message = "Cannot open file ("+fileName+")."+ Environment.NewLine + Environment.NewLine + "The file may already be open by another application or user. \n Error: \n" + ex.HResult;
+                string caption = "Error Detected in Input";
+                MessageBoxButton buttons = MessageBoxButton.OK;
+
+                // Displays the MessageBox.
+                MessageBox.Show(message, caption, buttons);
+                line_header1 = null;
+                line_header2 = null;
+                return;
             }
 
+            
+            
         }
 
         public void process_file(string fileName,  char delim)
@@ -158,8 +160,8 @@ namespace stomp_extrap_modflow.framework
             int row = 0;
             int line_num = 0;
             //DataTable data = new DataTable();
-            IEnumerable<string> lines = File.ReadLines(fileName);
-            foreach (var x in lines)
+            //IEnumerable<string> lines = File.ReadLines(fileName);
+            foreach (var x in File.ReadLines(fileName))
             {
                 line_num++;
                 string line = remove_extra_spaces(x.Trim(' '));

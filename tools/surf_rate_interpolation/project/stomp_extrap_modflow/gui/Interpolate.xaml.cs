@@ -99,11 +99,11 @@ namespace stomp_extrap_modflow.gui
                         {
                             columns temp = new columns();
                             temp.column_num = i + 1;
-                            if (header2 != null && header2.Length > i)
-                                temp.title = String.Format("{0} {1}", header1[i], header2[i]);
-                            else
-                                temp.title = header1[i];
-
+                            //if (header2 != null && header2.Length > i)
+                            //    temp.title = String.Format("{0} {1}", header1[i], header2[i]);
+                            //else
+                            //    temp.title = header1[i];
+                            temp.title = header1[i];
 
                             temp.definition = "";
                             temp.conv_factor = 1;
@@ -194,11 +194,16 @@ namespace stomp_extrap_modflow.gui
                     srf.process_file(fileName, delim);
                     //srf.data = srf.data;
                     bool useCum = false;
+                    bool stepwise = false;
                     if (ckbx_cumulative.IsChecked == true)
                     {
                         useCum = true;
                     }
-                    interp.convert_time_yearly(srf.data, colSet.column_def, useCum);
+                    if (ckbx_stepwise.IsChecked == true)
+                    {
+                        stepwise = true;
+                    }
+                    interp.convert_time_yearly(srf.data, colSet.column_def, useCum, stepwise);
 
                     //outfile.build_ecf(interp.year_data, interp.f_data, path);
                     //outfile.build_yearly_csv_by_def(interp.year_data, path, "\t");
