@@ -188,7 +188,7 @@ def clean_df(df, drop_cols, val_col=None):
     return df
 
 
-def legacy_col_formatter(col_str, year_col=None, water_col=None):
+def legacy_col_formatter(col_str, year_col=None, water_col=None, site_col=None, source_col=None):
     """
     Reformats the column header to be the expected format for the legacy script to function properly. Example:
         Input (inside quotes):  "SR-90(ci/year)"
@@ -196,13 +196,19 @@ def legacy_col_formatter(col_str, year_col=None, water_col=None):
     Also reformats header columns 
     :param col_str:     The column header string to be reformatted
     :param year_col:    The year column has a specific designation in the legacy tool: Discharge/decay-corrected year
-    :param water_col:   The water column is also specific in the legacy tool:
+    :param water_col:   The water column is also specific in the legacy tool: Volume [m3]
+    :param site_col:    Legacy tool expects a site column named: CA Site Name
+    :param source_col:  Legacy tool expects a source column named: Source Type
     :return:
     """
     if year_col is True:
         new_col, units = 'Discharge/decay-corrected year', 'year'
     elif water_col is True:
         new_col, units = 'Volume [m3]', 'm^3'
+    elif site_col is True:
+        new_col, units = 'CA Site Name', ''
+    elif source_col is True:
+        new_col, units = 'Source Type', ''
     else:
         col_str = col_str.lower()
         # Strip out the unwanted characters
@@ -210,7 +216,6 @@ def legacy_col_formatter(col_str, year_col=None, water_col=None):
         # Split and capitalize, but don't capitalize the string if it is "kg"
         new_col, units = [substr.capitalize() if substr != 'kg' else substr for substr in col_str.split('(')]
     return new_col, units
-
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -966,9 +971,39 @@ def write_legacy_output(df, write_path):
     # Add a new row to the dataframe for the unit row
     df.index += 1
     df.loc[0, :] = ''
-    col_order = list(df.columns())
+    df.sort_index(axis=0, ascending=True, inplace=True)
     # Add new columns and assign appropriate values
-
+    # Rename the columns to match the legacy formatting
+    for col in df.columns:
+        if col == 'Source':
+            legacy_col, units_val = legacy_col_formatter(col, source_col=True)
+        elif 'year' == col:
+            legacy_col, units_val = legacy_col_formatter(col, year_col=True)
+        elif 'WATER(m^3/year)' == col:
+            legacy_col, units_val = legacy_col_formatter(col, water_col=True)
+        elif 'SITE_NAME' == col:
+            legacy_col, units_val = legacy_col_formatter(col, site_col=True)
+        else:
+            legacy_col, units_val = legacy_col_formatter(col)
+        df.loc[0, col] = units_val
+        df.rename(columns={col: legacy_col}, inplace=True)
+    # With the new names, pull the column order of the dataframe before adding new columns
+    col_order = list(df.columns)
+    col_order = ['Inventory Module', 'SIMV2 site name', 'CA Site Name', 'Source Type', 'Discharge/decay-corrected year'] + col_order[3:]
+    df['SIMV2 site name'] = ''
+    df['Inventory Module'] = df['Source Type']
+    # Rename source column
+    for val in df['Source Type'].unique():
+        if 'Solid-Waste-Release' == val.lower():
+            df.loc[df['Source Type'] == val, 'Source Type'] = 'Solid Release Series'
+        elif val == '':
+            continue
+        else:
+            df.loc[df['Source Type'] == val, 'Source Type'] = 'Liquid'
+    with open(write_path, 'w+') as write_file:
+        write_file.write('# Header String\n' * 11)
+    df[col_order].to_csv(path_or_buf=out_file, index=False, mode='a')
+    return
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -998,4 +1033,5 @@ if __name__ == '__main__':
     if args.legacy is False:
         ipp_df.to_csv(path_or_buf=out_file, index=False)
     else:
+        logging.info('##Formatting output to work with LEGACY tool')
         write_legacy_output(ipp_df, out_file)
