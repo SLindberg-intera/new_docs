@@ -14,12 +14,12 @@ using System.Windows;
 //using System.Windows.Media.Imaging;
 //using System.Windows.Navigation;
 //using System.Windows.Shapes;
-//using stomp_extrap_modflow.framework;
+using surf_rate_interp.framework;
 using stomp_extrap_modflow.gui;
+using surf_rate_interp.gui;
 //using stomp_extrap_modflow.data;
 //using Microsoft.WindowsAPICodePack.Dialogs;
 //using System.Text.RegularExpressions;
-
 namespace stomp_extrap_modflow
 {
     /// <summary>
@@ -35,6 +35,13 @@ namespace stomp_extrap_modflow
         {
             InitializeComponent();
             winFrame.Content = interp_win;
+        }
+        public MainWindow(string config)
+        {
+            InitializeComponent();
+            menu.Visibility = Visibility.Hidden;
+            config_interp config_interp = new config_interp(config);
+            winFrame.Content = config_interp;
         }
         private void load_interpolate_page(object sender, RoutedEventArgs e)
         {

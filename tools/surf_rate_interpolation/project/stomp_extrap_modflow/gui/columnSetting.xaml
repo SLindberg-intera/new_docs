@@ -3,7 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:stomp_extrap_modflow.gui"
+      xmlns:local="clr-namespace:surf_rate_interp.gui"
       mc:Ignorable="d" 
      
       Title="columnSetting">
@@ -43,7 +43,7 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <local:DataGriddecimalColumn IsReadOnly="false" x:Name="col5" Header="Conv. F." Binding="{Binding conv_factor}" Width="50" MaxWidth="50" ></local:DataGriddecimalColumn>
+                <local:DataGriddecimalColumn IsReadOnly="false" x:Name="col5" Header="Conv. F." Binding="{Binding conv_factor}" Width="50" MaxWidth="50" />
             </DataGrid.Columns>
         </DataGrid>
         
