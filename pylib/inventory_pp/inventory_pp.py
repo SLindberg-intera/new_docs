@@ -139,6 +139,10 @@ def is_integer(mystr):
         return False
 
 
+def has_digit(mystr):
+    return any(char.isdigit() for char in mystr)
+
+
 def normalize_col_names(old_col, water_col=None, chm_col=False):
     """
     :param old_col:     Old column name to change
@@ -149,7 +153,7 @@ def normalize_col_names(old_col, water_col=None, chm_col=False):
     # For radionuclide waste columns
     if water_col is None and chm_col is False:
         new_copc = old_col.replace(' (decay only)', '').upper()
-        new_col = '{}(ci/year)'.format(new_copc)
+        new_col = '{}(Ci/year)'.format(new_copc)
     # For chemical waste columns
     elif chm_col:
         new_copc = old_col.replace('-Total', '').replace(' [kg]', '').upper()
@@ -160,7 +164,7 @@ def normalize_col_names(old_col, water_col=None, chm_col=False):
     return new_copc, new_col
 
 
-def clean_df(df, drop_cols, val_col=None):
+def clean_df(df, drop_cols, val_col=None, group_col='YEAR'):
     """
     Removes the unwanted columns, and "NAN" records.
     This will NOT take into account whether all of your records are kept. If a "NAN"  cell is present in the row,
@@ -170,6 +174,7 @@ def clean_df(df, drop_cols, val_col=None):
     :param df:          Dataframe to be cleaned
     :param drop_cols:   "List" data type containing strings representing column names
     :param val_col:     String of the column name to filter out rows with a value of zero
+    :param group_col:   The column by which to group, typically the temporal column is used to get unique x-y coordinate
     :return:
     """
     try:
@@ -179,8 +184,10 @@ def clean_df(df, drop_cols, val_col=None):
     except TypeError:
         raise TypeError("This function expects a dataframe with an iterable")
         exit()
+    # Account for parsed files with dirty types (strings with numeric values in the same column)
+    df = df.apply(pd.to_numeric, errors='coerce')
     # Groupby years, then return as dataframe
-    df = pd.DataFrame(df.groupby(by='year', as_index=False).sum())
+    df = pd.DataFrame(df.groupby(by=group_col, as_index=False).sum())
     # Remove rows with value of zero
     if val_col is not None and val_col in df.columns:
         df = df.loc[df[val_col] > 0, :].copy(deep=True)
@@ -191,7 +198,7 @@ def clean_df(df, drop_cols, val_col=None):
 def legacy_col_formatter(col_str, year_col=None, water_col=None, site_col=None, source_col=None):
     """
     Reformats the column header to be the expected format for the legacy script to function properly. Example:
-        Input (inside quotes):  "SR-90(ci/year)"
+        Input (inside quotes):  "SR-90(Ci/year)"
         Output (2 strings):     "Sr-90", "Ci"
     Also reformats header columns 
     :param col_str:     The column header string to be reformatted
@@ -292,7 +299,9 @@ parser.add_argument('--COPC',
                         'CN'
                     ],
                     help='This flag allows you to define which constituents/analytes to include in the check.\n'
-                         'Separate each COPC by spaces after calling the flag.'
+                         'Separate each COPC by spaces after calling the flag. When specifying water, accepted names\n'
+                         'include: water, volume, and liquid (case-insensitive). This will ensure the right units\n'
+                         'are assigned [m^3].'
                     )
 parser.add_argument('-o', '--output',
                     dest='output',
@@ -448,7 +457,7 @@ def stomp_format_parser(path, skip_pattern='241-[^Cc]'):
                 if re.match(skip_pattern, site) is not None:
                     skip_sites.append(site)
                     continue
-                df = pd.DataFrame(data_series, columns=['year', 'WATER(m^3/year)'])
+                df = pd.DataFrame(data_series, columns=['YEAR', 'WATER(m^3/year)'])
                 # Add a source column to the dataframe
                 df['Source'] = "SAC-Water"
                 new_lex[site] = {'WATER': df}
@@ -486,17 +495,18 @@ def combine_lex(lex1, lex2, level='year', exclude=None, return_site_list=False):
     if exclude is None:
         exclude = []
     used_sites = []
-    for site in lex1:
+    for site in lex2:
         if site in exclude:
             continue
-        # If there is information from the source being added for the site in question...
-        if site in lex2:
+        # Add information to the dictionary if it is in the accepted site list (lex1.keys()
+        if site in lex1.keys():
             if level.lower() == 'site':
                 # If the site already has a COPC list, then don't add any information. If no COPC's are included, add
                 # the information available
                 if len(lex1[site].keys()) > 0:
                     continue
                 else:
+                    used_sites.append(site)
                     for copc in lex2[site].keys():
                         lex1[site][copc] = lex2[site][copc]
             elif level.lower() == 'year':
@@ -509,7 +519,7 @@ def combine_lex(lex1, lex2, level='year', exclude=None, return_site_list=False):
                         # of information. WILL NOT OVERWRITE INFORMATION FROM PREVIOUS SOURCES!!
                         df1 = deepcopy(lex1[site][copc])
                         df2 = deepcopy(lex2[site][copc])
-                        df3 = df2.loc[~df2['year'].isin(df1['year']), :]
+                        df3 = df2.loc[~df2['YEAR'].isin(df1['YEAR']), :]
                         df1 = pd.concat([df1, df3], ignore_index=True)
                         lex1[site][copc] = df1
     logging.info("Site information included from data package: \n{}".format('\n'.join(sorted(used_sites))))
@@ -523,10 +533,10 @@ class InvObj:
     def __init__(self, user_args):
         self.inv_args = deepcopy(user_args)  # User arguments passed from namespace as namespace
         if hasattr(self.inv_args, "copcs"):  # Make all copc's uppercase for consistency
-            self.inv_args.copcs = [c.upper() for c in self.inv_args.copcs] + ['WATER']
+            self.inv_args.copcs = [c.upper() for c in self.inv_args.copcs]
         self.vz_sites = self.parse_vzehsit()  # Parse list of accepted waste sites as generator
         self.inv_lex = self.init_lex()  # Initialize final inventory dictionary
-        self.chm_cols = {  # Chemical columns (general match for input files, no uppercase)
+        self.chm_cols = {  # Chemical columns (general match for input files, no uppercase) ###TODO, make case-insensitive and reflect user-input, remove hard-coded list of chemicals
             'Cr',
             'NO3',
             'U',
@@ -604,7 +614,7 @@ class InvObj:
                 # Rename the columns to be consistent with the rest
                 new_copc, new_col = normalize_col_names(copc)
                 site_df[new_col] = site_df["Reduced Activity Release Rate (Ci/year)"]
-                site_df['year'] = site_df["Reduced Year"]
+                site_df['YEAR'] = site_df["Reduced Year"]
                 site_df = clean_df(site_df, ["Reduced Year", "Reduced Activity Release Rate (Ci/year)"], new_col)
                 # Add a source column to the dataframe
                 site_df['Source'] = "Solid-Waste-Release"
@@ -639,14 +649,14 @@ class InvObj:
             ca_site_col,
             'Source Type',
             year_col,
-            'year',
+            'YEAR',
         ]
         # Keep track of any sites that aren't part of VZEHSIT to pass to logger
         not_vzehsit = []
         for red_file in self.inv_args.reroute:
             df = csv_parser(red_file, skip_lines=[1])
             # Split by waste site and stream and store in dictionary
-            df['year'] = df[year_col]
+            df['YEAR'] = df[year_col]
             for copc in df.columns:
                 if copc in non_copcs:
                     continue
@@ -658,7 +668,7 @@ class InvObj:
                     for site in get_unique_vals(df, site_col):
                         if site not in self.inv_lex:
                             not_vzehsit.append(site)
-                        site_df = df.loc[df[site_col] == site, ['year', copc]].copy(deep=True)
+                        site_df = df.loc[df[site_col] == site, ['YEAR', copc]].copy(deep=True)
                         if copc == water_col:
                             new_copc, new_col = normalize_col_names(copc, water_col=water_col)
                         elif copc in self.chm_cols:
@@ -668,7 +678,7 @@ class InvObj:
                         site_df[new_col] = site_df[copc]
                         site_df = clean_df(site_df, [copc], new_col)
                         # Add a source column to the dataframe
-                        site_df['Source'] = "Rerouted-Site"
+                        site_df['Source'] = Path(red_file).stem
                         # Verify that there are records in the new dataframe, continue if empty dataframe
                         if len(site_df) == 0:
                             continue
@@ -697,10 +707,83 @@ class InvObj:
         Expects a CSV file with at least 3 columns: SITE_NAME, YEAR, [COPC]
         The column headers are read in a case-insensitive way, but the names should be maintained (replacing the [COPC]
         as-applicable for the circumstance). Extra columns may be added for additional COPC's as-necessary (no limit).
-        :return:
+        Note: water is considered a "waste" analyte. Name the water column the same as is had in the COPC list provided.
+        :return:    Dictionary with levels: new_lex[site][copc] = Pandas DataFrame
         """
         new_lex = {}
-
+        # Ignore the following columns when evaluating for copc's
+        site_keys = ['SITE_NAME', 'CIE SITE NAME', 'CA SITE NAME']
+        site_col = 'SITE_NAME'
+        year_keys = ['DISCHARGE/DECAY-CORRECTED YEAR', 'YEAR']
+        year_col = 'YEAR'
+        water_keys = ['WATER', 'VOLUME', 'LIQUID']
+        # Keep track of any sites that aren't part of VZEHSIT to pass to logger
+        not_vzehsit = []
+        for ssi_file in self.inv_args.site_specific:
+            df = csv_parser(ssi_file, skip_lines=None)
+            df.columns = map(str.upper, df.columns)
+            # Get the site column, default is 'SITE_NAME'
+            if site_col not in df.columns:
+                for key in site_keys:
+                    if key in df.columns:
+                        site_col = key
+                        break
+            if year_col not in df.columns:
+                for key in year_keys:
+                    if key in df.columns:
+                        year_col = key
+                        break
+            for site in get_unique_vals(df, site_col):
+                # Make sure the site is in the accepted list
+                if site not in self.inv_lex:
+                    not_vzehsit.append(site)
+                    continue
+                for copc in [col for col in df.columns if col != site_col and col != year_col]:
+                    # Verify whether the copc is a water column
+                    water_col = None
+                    for keyword in water_keys:
+                        if keyword in copc:
+                            water_col = copc
+                            break
+                    # Process if the copc is the water column or if it is an accepted COPC
+                    if (copc not in self.inv_args.copcs) and (water_col is None):
+                        continue
+                    site_df = df.loc[df[site_col] == site, [year_col, copc]].copy(deep=True)
+                    if water_col is not None:
+                        new_copc, new_col = normalize_col_names(copc, water_col=water_col)
+                    elif copc in self.chm_cols:
+                        new_copc, new_col = normalize_col_names(copc, chm_col=True)
+                    else:
+                        new_copc, new_col = normalize_col_names(copc)
+                    site_df[new_col] = site_df[copc]
+                    # Make the year column uniform if not already
+                    if 'YEAR' != year_col:
+                        site_df['YEAR'] = site_df[year_col]
+                        site_df = clean_df(df=site_df, drop_cols=[copc, year_col], val_col=new_col, group_col='YEAR')
+                    else:
+                        site_df = clean_df(df=site_df, drop_cols=[copc], val_col=new_col, group_col=year_col)
+                    # Add a source column to the dataframe
+                    site_df['Source'] = Path(ssi_file).stem
+                    # Verify that there are records in the new dataframe, continue if empty dataframe
+                    if len(site_df) == 0:
+                        continue
+                    if site in new_lex:
+                        new_lex[site][new_copc] = site_df
+                    else:
+                        new_lex[site] = {
+                            new_copc: site_df
+                        }
+            if len(not_vzehsit) > 0:
+                logging.debug("##Site-Specific-Source sites NOT in VZEHSIT:")
+                for site in not_vzehsit:
+                    logging.debug("{}".format(site))
+            logging.info("##Site-Specific-Source Sites:")
+            logging.info("{:<40}{:<40}".format("Waste Site:", "[Listing of routed waste streams]"))
+            for site in new_lex:
+                copc_list = list(new_lex[site].keys())
+                write_str = "{:<40}" + len(copc_list) * "{:10}"
+                site += ':'
+                logging.info(write_str.format(site, *copc_list))
         return new_lex
 
     def parse_sac(self):
@@ -712,8 +795,9 @@ class InvObj:
         unused_sac_sites = set(sac_lex.keys()) - set(new_lex.keys())
         logging.info("##Total number of sites included from SAC: {}".format(len(new_lex)))
         logging.info("##Sites with data in SAC not present in VZEHSIT ({}):".format(len(unused_sac_sites)))
-        for site in sorted(unused_sac_sites):
-            logging.info(site)
+        logging.info('{}'.format('\n'.join(sorted(unused_sac_sites))))
+        # for site in sorted(unused_sac_sites):
+        #     logging.info(site)
         return new_lex
 
     def parse_chm(self):
@@ -739,7 +823,7 @@ class InvObj:
                     if site.upper() not in self.inv_lex:
                         not_vzehsit.append(site.upper())
                     site_df = df.loc[df[site_col] == site, [year_col, copc]].copy(deep=True)
-                    site_df.rename(columns={year_col: 'year'}, inplace=True)
+                    site_df.rename(columns={year_col: 'YEAR'}, inplace=True)
                     # Normalize the column names
                     if copc == water_col:
                         new_copc, new_col = normalize_col_names(copc, water_col=water_col)
@@ -806,7 +890,7 @@ class InvObj:
                         continue
                     # Filter by waste site, waste stream, exclude waste_type = solid if site in solid waste release list
                     site_df = df.loc[df[site_col] == site, [year_col, copc]].copy(deep=True)
-                    site_df['year'] = site_df[year_col]
+                    site_df['YEAR'] = site_df[year_col]
                     if copc == water_col:
                         new_copc, new_col = normalize_col_names(copc, water_col=water_col)
                     else:
@@ -840,24 +924,31 @@ class InvObj:
         # against the ca-ipp output file (comparison done in another function, not included in this class)
         # The order is essential for this given the functional requirements listed at the header of this file. The order
         # for adding the parsed information is as follows:
-        #   1.  Rerouted Inventory  (red_lex)
-        #   2.  Solid Waste Release (swr_lex)
-        #   3.  SIMV2 Inventory     (sim_inv)
-        #   4.  Chemical Inventory  (chm_lex)
-        #   4.  SAC Water Inventory (sac_lex)
+        #   1.  Site-Specific       (ssi_lex)
+        #   2.  Rerouted Inventory  (red_lex)
+        #   3.  Solid Waste Release (swr_lex)
+        #   4.  SIMV2 Inventory     (sim_inv)
+        #   5.  Chemical Inventory  (chm_lex)
+        #   6.  SAC Water Inventory (sac_lex)
         final_lex = self.inv_lex
+        exclude_sites = []
+        if hasattr(self, "ssi_lex"):
+            logging.info('##Merging Site-Specific-Inventory Sites into final dictionary')
+            final_lex, used_sites = combine_lex(final_lex, self.ssi_lex, return_site_list=True)
+            exclude_sites += used_sites
         if hasattr(self, "red_lex"):
             logging.info('##Merging Rerouted Sites into final dictionary')
-            final_lex, red_sites = combine_lex(final_lex, self.red_lex, return_site_list=True)
+            final_lex, used_sites = combine_lex(final_lex, self.red_lex, level='site', exclude=exclude_sites, return_site_list=True)
+            exclude_sites += used_sites
         if hasattr(self, "swr_lex"):
             logging.info('##Merging SWR into final dictionary')
-            final_lex = combine_lex(final_lex, self.swr_lex, exclude=red_sites)
+            final_lex = combine_lex(final_lex, self.swr_lex, exclude=exclude_sites)
         if hasattr(self, "sim_lex"):
             logging.info('##Merging SIMV2 into final dictionary')
-            final_lex = combine_lex(final_lex, self.sim_lex, exclude=red_sites)
+            final_lex = combine_lex(final_lex, self.sim_lex, exclude=exclude_sites)
         if hasattr(self, "chm_lex"):
             logging.info('##Merging Chemical Inventory into final dictionary')
-            final_lex = combine_lex(final_lex, self.chm_lex, exclude=red_sites)
+            final_lex = combine_lex(final_lex, self.chm_lex, exclude=exclude_sites)
         if hasattr(self, "sac_lex"):
             logging.info('##Merging SAC into final dictionary')
             final_lex = combine_lex(final_lex, self.sac_lex, level='site')
@@ -915,21 +1006,21 @@ def build_inventory_df(inv_dict, copc_list):
         logging.info(site_log)
         site_df = pd.DataFrame()
         for copc in copcs:
-            if 'year' not in site_df.columns:
+            if 'YEAR' not in site_df.columns:
                 site_df = pd.concat([site_df, inv_dict[site][copc]], sort=True)
             else:
-                site_df = site_df.merge(inv_dict[site][copc], on='year', sort=True, how='outer')
+                site_df = site_df.merge(inv_dict[site][copc], on='YEAR', sort=True, how='outer')
                 if 'Source_x' in site_df.columns and 'Source_y' in site_df.columns:
                     site_df['Source_x'] = site_df['Source_x'].fillna(value=' ')
                     site_df['Source_y'] = site_df['Source_y'].fillna(value=' ')
-                    site_df['Source_x'] = site_df['Source_x'].str.cat(site_df['Source_y'], sep='_')
-                    site_df['Source'] = site_df['Source_x'].str.replace('_ ', '').str.replace(' _', '')
+                    site_df['Source_x'] = site_df['Source_x'].str.cat(site_df['Source_y'], sep='|')
+                    site_df['Source'] = site_df['Source_x'].str.replace('| ', '').str.replace(' |', '')
                     # Drop the excess columns
                     site_df.drop(columns=['Source_x', 'Source_y'], inplace=True)
         site_df['SITE_NAME'] = site
         df = pd.concat([df, site_df], sort=False)
     # Simplify the "Source" column by removing duplicates
-    df['Source'] = df['Source'].apply(lambda x: '_'.join(set(x.split('_'))))
+    df['Source'] = df['Source'].apply(lambda x: '_'.join(sorted(set(x.split('|')))))
     # Format the columns based on the user's column list (in order)
     use_copcs = [copc for copc in copc_list if copc.upper() in fin_copcs]
     # Log whether all COPC's made it into the final list
@@ -958,7 +1049,7 @@ def build_inventory_df(inv_dict, copc_list):
         else:
             logging.critical(
                 "The following copc provided cannot be matched with the dataframe column set: {}".format(copc))
-    col_order = ['Source', 'SITE_NAME', 'year'] + copc_cols
+    col_order = ['Source', 'SITE_NAME', 'YEAR'] + copc_cols
     df = df[col_order]
     # Reset index of dataframe
     df.reset_index(drop=True, inplace=True)
@@ -1003,7 +1094,7 @@ def write_legacy_output(df, write_path):
     for col in df.columns:
         if col == 'Source':
             legacy_col, units_val = legacy_col_formatter(col, source_col=True)
-        elif 'year' == col:
+        elif 'YEAR' == col:
             legacy_col, units_val = legacy_col_formatter(col, year_col=True)
         elif 'WATER(m^3/year)' == col:
             legacy_col, units_val = legacy_col_formatter(col, water_col=True)
