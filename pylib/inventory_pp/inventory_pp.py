@@ -345,6 +345,27 @@ parser.add_argument('--legacy',
                     help='This option spans the code difference, producing an output compatible with the legacy\n'
                          'source-to-stomp tool written for the first iteration of the CA modeling effort.'
                     )
+parser.add_argument('--site_keys',
+                    dest='site_keys',
+                    nargs='+',
+                    type=str.upper,
+                    default=['SITE_NAME', 'CIE SITE NAME', 'CA SITE NAME'],
+                    help='This provides default keys for possible site-naming conventions used in the files to be read.'
+                    )
+parser.add_argument('--year_keys',
+                    dest='year_keys',
+                    nargs='+',
+                    type=str.upper,
+                    default=['DISCHARGE/DECAY-CORRECTED YEAR', 'YEAR'],
+                    help='This provides default keys for possible year columns used in the files to be read.'
+                    )
+parser.add_argument('--water_keys',
+                    dest='water_keys',
+                    nargs='+',
+                    type=str.upper,
+                    default=['WATER', 'VOLUME', 'LIQUID', 'VOLUME [KG]'],
+                    help='This provides default keys for possible water columns used in the files to be read.'
+                    )
 args = parser.parse_args()
 
 
@@ -676,12 +697,8 @@ class InvObj:
 
     def parse_red(self):
         new_lex = {}
-        # Provide options for files to use different header names for some columns
-        site_keys = ['SITE_NAME', 'CIE SITE NAME', 'CA SITE NAME']
         site_col = 'SITE_NAME'
-        year_keys = ['DISCHARGE/DECAY-CORRECTED YEAR', 'YEAR']
         year_col = 'YEAR'
-        water_keys = ['WATER', 'VOLUME', 'LIQUID']
         # Columns to ignore while parsing
         non_copcs = [
             'INVENTORY MODULE',
@@ -695,13 +712,13 @@ class InvObj:
             df.columns = map(str.upper, df.columns)
             # Select the appropriate site and year columns
             if site_col not in df.columns:
-                for key in site_keys:
+                for key in self.inv_args.site_keys:
                     if key in df.columns:
                         site_col = key
                         non_copcs.append(key)
                         break
             if year_col not in df.columns:
-                for key in year_keys:
+                for key in self.inv_args.year_keys:
                     if key in df.columns:
                         year_col = key
                         non_copcs.append(key)
@@ -714,7 +731,7 @@ class InvObj:
                 for copc in [col for col in df.columns if col not in non_copcs]:
                     # Verify whether the copc is a water column
                     water_col = None
-                    for keyword in water_keys:
+                    for keyword in self.inv_args.water_keys:
                         if keyword in copc:
                             water_col = copc
                             break
@@ -772,12 +789,8 @@ class InvObj:
         :return:    Dictionary with levels: new_lex[site][copc] = Pandas DataFrame
         """
         new_lex = {}
-        # Provide options for files to use different header names for some columns
-        site_keys = ['SITE_NAME', 'CIE SITE NAME', 'CA SITE NAME']
         site_col = 'SITE_NAME'
-        year_keys = ['DISCHARGE/DECAY-CORRECTED YEAR', 'YEAR']
         year_col = 'YEAR'
-        water_keys = ['WATER', 'VOLUME', 'LIQUID']
         # Keep track of any sites that aren't part of VZEHSIT to pass to logger
         not_vzehsit = []
         for ssi_file in self.inv_args.site_specific:
@@ -785,12 +798,12 @@ class InvObj:
             df.columns = map(str.upper, df.columns)
             # Get the site column, default is 'SITE_NAME'
             if site_col not in df.columns:
-                for key in site_keys:
+                for key in self.inv_args.site_keys:
                     if key in df.columns:
                         site_col = key
                         break
             if year_col not in df.columns:
-                for key in year_keys:
+                for key in self.inv_args.year_keys:
                     if key in df.columns:
                         year_col = key
                         break
@@ -802,7 +815,7 @@ class InvObj:
                 for copc in [col for col in df.columns if col != site_col and col != year_col]:
                     # Verify whether the copc is a water column
                     water_col = None
-                    for keyword in water_keys:
+                    for keyword in self.inv_args.water_keys:
                         if keyword in copc:
                             water_col = copc
                             break
@@ -926,52 +939,86 @@ class InvObj:
         return new_lex
 
     def parse_chm(self):
-        # Take the CHEMINV work product file, parse as Pandas dataframe, then convert to
+        """
+        This method will parse the Chemical Inventory Work Product. It is expected to have at least 3 columns:
+        1.  Site name column [SITE_NAME]
+        2.  Year column [YEAR]
+        3.  COPC column
+        A water column can be identified with any one of the following keys: VOLUME, WATER, LIQUID
+        A site column can be identified with any one of the following keys: SITE_NAME, CIE SITE NAME, CA SITE NAME
+        COPC columns must be identified by the user in running this script (see the argument parser).
+        Known columns for exclusion include: Inventory Module, SIMV2 Site Name, and Source Type
+        :return:
+        """
+        new_lex = {}
         chm_path = self.inv_args.cheminv
-        site_col = 'CIE Site Name'
-        year_col = 'Year'
-        water_col = 'Volume Mean [m3]'
-        copc_cols = [
-            'U-Total [kg]',
-            'Cr [kg]',
-            'NO3 [kg]',
-            'CN [kg]',
-            water_col
+        # Provide options for files to use different header names for some columns
+        site_col = 'SITE_NAME'
+        year_col = 'YEAR'
+        water_col = 'WATER'
+        # Keep track of any sites that aren't part of VZEHSIT to pass to logger
+        not_vzehsit = []
+        site_counter = 0
+        # Columns to be excluded from the parse (if present)
+        exclude_cols = [
+            'INVENTORY MODULE',
+            'SIMV2 SITE NAME',
+            'SOURCE TYPE'
         ]
         df = csv_parser(chm_path, skip_lines=[], codec='utf-8')
         df.columns = map(str.upper, df.columns)
-        not_vzehsit = []
-        new_lex = {}
-        site_counter = 0
-        for copc in self.chm_cols:
-            if copc in copc_cols:
-                for site in get_unique_vals(df, site_col):
-                    if site.upper() not in self.inv_lex:
-                        not_vzehsit.append(site.upper())
-                    site_df = df.loc[df[site_col] == site, [year_col, copc]].copy(deep=True)
-                    site_df.rename(columns={year_col: 'YEAR'}, inplace=True)
-                    # Normalize the column names
-                    if copc == water_col:
-                        new_copc, new_col = normalize_col_names(copc, water_col=water_col)
-                    else:
-                        new_copc, new_col = normalize_col_names(copc, chm_col=True)
-                    site_df[new_col] = site_df[copc]
-                    site_df = clean_df(site_df, [copc], new_col)
-                    # Add a source column to the dataframe
-                    site_df['Source'] = "Chemical-Inventory"
-                    # Normalize the site name to only have upper case
-                    site = site.upper()
-                    if len(site_df) == 0:
-                        continue
-                    elif site_df[new_col].sum() == 0:
-                        continue
-                    if site in new_lex:
-                        new_lex[site][new_copc] = site_df
-                    else:
-                        site_counter += 1
-                        new_lex[site] = {
-                            new_copc: site_df
-                        }
+        # Get the site and year columns, default is 'SITE_NAME' and 'YEAR', respectively
+        if site_col not in df.columns:
+            for key in self.inv_args.site_keys:
+                if key in df.columns:
+                    site_col = key
+                    break
+        if year_col not in df.columns:
+            for key in self.inv_args.year_keys:
+                if key in df.columns:
+                    year_col = key
+                    break
+        # Find the water column
+        if water_col not in df.columns:
+            for key in self.inv_args.water_keys:
+                if key in df.columns:
+                    water_col = key
+        # Given that there may be some formatting differences, test for each column present, logging which columns
+        # are identified with each chemical COPC
+        chm_inv_cols = self.match_chm_cols(df.columns, exclude_cols)
+        for site in get_unique_vals(df, site_col):
+            if site.upper() not in self.inv_lex:
+                not_vzehsit.append(site.upper())
+            for copc in chm_inv_cols:
+                copc_col = chm_inv_cols[copc]
+                site_df = df.loc[df[site_col] == site, [year_col, copc_col]].copy(deep=True)
+                # Normalize the column names
+                if copc_col == water_col:
+                    new_copc, new_col = normalize_col_names(copc, water_col=water_col)
+                else:
+                    new_copc, new_col = normalize_col_names(copc, chm_col=True)
+                site_df[new_col] = site_df[copc_col]
+                # Make the year column uniform if not already
+                if 'YEAR' != year_col:
+                    site_df['YEAR'] = site_df[year_col]
+                    site_df = clean_df(df=site_df, drop_cols=[copc_col, year_col], val_col=new_col, group_col='YEAR')
+                else:
+                    site_df = clean_df(df=site_df, drop_cols=[copc_col], val_col=new_col, group_col=year_col)
+                # Add a source column to the dataframe
+                site_df['Source'] = "Chemical-Inventory"
+                # Normalize the site name to only have upper case
+                site = site.upper()
+                if len(site_df) == 0:
+                    continue
+                elif site_df[new_col].sum() == 0:
+                    continue
+                if site in new_lex:
+                    new_lex[site][new_copc] = site_df
+                else:
+                    site_counter += 1
+                    new_lex[site] = {
+                        new_copc: site_df
+                    }
         # Remove 'nan' values from list
         not_vzehsit = remove_nans(not_vzehsit)
         if len(not_vzehsit) > 0:
@@ -983,6 +1030,43 @@ class InvObj:
             logging.info("##Total number of CHEMINV Sites: {}".format(site_counter))
             logging.info("##All CHEMINV Sites are present in VZEHSIT")
         return new_lex
+
+    def match_chm_cols(self, chm_inv_cols, chm_exclude_cols):
+        """
+        Takes two lists and produces a matched set. If uranium is specified as "U" by the user, looking through the
+        chemical inventory file column names, it will attempt to match up with an appropriate column (e.g. U-Total [kg])
+        Matching methods are as follows:
+            1.  Attempt a direct match (e.g. 'U' in col_list = True)
+            2.  Verify that the COPC is not contained in each string (e.g. 'U' in 'U-Total [kg]' = True)
+                If more than one column matches, log an error and exit the program
+        :param chm_inv_cols:        The columns to be matched against the chemical COPC's
+        :param chm_exclude_cols:    The columns to be excluded if present in the list
+        :return:
+        """
+        matched_cols = {}
+        # Get rid of the columns that aren't to be included for the column matching
+        check_cols = list(set(chm_inv_cols).difference(set(chm_exclude_cols)))
+        for copc in self.chm_cols:
+            if copc in check_cols:
+                if copc in matched_cols:
+                    logging.critical("##Could not match the COPC to the right column, multiple columns found:")
+                    logging.critical(
+                        "{0} was found to match at least 2 columns (in single quotes: '{1}', and '{1}'".format(
+                            matched_cols[copc], copc))
+                    exit(1)
+                matched_cols[copc] = copc
+                continue
+            else:
+                for col in check_cols:
+                    if copc in col:
+                        if copc in matched_cols:
+                            logging.critical("##Could not match the COPC to the right column, multiple columns found:")
+                            logging.critical(
+                                "{0} was found to match at least 2 columns (in single quotes: '{1}', and '{1}'".format(
+                                    matched_cols[copc], copc))
+                            exit(1)
+                        matched_cols[copc] = col
+        return matched_cols
 
     def parse_sim(self):
         new_lex = {}
@@ -1017,7 +1101,7 @@ class InvObj:
                     if site.upper() not in self.inv_lex:
                         not_vzehsit.append(site.upper())
                         continue
-                    # Filter by waste site, waste stream, exclude waste_type = solid if site in solid waste release list
+                    # Filter by waste site, waste stream
                     site_df = df.loc[df[site_col] == site, [year_col, copc]].copy(deep=True)
                     site_df['YEAR'] = site_df[year_col]
                     if copc == water_col:
