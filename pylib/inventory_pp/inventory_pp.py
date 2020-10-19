@@ -531,31 +531,26 @@ def combine_lex(lex1, lex2, level='year', exclude=None, return_site_list=False):
 
 class InvObj:
     def __init__(self, user_args):
-        self.inv_args = deepcopy(user_args)  # User arguments passed from namespace as namespace
-        if hasattr(self.inv_args, "copcs"):  # Make all copc's uppercase for consistency
+        self.inv_args = deepcopy(user_args)     # User arguments passed from namespace as namespace
+        if hasattr(self.inv_args, "copcs"):     # Make all copc's uppercase for consistency
             self.inv_args.copcs = [c.upper() for c in self.inv_args.copcs]
-        self.vz_sites = self.parse_vzehsit()  # Parse list of accepted waste sites as generator
-        self.inv_lex = self.init_lex()  # Initialize final inventory dictionary
-        self.chm_cols = {  # Chemical columns (general match for input files, no uppercase) ###TODO, make case-insensitive and reflect user-input, remove hard-coded list of chemicals
-            'Cr',
-            'NO3',
-            'U',
-            'CN'
-        }
-        if self.inv_args.rcaswr_dir is not None or self.inv_args.rcaswr_idx is not None:
-            self.swr_lex = self.parse_swr()  # Solid waste release dictionary
+        self.vz_sites = self.parse_vzehsit()    # Parse list of accepted waste sites as generator
+        self.inv_lex = self.init_lex()          # Initialize final inventory dictionary
+        self.chm_cols = self.select_chms()      # From the copc list provided, create a dictionary of just chemicals
+        if self.inv_args.rcaswr_dir is not None and self.inv_args.rcaswr_idx is not None:
+            self.swr_lex = self.parse_swr()     # Solid waste release dictionary
         if self.inv_args.reroute is not None:
-            self.red_lex = self.parse_red()  # Rerouted waste releases dictionary
+            self.red_lex = self.parse_red()     # Rerouted waste releases dictionary
         if self.inv_args.site_specific is not None:
-            self.ssi_lex = self.parse_ssi()         # Site specific dictionary
+            self.ssi_lex = self.parse_ssi()     # Site specific dictionary
         if self.inv_args.cleaninv is not None:
-            self.sac_lex = self.parse_sac()  # SAC liquid-only inventory
+            self.sac_lex = self.parse_sac()     # SAC liquid-only inventory
         if self.inv_args.cheminv is not None:
-            self.chm_lex = self.parse_chm()  # Chemical Inventory
+            self.chm_lex = self.parse_chm()     # Chemical Inventory
         if self.inv_args.vzinv is not None:
-            self.sim_lex = self.parse_sim()  # SIMV2 RAD inventory
-        self.inv_lex = self.build_inv()  # Populate final inventory dictionary
-        self.inv_lex = self.clean_inv()  # Clean up any sites that don't have any waste streams/water sources
+            self.sim_lex = self.parse_sim()     # SIMV2 RAD inventory
+        self.inv_lex = self.build_inv()         # Populate final inventory dictionary
+        self.inv_lex = self.clean_inv()         # Clean up any sites that don't have any waste streams/water sources
 
     def parse_vzehsit(self):
         path = self.inv_args.vzehsit
@@ -586,9 +581,31 @@ class InvObj:
                      )
         if len(dup_sites) > 0:
             logging.debug("##Sites with duplicate entries in VZEHSIT:")
-            for site in set(dup_sites):
-                logging.debug('{}'.format(site))
+            logging.debug('\n'.join(sorted(dup_sites)))
+            # for site in set(dup_sites):
+            #     logging.debug('{}'.format(site))
         return new_lex
+
+    def select_chms(self):
+        """
+        Expects the list of copcs to be in the self.inv_args.copcs object. Will select all copc's that do not have a
+        number (e.g. SR-90 is a rad, CN is chem). Keywords that have water|liquid|volume will be excluded from the list.
+        :return:
+        """
+        chm_cols = []
+        for copc in self.inv_args.copcs:
+            if 'WATER' in copc:
+                continue
+            elif 'LIQUID' in copc:
+                continue
+            elif 'VOLUME' in copc:
+                continue
+            elif has_digit(copc):
+                continue
+            else:
+                chm_cols.append(copc)
+        chm_cols.sort()
+        return chm_cols
 
     def parse_swr(self):
         """
@@ -626,9 +643,10 @@ class InvObj:
                 else:
                     new_lex[site_name][new_copc] = site_df
         if len(not_vzehsit) > 0:
-            logging.debug("##Solid Waste Release sites NOT in VZEHSIT")
-            for site in not_vzehsit:
-                logging.debug("{}".format(site))
+            logging.debug("##Solid Waste Release sites NOT in VZEHSIT:")
+            logging.debug('\n'.join(sorted(not_vzehsit)))
+            # for site in not_vzehsit:
+            #     logging.debug("{}".format(site))
         else:
             logging.info("##Total number of Solid Waste Release Sites: {}".format(site_counter))
             logging.info("##All Solid Waste Release Sites are present in VZEHSIT")
@@ -690,8 +708,9 @@ class InvObj:
                             }
         if len(not_vzehsit) > 0:
             logging.debug("##Rerouted sites NOT in VZEHSIT:")
-            for site in not_vzehsit:
-                logging.debug("{}".format(site))
+            logging.debug('\n'.join(sorted(not_vzehsit)))
+            # for site in not_vzehsit:
+            #     logging.debug("{}".format(site))
         logging.info("##Rerouted Waste Sites:")
         logging.info("{:<40}{:<40}".format("Waste Site:", "[Listing of routed waste streams]"))
         for site in new_lex:
@@ -775,8 +794,9 @@ class InvObj:
                         }
             if len(not_vzehsit) > 0:
                 logging.debug("##Site-Specific-Source sites NOT in VZEHSIT:")
-                for site in not_vzehsit:
-                    logging.debug("{}".format(site))
+                logging.debug('\n'.join(sorted(not_vzehsit)))
+                # for site in not_vzehsit:
+                #     logging.debug("{}".format(site))
             logging.info("##Site-Specific-Source Sites:")
             logging.info("{:<40}{:<40}".format("Waste Site:", "[Listing of routed waste streams]"))
             for site in new_lex:
@@ -794,8 +814,9 @@ class InvObj:
         new_lex = {site: sac_lex[site] for site in self.inv_lex if site in sac_lex}
         unused_sac_sites = set(sac_lex.keys()) - set(new_lex.keys())
         logging.info("##Total number of sites included from SAC: {}".format(len(new_lex)))
-        logging.info("##Sites with data in SAC not present in VZEHSIT ({}):".format(len(unused_sac_sites)))
-        logging.info('{}'.format('\n'.join(sorted(unused_sac_sites))))
+        if len(unused_sac_sites) > 0:
+            logging.debug("##Sites with data in SAC not present in VZEHSIT ({}):".format(len(unused_sac_sites)))
+            logging.debug('{}'.format('\n'.join(sorted(unused_sac_sites))))
         # for site in sorted(unused_sac_sites):
         #     logging.info(site)
         return new_lex
@@ -848,8 +869,9 @@ class InvObj:
                         }
         if len(not_vzehsit) > 0:
             logging.debug("##CHEMINV sites NOT in VZEHSIT:")
-            for site in not_vzehsit:
-                logging.debug("{}".format(site))
+            logging.debug('\n'.join(sorted(not_vzehsit)))
+            # for site in not_vzehsit:
+            #     logging.debug("{}".format(site))
         else:
             logging.info("##Total number of CHEMINV Sites: {}".format(site_counter))
             logging.info("##All CHEMINV Sites are present in VZEHSIT")
@@ -914,9 +936,11 @@ class InvObj:
                         }
                         site_counter += 1
         logging.info("##Total number of SIMV2 Waste Sites: {}".format(site_counter))
-        logging.info("##Sites not in VZEHSIT ({}):".format(len(set(not_vzehsit))))
-        for site in sorted(set(not_vzehsit)):
-            logging.info(site)
+        if len(not_vzehsit) > 0:
+            logging.debug("##Sites not in VZEHSIT ({}):".format(len(set(not_vzehsit))))
+            logging.debug('\n'.join(sorted(not_vzehsit)))
+            # for site in sorted(set(not_vzehsit)):
+            #     logging.info(site)
         return new_lex
 
     def build_inv(self):
@@ -978,9 +1002,10 @@ class InvObj:
         # Log the waste sites that have no inventory for evaluation after excluding the extraneous information
         unused_sites = set(self.inv_lex.keys()) - set(final_lex.keys())
         if len(unused_sites) > 0:
-            logging.info("##The following sites had no inventory or water volume (after excluding extraneous sources):")
-            for site in sorted(unused_sites):
-                logging.info(site)
+            logging.debug("##The following sites had no inventory or water (after excluding extraneous sources):")
+            logging.debug('\n'.join(sorted(unused_sites)))
+            # for site in sorted(unused_sites):
+            #     logging.debug(site)
         else:
             logging.info("##All sites in VZEHSIT have at least one waste stream/water volume time series.")
         return final_lex
