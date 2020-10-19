@@ -1156,7 +1156,7 @@ def build_inventory_df(inv_dict, copc_list):
         site_df['SITE_NAME'] = site
         df = pd.concat([df, site_df], sort=False)
     # Simplify the "Source" column by removing duplicates
-    df['Source'] = df['Source'].apply(lambda x: '_'.join(sorted(set(x.replace('||', '').split('|')))))
+    df['Source'] = df['Source'].apply(lambda x: '_'.join(sorted(set(x.replace('||', '|').split('|')))))
     # Format the columns based on the user's column list (in order)
     use_copcs = [copc for copc in copc_list if copc.upper() in fin_copcs]
     # Log whether all COPC's made it into the final list
