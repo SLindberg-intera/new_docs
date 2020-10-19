@@ -143,6 +143,18 @@ def has_digit(mystr):
     return any(char.isdigit() for char in mystr)
 
 
+def remove_nans(myiterable):
+    try:
+        iter(myiterable)
+        if isinstance(myiterable, str):
+            raise TypeError("Expected an iterable list or set, not a string")
+    except TypeError:
+        raise TypeError("Function expected an iterable set, the object provided is not iterable")
+    myiterable = [x for x in myiterable if str(x) != 'nan']
+    return myiterable
+
+
+
 def normalize_col_names(old_col, water_col=None, chm_col=False):
     """
     :param old_col:     Old column name to change
@@ -468,6 +480,10 @@ def stomp_format_parser(path, skip_pattern='241-[^Cc]'):
                 no_data_sites.append(site)
         logging.info("##Total number of sites in SAC: {}".format(site_counter))
         logging.info("##Number of sites with data from SAC: {}".format(len(new_lex)))
+        # Remove 'nan' values from lists
+        dup_sites = remove_nans(dup_sites)
+        no_data_sites = remove_nans(no_data_sites)
+        skip_sites = remove_nans(skip_sites)
         if len(dup_sites) > 0:
             logging.debug("##SAC Inventory has duplicate entries for the following sites ({}):".format(len(dup_sites)))
             logging.info('{}'.format('\n'.join(sorted(dup_sites))))
@@ -579,6 +595,8 @@ class InvObj:
                      "##Total number of sites in VZEHSIT: {0}\n"
                      "##Total number of sites used (excluding duplicates): {1}".format(site_counter, sites_used)
                      )
+        # Remove 'nan' values from list
+        dup_sites = remove_nans(dup_sites)
         if len(dup_sites) > 0:
             logging.debug("##Sites with duplicate entries in VZEHSIT:")
             logging.debug('\n'.join(sorted(dup_sites)))
@@ -642,6 +660,8 @@ class InvObj:
                     new_lex[site_name] = {new_copc: site_df}
                 else:
                     new_lex[site_name][new_copc] = site_df
+        # Remove 'nan' values from list
+        not_vzehsit = remove_nans(not_vzehsit)
         if len(not_vzehsit) > 0:
             logging.debug("##Solid Waste Release sites NOT in VZEHSIT:")
             logging.debug('\n'.join(sorted(not_vzehsit)))
@@ -706,6 +726,8 @@ class InvObj:
                             new_lex[site] = {
                                 new_copc: site_df
                             }
+        # Remove 'nan' values from list
+        not_vzehsit = remove_nans(not_vzehsit)
         if len(not_vzehsit) > 0:
             logging.debug("##Rerouted sites NOT in VZEHSIT:")
             logging.debug('\n'.join(sorted(not_vzehsit)))
@@ -792,6 +814,8 @@ class InvObj:
                         new_lex[site] = {
                             new_copc: site_df
                         }
+            # Remove 'nan' values from list
+            not_vzehsit = remove_nans(not_vzehsit)
             if len(not_vzehsit) > 0:
                 logging.debug("##Site-Specific-Source sites NOT in VZEHSIT:")
                 logging.debug('\n'.join(sorted(not_vzehsit)))
@@ -814,6 +838,8 @@ class InvObj:
         new_lex = {site: sac_lex[site] for site in self.inv_lex if site in sac_lex}
         unused_sac_sites = set(sac_lex.keys()) - set(new_lex.keys())
         logging.info("##Total number of sites included from SAC: {}".format(len(new_lex)))
+        # Remove 'nan' values from list
+        unused_sac_sites = remove_nans(unused_sac_sites)
         if len(unused_sac_sites) > 0:
             logging.debug("##Sites with data in SAC not present in VZEHSIT ({}):".format(len(unused_sac_sites)))
             logging.debug('{}'.format('\n'.join(sorted(unused_sac_sites))))
@@ -867,6 +893,8 @@ class InvObj:
                         new_lex[site] = {
                             new_copc: site_df
                         }
+        # Remove 'nan' values from list
+        not_vzehsit = remove_nans(not_vzehsit)
         if len(not_vzehsit) > 0:
             logging.debug("##CHEMINV sites NOT in VZEHSIT:")
             logging.debug('\n'.join(sorted(not_vzehsit)))
@@ -936,6 +964,8 @@ class InvObj:
                         }
                         site_counter += 1
         logging.info("##Total number of SIMV2 Waste Sites: {}".format(site_counter))
+        # Remove 'nan' values from list
+        not_vzehsit = remove_nans(not_vzehsit)
         if len(not_vzehsit) > 0:
             logging.debug("##Sites not in VZEHSIT ({}):".format(len(set(not_vzehsit))))
             logging.debug('\n'.join(sorted(not_vzehsit)))
@@ -1001,6 +1031,8 @@ class InvObj:
         logging.info(write_str.format(*copc_list))
         # Log the waste sites that have no inventory for evaluation after excluding the extraneous information
         unused_sites = set(self.inv_lex.keys()) - set(final_lex.keys())
+        # Remove 'nan' values from list
+        unused_sites = remove_nans(unused_sites)
         if len(unused_sites) > 0:
             logging.debug("##The following sites had no inventory or water (after excluding extraneous sources):")
             logging.debug('\n'.join(sorted(unused_sites)))
