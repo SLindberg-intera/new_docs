@@ -137,10 +137,10 @@ def is_integer(mystr):
         return True
     except:
         return False
-
-
-def has_digit(mystr):
-    return any(char.isdigit() for char in mystr)
+#
+#
+# def has_digit(mystr):
+#     return any(char.isdigit() for char in mystr)
 
 
 def remove_nans(myiterable):
@@ -233,6 +233,9 @@ def legacy_col_formatter(col_str, year_col=None, water_col=None, site_col=None, 
         col_str = col_str.replace('/year', '').replace(')', '')
         # Split and capitalize, but don't capitalize the string if it is "kg"
         new_col, units = [substr.capitalize() if substr != 'kg' else substr for substr in col_str.split('(')]
+        # Catch the nitrate case for capitalizing the column
+        if new_col.lower == 'no3':
+            new_col = 'NO3'
     return new_col, units
 
 
@@ -297,15 +300,15 @@ parser.add_argument('-i', '--ipp_output',
 parser.add_argument('--COPC',
                     dest='copcs',
                     nargs='+',
-                    type=str,
+                    type=str.upper,
                     default=[
-                        'Water',
+                        'WATER',
                         'H-3',
                         'I-129',
-                        'Sr-90',
-                        'Tc-99',
+                        'SR-90',
+                        'TC-99',
                         'U',
-                        'Cr',
+                        'CR',
                         'NO3',
                         'CN'
                     ],
@@ -333,10 +336,12 @@ parser.add_argument('--logger',
                     )
 parser.add_argument('--verbosity',
                     dest='verbosity',
+                    type=str.upper,
                     choices=["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG", "ALL"],
                     default="ALL",
                     help='Set the verbosity to produce more/less output in the log file.\n'
-                         '"ALL" is equivalent to "NOTSET" when setting the logger and will print all messages.'
+                         '"ALL" is equivalent to "NOTSET" when setting the logger and will print all messages.\n'
+                         'Available options include: "CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG", and "ALL".'
                     )
 parser.add_argument('--legacy',
                     dest='legacy',
@@ -350,21 +355,32 @@ parser.add_argument('--site_keys',
                     nargs='+',
                     type=str.upper,
                     default=['SITE_NAME', 'CIE SITE NAME', 'CA SITE NAME'],
-                    help='This provides default keys for possible site-naming conventions used in the files to be read.'
+                    help='This provides default keys for possible site-naming conventions used in the files to be '
+                         'read.\nDefault list includes: "SITE_NAME", "CIE SITE NAME", AND "CA SITE NAME".'
                     )
 parser.add_argument('--year_keys',
                     dest='year_keys',
                     nargs='+',
                     type=str.upper,
                     default=['DISCHARGE/DECAY-CORRECTED YEAR', 'YEAR'],
-                    help='This provides default keys for possible year columns used in the files to be read.'
+                    help='This provides default keys for possible year columns used in the files to be read. Default\n'
+                         'list includes: "DISCHARGE/DECAY-CORRECTED YEAR" and "YEAR".'
                     )
 parser.add_argument('--water_keys',
                     dest='water_keys',
                     nargs='+',
                     type=str.upper,
-                    default=['WATER', 'VOLUME', 'LIQUID', 'VOLUME [KG]'],
-                    help='This provides default keys for possible water columns used in the files to be read.'
+                    default=['WATER', 'VOLUME', 'LIQUID', 'VOLUME MEAN [M3]'],
+                    help='This provides default keys for possible water columns used in the files to be read.\n'
+                         'Default list includes: WATER, VOLUME, LIQUID, and VOLUME MEAN [M3].'
+                    )
+parser.add_argument('--chem_copcs',
+                    dest='chem_copcs',
+                    nargs='+',
+                    type=str.upper,
+                    default=['CN', 'CR', 'U', 'NO3'],
+                    help='This list contains known contaminants in the subcategory of "chemicals" (as opposed to \n'
+                         '"radionuclides"). Default list includes: CN, CR, U, and NO3.'
                     )
 args = parser.parse_args()
 
@@ -523,7 +539,7 @@ def combine_lex(lex1, lex2, level='year', exclude=None, return_site_list=False):
     :param lex1:             Dictionary to combine information into, should start out as a dictionary with sites and no
                              other nested keys (i.e. len(lex1[site].keys()) = 0 should yield True)
     :param lex2:             Dictionary of site records from a primary source to be combined into lex1
-    :param level:            The level at which to combine (at the site level or the year level)
+    :param level:            The level at which to combine (at the site level, the year level, or the copc level)
     :param exclude:          Sites to exclude
     :param return_site_list: Return the list of sites included from lex2 (sites merged into lex1)
     :return:                 Combined dictionary, dictionary of sites and streams used from primary source
@@ -558,6 +574,11 @@ def combine_lex(lex1, lex2, level='year', exclude=None, return_site_list=False):
                         df3 = df2.loc[~df2['YEAR'].isin(df1['YEAR']), :]
                         df1 = pd.concat([df1, df3], ignore_index=True)
                         lex1[site][copc] = df1
+            # elif level.lower() == 'copc':
+            #     used_sites.append(site)
+            #     for copc in lex2[site].keys():
+            #         if copc not in lex1[site]:
+            #             lex1[site][copc] = lex2[site][copc]
     logging.info("Site information included from data package: \n{}".format('\n'.join(sorted(used_sites))))
     if return_site_list is False:
         return lex1
@@ -568,8 +589,8 @@ def combine_lex(lex1, lex2, level='year', exclude=None, return_site_list=False):
 class InvObj:
     def __init__(self, user_args):
         self.inv_args = deepcopy(user_args)     # User arguments passed from namespace as namespace
-        if hasattr(self.inv_args, "copcs"):     # Make all copc's uppercase for consistency
-            self.inv_args.copcs = [c.upper() for c in self.inv_args.copcs]
+        # if hasattr(self.inv_args, "copcs"):     # Make all copc's uppercase for consistency
+        #     self.inv_args.copcs = [c.upper() for c in self.inv_args.copcs]
         self.vz_sites = self.parse_vzehsit()    # Parse list of accepted waste sites as generator
         self.inv_lex = self.init_lex()          # Initialize final inventory dictionary
         self.chm_cols = self.select_chms()      # From the copc list provided, create a dictionary of just chemicals
@@ -632,13 +653,13 @@ class InvObj:
         """
         chm_cols = []
         for copc in self.inv_args.copcs:
-            if 'WATER' in copc.upper():
+            if 'WATER' in copc:
                 continue
-            elif 'LIQUID' in copc.upper():
+            elif 'LIQUID' in copc:
                 continue
-            elif 'VOLUME' in copc.upper():
+            elif 'VOLUME' in copc:
                 continue
-            elif has_digit(copc):
+            elif copc not in self.inv_args.chem_copcs:
                 continue
             else:
                 chm_cols.append(copc)
@@ -667,6 +688,8 @@ class InvObj:
                 site_name, copc = swr_file.upper().replace('.CSV', '').split('_')
                 if site_name not in self.inv_lex:
                     not_vzehsit.append(site_name)
+                # Normalize the site name used (make all uppercase)
+                site_key = site_name.upper()
                 path = os.path.join(swr_dir, swr_file)
                 site_df = csv_parser(path, 4)
                 # Rename the columns to be consistent with the rest
@@ -678,11 +701,11 @@ class InvObj:
                 site_df['Source'] = "Solid-Waste-Release"
                 if len(site_df) == 0:
                     continue
-                if site_name not in new_lex:
+                if site_key not in new_lex:
                     site_counter += 1
-                    new_lex[site_name] = {new_copc: site_df}
+                    new_lex[site_key] = {new_copc: site_df}
                 else:
-                    new_lex[site_name][new_copc] = site_df
+                    new_lex[site_key][new_copc] = site_df
         # Remove 'nan' values from list
         not_vzehsit = remove_nans(not_vzehsit)
         if len(not_vzehsit) > 0:
@@ -728,6 +751,8 @@ class InvObj:
                 if site not in self.inv_lex:
                     not_vzehsit.append(site)
                     continue
+                # Normalize the site key (make all uppercase)
+                site_key = site.upper()
                 for copc in [col for col in df.columns if col not in non_copcs]:
                     # Verify whether the copc is a water column
                     water_col = None
@@ -757,10 +782,10 @@ class InvObj:
                     # Verify that there are records in the new dataframe, continue if empty dataframe
                     if len(site_df) == 0:
                         continue
-                    if site in new_lex:
-                        new_lex[site][new_copc] = site_df
+                    if site_key in new_lex:
+                        new_lex[site_key][new_copc] = site_df
                     else:
-                        new_lex[site] = {
+                        new_lex[site_key] = {
                             new_copc: site_df
                         }
         # Remove 'nan' values from list
@@ -812,6 +837,8 @@ class InvObj:
                 if site not in self.inv_lex:
                     not_vzehsit.append(site)
                     continue
+                # Normalize the site name (all uppercase)
+                site_key = site.upper()
                 for copc in [col for col in df.columns if col != site_col and col != year_col]:
                     # Verify whether the copc is a water column
                     water_col = None
@@ -841,10 +868,10 @@ class InvObj:
                     # Verify that there are records in the new dataframe, continue if empty dataframe
                     if len(site_df) == 0:
                         continue
-                    if site in new_lex:
-                        new_lex[site][new_copc] = site_df
+                    if site_key in new_lex:
+                        new_lex[site_key][new_copc] = site_df
                     else:
-                        new_lex[site] = {
+                        new_lex[site_key] = {
                             new_copc: site_df
                         }
             # Remove 'nan' values from list
@@ -983,12 +1010,16 @@ class InvObj:
             for key in self.inv_args.water_keys:
                 if key in df.columns:
                     water_col = key
+                    break
         # Given that there may be some formatting differences, test for each column present, logging which columns
-        # are identified with each chemical COPC
-        chm_inv_cols = self.match_chm_cols(df.columns, exclude_cols)
+        # are identified with each chemical COPC. Add water
+        chm_inv_cols = self.match_chm_cols(df.columns, exclude_cols + [site_col, year_col, water_col])
+        chm_inv_cols['WATER'] = water_col
         for site in get_unique_vals(df, site_col):
             if site.upper() not in self.inv_lex:
                 not_vzehsit.append(site.upper())
+            # Normalize the site name to only have upper case
+            site_key = site.upper()
             for copc in chm_inv_cols:
                 copc_col = chm_inv_cols[copc]
                 site_df = df.loc[df[site_col] == site, [year_col, copc_col]].copy(deep=True)
@@ -1006,17 +1037,15 @@ class InvObj:
                     site_df = clean_df(df=site_df, drop_cols=[copc_col], val_col=new_col, group_col=year_col)
                 # Add a source column to the dataframe
                 site_df['Source'] = "Chemical-Inventory"
-                # Normalize the site name to only have upper case
-                site = site.upper()
                 if len(site_df) == 0:
                     continue
                 elif site_df[new_col].sum() == 0:
                     continue
-                if site in new_lex:
-                    new_lex[site][new_copc] = site_df
+                if site_key in new_lex:
+                    new_lex[site_key][new_copc] = site_df
                 else:
                     site_counter += 1
-                    new_lex[site] = {
+                    new_lex[site_key] = {
                         new_copc: site_df
                     }
         # Remove 'nan' values from list
@@ -1231,16 +1260,16 @@ def build_inventory_df(inv_dict, copc_list):
             else:
                 site_df = site_df.merge(inv_dict[site][copc], on='YEAR', sort=True, how='outer')
                 if 'Source_x' in site_df.columns and 'Source_y' in site_df.columns:
-                    site_df['Source_x'] = site_df['Source_x'].fillna(value=' ')
-                    site_df['Source_y'] = site_df['Source_y'].fillna(value=' ')
-                    site_df['Source_x'] = site_df['Source_x'].str.cat(site_df['Source_y'], sep='|')
-                    site_df['Source'] = site_df['Source_x'].str.replace('| ', '').str.replace(' |', '')
+                    site_df['Source_x'] = site_df['Source_x'].fillna(value='')
+                    site_df['Source_y'] = site_df['Source_y'].fillna(value='')
+                    site_df['Source'] = site_df['Source_x'].str.cat(site_df['Source_y'], sep='|')
+                    # site_df['Source'] = site_df['Source_x'].str.replace('| ', '').str.replace(' |', '')
                     # Drop the excess columns
                     site_df.drop(columns=['Source_x', 'Source_y'], inplace=True)
         site_df['SITE_NAME'] = site
         df = pd.concat([df, site_df], sort=False)
     # Simplify the "Source" column by removing duplicates
-    df['Source'] = df['Source'].apply(lambda x: '_'.join(sorted(set(x.replace('||', '|').split('|')))))
+    df['Source'] = df['Source'].apply(lambda x: '_'.join(sorted(set(x.split('|')).difference({''}))))
     # Format the columns based on the user's column list (in order)
     use_copcs = [copc for copc in copc_list if copc.upper() in fin_copcs]
     # Log whether all COPC's made it into the final list
