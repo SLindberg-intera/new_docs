@@ -644,8 +644,6 @@ class InvObj:
         if len(dup_sites) > 0:
             logging.debug("##Sites with duplicate entries in VZEHSIT:")
             logging.debug('\n'.join(sorted(dup_sites)))
-            # for site in set(dup_sites):
-            #     logging.debug('{}'.format(site))
         return new_lex
 
     def select_chms(self):
@@ -813,8 +811,6 @@ class InvObj:
         if len(not_vzehsit) > 0:
             logging.debug("##Rerouted sites NOT in VZEHSIT:")
             logging.debug('\n'.join(sorted(not_vzehsit)))
-            # for site in not_vzehsit:
-            #     logging.debug("{}".format(site))
         logging.info("##Rerouted Waste Sites:")
         logging.info("{:<40}{:<40}".format("Waste Site:", "[Listing of routed waste streams]"))
         for site in new_lex:
@@ -899,8 +895,6 @@ class InvObj:
             if len(not_vzehsit) > 0:
                 logging.debug("##Site-Specific-Source sites NOT in VZEHSIT:")
                 logging.debug('\n'.join(sorted(not_vzehsit)))
-                # for site in not_vzehsit:
-                #     logging.debug("{}".format(site))
             logging.info("##Site-Specific-Source Sites:")
             logging.info("{:<40}{:<40}".format("Waste Site:", "[Listing of routed waste streams]"))
             for site in new_lex:
@@ -923,8 +917,6 @@ class InvObj:
         if len(unused_sac_sites) > 0:
             logging.debug("##Sites with data in SAC not present in VZEHSIT ({}):".format(len(unused_sac_sites)))
             logging.debug('{}'.format('\n'.join(sorted(unused_sac_sites))))
-        # for site in sorted(unused_sac_sites):
-        #     logging.info(site)
         return new_lex
 
     def parse_chm(self):
@@ -1015,8 +1007,6 @@ class InvObj:
         if len(not_vzehsit) > 0:
             logging.debug("##CHEMINV sites NOT in VZEHSIT:")
             logging.debug('\n'.join(sorted(not_vzehsit)))
-            # for site in not_vzehsit:
-            #     logging.debug("{}".format(site))
         else:
             logging.info("##Total number of CHEMINV Sites: {}".format(site_counter))
             logging.info("##All CHEMINV Sites are present in VZEHSIT")
@@ -1114,20 +1104,18 @@ class InvObj:
         sim_inv_cols = self.match_cols(df.columns, non_copcs + [water_col], rads=True)
         sim_inv_cols['WATER'] = water_col
         # Split by waste site and stream and store in dictionary
-        for copc in sim_inv_cols:
-            copc_col = sim_inv_cols[copc]
-            for site in get_unique_vals(df, site_col):
-                if site.upper() not in self.inv_lex:
-                    not_vzehsit.append(site.upper())
-                    continue
+        for site in get_unique_vals(df, site_col):
+            if site.upper() not in self.inv_lex:
+                not_vzehsit.append(site.upper())
+                continue
+            for copc in sim_inv_cols:
+                copc_col = sim_inv_cols[copc]
                 # Filter by waste site, waste stream
                 site_df = df.loc[df[site_col] == site, [year_col, copc_col]].copy(deep=True)
                 if copc_col == water_col:
                     new_copc, new_col = normalize_col_names(copc_col, water_col=water_col)
                 else:
                     new_copc, new_col = normalize_col_names(copc_col)
-                if new_copc.upper() not in self.inv_args.copcs:
-                    continue
                 site_df.rename(columns={copc_col: new_col}, inplace=True)
                 # Make the year column uniform if not already
                 if 'YEAR' != year_col:
@@ -1155,8 +1143,6 @@ class InvObj:
         if len(not_vzehsit) > 0:
             logging.debug("##Sites not in VZEHSIT ({}):".format(len(set(not_vzehsit))))
             logging.debug('\n'.join(sorted(not_vzehsit)))
-            # for site in sorted(set(not_vzehsit)):
-            #     logging.info(site)
         return new_lex
 
     def build_inv(self):
@@ -1222,8 +1208,6 @@ class InvObj:
         if len(unused_sites) > 0:
             logging.debug("##The following sites had no inventory or water (after excluding extraneous sources):")
             logging.debug('\n'.join(sorted(unused_sites)))
-            # for site in sorted(unused_sites):
-            #     logging.debug(site)
         else:
             logging.info("##All sites in VZEHSIT have at least one waste stream/water volume time series.")
         return final_lex
@@ -1257,7 +1241,6 @@ def build_inventory_df(inv_dict, copc_list):
                     site_df['Source_x'] = site_df['Source_x'].fillna(value='')
                     site_df['Source_y'] = site_df['Source_y'].fillna(value='')
                     site_df['Source'] = site_df['Source_x'].str.cat(site_df['Source_y'], sep='|')
-                    # site_df['Source'] = site_df['Source_x'].str.replace('| ', '').str.replace(' |', '')
                     # Drop the excess columns
                     site_df.drop(columns=['Source_x', 'Source_y'], inplace=True)
         site_df['SITE_NAME'] = site
