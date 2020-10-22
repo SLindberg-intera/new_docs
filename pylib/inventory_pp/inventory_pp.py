@@ -137,10 +137,6 @@ def is_integer(mystr):
         return True
     except:
         return False
-#
-#
-# def has_digit(mystr):
-#     return any(char.isdigit() for char in mystr)
 
 
 def remove_nans(myiterable):
@@ -591,8 +587,6 @@ def combine_lex(lex1, lex2, level='year', exclude=None, return_site_list=False):
 class InvObj:
     def __init__(self, user_args):
         self.inv_args = deepcopy(user_args)     # User arguments passed from namespace as namespace
-        # if hasattr(self.inv_args, "copcs"):     # Make all copc's uppercase for consistency
-        #     self.inv_args.copcs = [c.upper() for c in self.inv_args.copcs]
         self.vz_sites = self.parse_vzehsit()    # Parse list of accepted waste sites as generator
         self.inv_lex = self.init_lex()          # Initialize final inventory dictionary
         self.chm_cols = self.select_chms()      # From the copc list provided, create a list of just chemicals
@@ -1044,7 +1038,7 @@ class InvObj:
                 continue
             else:
                 for col in check_cols:
-                    if copc in col:
+                    if copc in col.upper():
                         if copc in matched_cols:
                             logging.critical("##Could not match the COPC to the right column, multiple columns found:")
                             logging.critical(
