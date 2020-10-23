@@ -278,14 +278,6 @@ parser.add_argument('--RCASWR_idx',
                     type=str,
                     help='Provide only the filename of the RCASWR index file from the ICF (do not include path)'
                     )
-parser.add_argument('--REROUTE',
-                    dest='reroute',
-                    nargs='+',
-                    type=file_path,
-                    help='Provide each rerouting work product file (and path) from the ICF, separated by spaces.\n'
-                         'Each rerouted source file must have a site column that matches either "CA site name" or \n'
-                         '"CIE site name" (case-sensitive).'
-                    )
 parser.add_argument('--Site_Specific',
                     dest='site_specific',
                     nargs='+',
@@ -593,8 +585,6 @@ class InvObj:
         self.rad_cols = self.select_rads()      # Invert the selection for the rads from the chemicals
         if self.inv_args.rcaswr_dir is not None and self.inv_args.rcaswr_idx is not None:
             self.swr_lex = self.parse_swr()     # Solid waste release dictionary
-        if self.inv_args.reroute is not None:
-            self.red_lex = self.parse_red()     # Rerouted waste releases dictionary
         if self.inv_args.site_specific is not None:
             self.ssi_lex = self.parse_ssi()     # Site specific dictionary
         if self.inv_args.cleaninv is not None:
@@ -728,90 +718,6 @@ class InvObj:
         else:
             logging.info("##Total number of Solid Waste Release Sites: {}".format(site_counter))
             logging.info("##All Solid Waste Release Sites are present in VZEHSIT")
-        return new_lex
-
-    def parse_red(self):
-        new_lex = {}
-        site_col = 'SITE_NAME'
-        year_col = 'YEAR'
-        # Columns to ignore while parsing
-        non_copcs = [
-            'INVENTORY MODULE',
-            'SIMV2 SITE NAME',
-            'SOURCE TYPE',
-        ]
-        # Keep track of any sites that aren't part of VZEHSIT to pass to logger
-        not_vzehsit = []
-        for red_file in self.inv_args.reroute:
-            df = csv_parser(red_file, skip_lines=[1])
-            df.columns = map(str.upper, df.columns)
-            # Select the appropriate site and year columns
-            if site_col not in df.columns:
-                for key in self.inv_args.site_keys:
-                    if key in df.columns:
-                        site_col = key
-                        non_copcs.append(key)
-                        break
-            if year_col not in df.columns:
-                for key in self.inv_args.year_keys:
-                    if key in df.columns:
-                        year_col = key
-                        non_copcs.append(key)
-                        break
-            for site in get_unique_vals(df, site_col):
-                # Make sure the site is in the accepted list
-                if site not in self.inv_lex:
-                    not_vzehsit.append(site)
-                    continue
-                # Normalize the site key (make all uppercase)
-                site_key = site.upper()
-                for copc in [col for col in df.columns if col not in non_copcs]:
-                    # Verify whether the copc is a water column
-                    water_col = None
-                    for keyword in self.inv_args.water_keys:
-                        if keyword in copc:
-                            water_col = copc
-                            break
-                    # Process if the copc is the water column or if it is an accepted COPC
-                    if (copc not in self.inv_args.copcs) and (water_col is None):
-                        continue
-                    site_df = df.loc[df[site_col] == site, [year_col, copc]].copy(deep=True)
-                    if water_col is not None:
-                        new_copc, new_col = normalize_col_names(copc, water_col=water_col)
-                    elif copc in self.chm_cols:
-                        new_copc, new_col = normalize_col_names(copc, chm_col=True)
-                    else:
-                        new_copc, new_col = normalize_col_names(copc)
-                    site_df[new_col] = site_df[copc]
-                    # Make the year column uniform if not already
-                    if 'YEAR' != year_col:
-                        site_df['YEAR'] = site_df[year_col]
-                        site_df = clean_df(df=site_df, drop_cols=[copc, year_col], val_col=new_col, group_col='YEAR')
-                    else:
-                        site_df = clean_df(df=site_df, drop_cols=[copc], val_col=new_col, group_col=year_col)
-                    # Add a source column to the dataframe
-                    site_df['Source'] = Path(red_file).stem
-                    # Verify that there are records in the new dataframe, continue if empty dataframe
-                    if len(site_df) == 0:
-                        continue
-                    if site_key in new_lex:
-                        new_lex[site_key][new_copc] = site_df
-                    else:
-                        new_lex[site_key] = {
-                            new_copc: site_df
-                        }
-        # Remove 'nan' values from list
-        not_vzehsit = remove_nans(not_vzehsit)
-        if len(not_vzehsit) > 0:
-            logging.debug("##Rerouted sites NOT in VZEHSIT:")
-            logging.debug('\n'.join(sorted(not_vzehsit)))
-        logging.info("##Rerouted Waste Sites:")
-        logging.info("{:<40}{:<40}".format("Waste Site:", "[Listing of routed waste streams]"))
-        for site in new_lex:
-            copc_list = list(new_lex[site].keys())
-            write_str = "{:<40}" + len(copc_list) * "{:10}"
-            site += ':'
-            logging.info(write_str.format(site, *copc_list))
         return new_lex
 
     def parse_ssi(self):
@@ -1145,20 +1051,15 @@ class InvObj:
         # The order is essential for this given the functional requirements listed at the header of this file. The order
         # for adding the parsed information is as follows:
         #   1.  Site-Specific       (ssi_lex)
-        #   2.  Rerouted Inventory  (red_lex)
-        #   3.  Solid Waste Release (swr_lex)
-        #   4.  SIMV2 Inventory     (sim_inv)
-        #   5.  Chemical Inventory  (chm_lex)
-        #   6.  SAC Water Inventory (sac_lex)
+        #   2.  Solid Waste Release (swr_lex)
+        #   3.  SIMV2 Inventory     (sim_inv)
+        #   4.  Chemical Inventory  (chm_lex)
+        #   5.  SAC Water Inventory (sac_lex)
         final_lex = self.inv_lex
         exclude_sites = []
         if hasattr(self, "ssi_lex"):
             logging.info('##Merging Site-Specific-Inventory Sites into final dictionary')
             final_lex, used_sites = combine_lex(final_lex, self.ssi_lex, return_site_list=True)
-            exclude_sites += used_sites
-        if hasattr(self, "red_lex"):
-            logging.info('##Merging Rerouted Sites into final dictionary')
-            final_lex, used_sites = combine_lex(final_lex, self.red_lex, level='site', exclude=exclude_sites, return_site_list=True)
             exclude_sites += used_sites
         if hasattr(self, "swr_lex"):
             logging.info('##Merging SWR into final dictionary')
