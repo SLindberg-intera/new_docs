@@ -862,7 +862,7 @@ class InvObj:
         for codec in self.inv_args.codec_list:
             try:
                 df = csv_parser(chm_path, skip_lines=[], codec=codec)
-                pass
+                break
             except:
                 continue
         df.columns = map(str.upper, df.columns)
