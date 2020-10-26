@@ -377,6 +377,14 @@ parser.add_argument('--chem_copcs',
                     help='This list contains known contaminants in the subcategory of "chemicals" (as opposed to \n'
                          '"radionuclides"). Default list includes: CN, CR, U, and NO3.'
                     )
+parser.add_argument('--codec_list',
+                    dest='codec_list',
+                    nargs='+',
+                    type=str.lower,
+                    default=['utf-8', 'iso-8859-1'],
+                    help="This list provides a list of codec's to parse the input files. Modify this if input files\n"
+                         "have characters that don't align with the default codec's provided [utf-8, iso-8859-1]"
+                    )
 args = parser.parse_args()
 
 
@@ -453,9 +461,6 @@ def stomp_format_parser(path, skip_pattern='241-[^Cc]'):
     :param skip_pattern:    Regex search pattern
     :return:
     """
-    #
-    #
-    #
     with open(path, 'r') as file:
         # Skip the header line
         line = next(file).split(',')
@@ -693,7 +698,12 @@ class InvObj:
                 # Normalize the site name used (make all uppercase)
                 site_key = site_name.upper()
                 path = os.path.join(swr_dir, swr_file)
-                site_df = csv_parser(path, 4)
+                for codec in self.inv_args.codec_list:
+                    try:
+                        site_df = csv_parser(path, 4, codec=codec)
+                        break
+                    except:
+                        continue
                 # Rename the columns to be consistent with the rest
                 new_copc, new_col = normalize_col_names(copc)
                 site_df[new_col] = site_df["Reduced Activity Release Rate (Ci/year)"]
@@ -713,8 +723,6 @@ class InvObj:
         if len(not_vzehsit) > 0:
             logging.debug("##Solid Waste Release sites NOT in VZEHSIT:")
             logging.debug('\n'.join(sorted(not_vzehsit)))
-            # for site in not_vzehsit:
-            #     logging.debug("{}".format(site))
         else:
             logging.info("##Total number of Solid Waste Release Sites: {}".format(site_counter))
             logging.info("##All Solid Waste Release Sites are present in VZEHSIT")
@@ -735,7 +743,12 @@ class InvObj:
         # Keep track of any sites that aren't part of VZEHSIT to pass to logger
         not_vzehsit = []
         for ssi_file in self.inv_args.site_specific:
-            df = csv_parser(ssi_file, skip_lines=None)
+            for codec in self.inv_args.codec_list:
+                try:
+                    df = csv_parser(ssi_file, skip_lines=None, codec=codec)
+                    break
+                except:
+                    continue
             df.columns = map(str.upper, df.columns)
             # Get the site column, default is 'SITE_NAME'
             if site_col not in df.columns:
@@ -846,7 +859,12 @@ class InvObj:
             'SIMV2 SITE NAME',
             'SOURCE TYPE'
         ]
-        df = csv_parser(chm_path, skip_lines=[], codec='utf-8')
+        for codec in self.inv_args.codec_list:
+            try:
+                df = csv_parser(chm_path, skip_lines=[], codec=codec)
+                pass
+            except:
+                continue
         df.columns = map(str.upper, df.columns)
         # Get the site and year columns, default is 'SITE_NAME' and 'YEAR', respectively
         if site_col not in df.columns:
@@ -966,7 +984,12 @@ class InvObj:
         not_vzehsit = []
         site_counter = 0
         path = self.inv_args.vzinv
-        df = csv_parser(path, skip_lines=3, codec='iso-8859-1')
+        for codec in self.inv_args.codec_list:
+            try:
+                df = csv_parser(path, skip_lines=3, codec=codec)
+                break
+            except:
+                continue
         df.columns = map(str.upper, df.columns)
         # Get the site and year columns, default is 'SITE_NAME' and 'YEAR', respectively
         if site_col not in df.columns:
