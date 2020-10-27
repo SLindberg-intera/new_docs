@@ -251,12 +251,12 @@ parser.add_argument('--VZINV',
                     type=file_path,
                     help='Provide the path to the VZINV work product from the ICF. Only radionuclides will be parsed.'
                     )
-parser.add_argument('--include_sim_solids',
-                    dest='include_sim_solids',
+parser.add_argument('--entrain_sim_solids',
+                    dest='entrain_sim_solids',
                     type=bool,
-                    default=False,
-                    help='Flag on whether to filter out "Solid" sources from the --VZINV source file. If [False],\n'
-                         'entrained solids will be included as liquid releases.'
+                    default=True,
+                    help='Flag on whether to include entrained solids as liquid release(s) from the --VZINV file.\n'
+                         'Default is [True], which will include entrained solids in the liquid discharges.'
                     )
 parser.add_argument('--CHEMINV',
                     dest='cheminv',
@@ -289,7 +289,7 @@ parser.add_argument('-i', '--ipp_output',
                     dest='ipp_name',
                     type=str,
                     default='preprocessed_inventory.csv',
-                    help='Name for the inventory file and log. File output will always be a comma-delimited-file\n'
+                    help='Name for the inventory file. File output will always be a comma-delimited-file\n'
                          'Default file name is [preprocessed_inventory.csv]'
                     )
 parser.add_argument('--COPC',
@@ -1018,7 +1018,7 @@ class InvObj:
             waste_type
         ]
         # If solids were flagged as being included, skip this step, else include only entrained solids
-        if self.inv_args.include_sim_solids is False:
+        if self.inv_args.entrain_sim_solids:
             # Convert all waste stream types (solid vs liquid) to liquid if inventory module is "Entrained Solids"
             df.loc[df[waste_mod].str.lower().str.contains('entrained solids'), waste_type] = 'Liquid'
             df = df.loc[df[waste_type] == 'Liquid', :]
@@ -1271,6 +1271,10 @@ def write_legacy_output(df, write_path):
 # Main Program
 if __name__ == '__main__':
     configure_logger(os.path.join(args.output, args.logger), args.verbosity)
+    # Record the options used to execute the tool
+    logging.info("## User arguments provided for tool execution:")
+    for arg, value in sorted(vars(args).items()):
+        logging.info("{0:<20}: {1}".format(arg, value))
     if args.rcaswr_idx is not None and args.rcaswr_dir is not None:
         is_RCASWR_idx(args.rcaswr_idx, args.rcaswr_dir)
     else:
