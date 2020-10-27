@@ -703,6 +703,7 @@ class InvObj:
                         site_df = csv_parser(path, 4, codec=codec)
                         break
                     except:
+                        logging.info("Unsuccessful attempt to parse {} using codec: {}".format(path, codec))
                         continue
                 # Rename the columns to be consistent with the rest
                 new_copc, new_col = normalize_col_names(copc)
@@ -748,6 +749,7 @@ class InvObj:
                     df = csv_parser(ssi_file, skip_lines=None, codec=codec)
                     break
                 except:
+                    logging.info("Unsuccessful attempt to parse {} using codec: {}".format(ssi_file, codec))
                     continue
             df.columns = map(str.upper, df.columns)
             # Get the site column, default is 'SITE_NAME'
@@ -864,6 +866,7 @@ class InvObj:
                 df = csv_parser(chm_path, skip_lines=[], codec=codec)
                 break
             except:
+                logging.info("Unsuccessful attempt to parse {} using codec: {}".format(chm_path, codec))
                 continue
         df.columns = map(str.upper, df.columns)
         # Get the site and year columns, default is 'SITE_NAME' and 'YEAR', respectively
@@ -989,6 +992,7 @@ class InvObj:
                 df = csv_parser(path, skip_lines=3, codec=codec)
                 break
             except:
+                logging.info("Unsuccessful attempt to parse {} using codec: {}".format(path, codec))
                 continue
         df.columns = map(str.upper, df.columns)
         # Get the site and year columns, default is 'SITE_NAME' and 'YEAR', respectively
