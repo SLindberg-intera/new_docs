@@ -1021,11 +1021,12 @@ class InvObj:
             'CA site name',
             waste_type
         ]
-        # If solids were flagged as being included, skip this step, else include only entrained solids
+        # Entrain solids if desired (check user input)
         if self.inv_args.entrain_sim_solids:
             # Convert all waste stream types (solid vs liquid) to liquid if inventory module is "Entrained Solids"
             df.loc[df[waste_mod].str.lower().str.contains('entrained solids'), waste_type] = 'Liquid'
-            df = df.loc[df[waste_type] == 'Liquid', :]
+        # Filter to only use the liquid discharges from the SIM source file
+        df = df.loc[df[waste_type] == 'Liquid', :]
         # Given that there may be some formatting differences, test for each column present, logging which columns
         # are identified with each chemical COPC. Add water
         sim_inv_cols = self.match_cols(df.columns, non_copcs + [water_col], rads=True)
