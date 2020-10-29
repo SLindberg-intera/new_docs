@@ -55,14 +55,6 @@ def dir_path(mystr):
         raise IsADirectoryError("Path provided is not a directory: {}".format(mystr))
 
 
-def is_RCASWR_idx(idx_name, rcaswr_dir):
-    file = os.path.join(rcaswr_dir, idx_name)
-    if os.path.isfile(file):
-        return
-    else:
-        raise FileNotFoundError("The file name/path does not exist: {}".format(file))
-
-
 def get_unique_vals(df, col):
     for val in df[col].unique():
         yield val
@@ -276,7 +268,7 @@ parser.add_argument('--RCASWR_dir',
 parser.add_argument('--RCASWR_idx',
                     dest='rcaswr_idx',
                     type=str,
-                    help='Provide only the filename of the RCASWR index file from the ICF (do not include path)'
+                    help='Provide the filename of the RCASWR index file from the ICF.'
                     )
 parser.add_argument('--Site_Specific',
                     dest='site_specific',
@@ -588,7 +580,7 @@ class InvObj:
         self.inv_lex = self.init_lex()          # Initialize final inventory dictionary
         self.chm_cols = self.select_chms()      # From the copc list provided, create a list of just chemicals
         self.rad_cols = self.select_rads()      # Invert the selection for the rads from the chemicals
-        if self.inv_args.rcaswr_dir is not None and self.inv_args.rcaswr_idx is not None:
+        if self.inv_args.rcaswr_dir is not None:
             self.swr_lex = self.parse_swr()     # Solid waste release dictionary
         if self.inv_args.site_specific is not None:
             self.ssi_lex = self.parse_ssi()     # Site specific dictionary
@@ -689,36 +681,39 @@ class InvObj:
         not_vzehsit = []
         site_counter = 0
         for swr_file in next(os.walk(swr_dir))[2]:
-            if swr_file != Path(self.inv_args.rcaswr_idx).name:
-                # All files except for the index file are delimited by '_', so splitting yields a list of:
-                #   [waste site, waste stream]
+            # All files except for the index file are delimited by '_', so splitting yields a list of:
+            #   [waste site, waste stream]
+            try:
                 site_name, copc = swr_file.upper().replace('.CSV', '').split('_')
-                if site_name not in self.inv_lex:
-                    not_vzehsit.append(site_name)
-                # Normalize the site name used (make all uppercase)
-                site_key = site_name.upper()
-                path = os.path.join(swr_dir, swr_file)
-                for codec in self.inv_args.codec_list:
-                    try:
-                        site_df = csv_parser(path, 4, codec=codec)
-                        break
-                    except:
-                        logging.info("Unsuccessful attempt to parse {} using codec: {}".format(path, codec))
-                        continue
-                # Rename the columns to be consistent with the rest
-                new_copc, new_col = normalize_col_names(copc)
-                site_df[new_col] = site_df["Reduced Activity Release Rate (Ci/year)"]
-                site_df['YEAR'] = site_df["Reduced Year"]
-                site_df = clean_df(site_df, ["Reduced Year", "Reduced Activity Release Rate (Ci/year)"], new_col)
-                # Add a source column to the dataframe
-                site_df['Source'] = "Solid-Waste-Release"
-                if len(site_df) == 0:
+            except ValueError:
+                continue
+            if site_name not in self.inv_lex:
+                not_vzehsit.append(site_name)
+                continue
+            # Normalize the site name used (make all uppercase)
+            site_key = site_name.upper()
+            path = os.path.join(swr_dir, swr_file)
+            for codec in self.inv_args.codec_list:
+                try:
+                    site_df = csv_parser(path, 4, codec=codec)
+                    break
+                except:
+                    logging.info("Unsuccessful attempt to parse {} using codec: {}".format(path, codec))
                     continue
-                if site_key not in new_lex:
-                    site_counter += 1
-                    new_lex[site_key] = {new_copc: site_df}
-                else:
-                    new_lex[site_key][new_copc] = site_df
+            # Rename the columns to be consistent with the rest
+            new_copc, new_col = normalize_col_names(copc)
+            site_df[new_col] = site_df["Reduced Activity Release Rate (Ci/year)"]
+            site_df['YEAR'] = site_df["Reduced Year"]
+            site_df = clean_df(site_df, ["Reduced Year", "Reduced Activity Release Rate (Ci/year)"], new_col)
+            # Add a source column to the dataframe
+            site_df['Source'] = "Solid-Waste-Release"
+            if len(site_df) == 0:
+                continue
+            if site_key not in new_lex:
+                site_counter += 1
+                new_lex[site_key] = {new_copc: site_df}
+            else:
+                new_lex[site_key][new_copc] = site_df
         # Remove 'nan' values from list
         not_vzehsit = remove_nans(not_vzehsit)
         if len(not_vzehsit) > 0:
@@ -893,6 +888,7 @@ class InvObj:
         for site in get_unique_vals(df, site_col):
             if site.upper() not in self.inv_lex:
                 not_vzehsit.append(site.upper())
+                continue
             # Normalize the site name to only have upper case
             site_key = site.upper()
             for copc in chm_inv_cols:
@@ -1280,9 +1276,7 @@ if __name__ == '__main__':
     logging.info("## User arguments provided for tool execution:")
     for arg, value in sorted(vars(args).items()):
         logging.info("{0:<20}: {1}".format(arg, value))
-    if args.rcaswr_idx is not None and args.rcaswr_dir is not None:
-        is_RCASWR_idx(args.rcaswr_idx, args.rcaswr_dir)
-    else:
+    if args.rcaswr_dir is None:
         logging.info("No Solid Waste Releases to be considered in this check.")
     inv_check = InvObj(args)
     # Unpack dictionary into Pandas dataframe
