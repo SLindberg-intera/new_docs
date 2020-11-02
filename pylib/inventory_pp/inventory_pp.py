@@ -265,11 +265,6 @@ parser.add_argument('--RCASWR_dir',
                     type=dir_path,
                     help='Provide the path to the RCASWR work product data directory from the ICF'
                     )
-parser.add_argument('--RCASWR_idx',
-                    dest='rcaswr_idx',
-                    type=str,
-                    help='Provide the filename of the RCASWR index file from the ICF.'
-                    )
 parser.add_argument('--Site_Specific',
                     dest='site_specific',
                     nargs='+',
@@ -599,7 +594,7 @@ class InvObj:
             next(file)
             for line in file:
                 # Read only the first column of each line for the waste site names
-                site = line.upper().split(',')[0]
+                site = line.upper().replace('\n', '').replace('\r', '').split(',')[0]
                 if site != '':
                     yield site.upper()
 
