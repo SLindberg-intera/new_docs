@@ -333,7 +333,7 @@ parser.add_argument('--verbosity',
 parser.add_argument('--legacy',
                     dest='legacy',
                     type=bool,
-                    default=True,
+                    default=False,
                     help='This option spans the code difference, producing an output compatible with the legacy\n'
                          'source-to-stomp tool written for the first iteration of the CA modeling effort.'
                     )
