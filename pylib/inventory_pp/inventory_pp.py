@@ -696,7 +696,10 @@ class InvObj:
                     logging.info("Unsuccessful attempt to parse {} using codec: {}".format(path, codec))
                     continue
             # Rename the columns to be consistent with the rest
-            new_copc, new_col = normalize_col_names(copc)
+            if copc in self.chm_cols:
+                new_copc, new_col = normalize_col_names(copc, chm_col=True)
+            else:
+                new_copc, new_col = normalize_col_names(copc)
             site_df[new_col] = site_df["Reduced Activity Release Rate (Ci/year)"]
             site_df['YEAR'] = site_df["Reduced Year"]
             site_df = clean_df(site_df, ["Reduced Year", "Reduced Activity Release Rate (Ci/year)"], new_col)
