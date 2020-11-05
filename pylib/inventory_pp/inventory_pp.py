@@ -55,6 +55,17 @@ def dir_path(mystr):
         raise IsADirectoryError("Path provided is not a directory: {}".format(mystr))
 
 
+def str2bool(mystr):
+    if isinstance(mystr, bool):
+        return mystr
+    if mystr.lower() in ('true', 't', '1'):
+        return True
+    elif mystr.lower() in ('false', 'f', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected [True|False|T|F|1|0].')
+
+
 def get_unique_vals(df, col):
     for val in df[col].unique():
         yield val
@@ -245,7 +256,7 @@ parser.add_argument('--VZINV',
                     )
 parser.add_argument('--entrain_sim_solids',
                     dest='entrain_sim_solids',
-                    type=bool,
+                    type=str2bool,
                     default=True,
                     help='Flag on whether to include entrained solids as liquid release(s) from the --VZINV file.\n'
                          'Default is [True], which will include entrained solids in the liquid discharges.'
@@ -327,7 +338,7 @@ parser.add_argument('--verbosity',
                     )
 parser.add_argument('--legacy',
                     dest='legacy',
-                    type=bool,
+                    type=str2bool,
                     default=False,
                     help='This option spans the code difference, producing an output compatible with the legacy\n'
                          'source-to-stomp tool written for the first iteration of the CA modeling effort.'
