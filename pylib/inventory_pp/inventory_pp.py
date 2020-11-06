@@ -5,18 +5,47 @@ Company:        INTERA Inc.
 Usage:          This is an inventory preprocessor whose intent is to generate a summary inventory file from many sources
 
 Functional Req's to verify from ca-ipp:
-                1.  Only include inventory information for sites in the VZEHSIT data set
-                2.  Read all input information provided, filtering out records with no temporal or release data (i.e.
-                    no year provided for release or a zero release for a given year)
-                3.  Option to convert "entrained solids" to be liquid source types (represents precipitated waste)
-                4.  Solid Waste Release types should be assigned the waste type "Solid Release Series"
-                5.  Combine the input files such that waste inventory per waste site is incorporated based on the
-                    following order of prioritization:
-                    a.  Rerouted Inventory
-                    b.  Solid Waste Release
-                    c.  SIMV2 Inventory
-                    d.  Chemical Inventory
-                    e.  SAC Water Inventory
+                1.  Accept user arguments at the command line
+                2.  Only sites whose site name is found in the VZEHSIT (site list) file will be included in the output
+                3.  Sites from the SAC are included if no other information is had. Sites with "241-" in its site name
+                    are excluded. The exception to the "241-" exclusion rule are sites with "241-C" in the site name
+                    (case-insensitive), which are included in the final output. Only water releases are considered.
+                4.  The user may identify a list of analytes to process from the input files (including whether to
+                    process water or not).
+                5.  The user may identify a list of analytes to be treated as chemicals. The designation of whether an
+                    analyte is a chemical will determine whether the analyte(s) are parsed from the SIMv2 or Chemical
+                    Inventory files (no other input files are affected by the grouping). Designating analytes as
+                    chemicals also determines the formatting of the output headers for each analyte.
+                6.  If the "entrain solids" is set to "True", the tool will convert SIMv2 records' source type (e.g.
+                    "Solids" vs "Liquid") to "Liquid" where the "Inventory Module" has the matching string "entrained
+                    solids" (case-insensitive).
+                7.  After parsing user-specified analytes from all input files provided (whose sites are found in the
+                    VZEHSIT list), the records are merged into a single file. The rules for merging the various input
+                    files into one output file are thus:
+                    a.  Records parsed from the Site-Specific Inventory file(s)
+                    b.  Records from Solid Waste Release file(s), excluding site(s) found in the Site-Specific Inventory
+                        file(s)
+                    c.  Records from SIMv2, excluding site(s) found in the Site-Specific Inventory file(s)
+                    d.  Records from Chemical Inventory Release, excluding site(s) found in the Site-Specific Inventory
+                        file(s)
+                    e.  Records from the SAC if site(s) not been listed in any other source
+                8.  When writing the output file, waste release information will be grouped on a site-by-site, analyte-
+                    by-analyte, and year-by-year basis
+                9.  The Source/Inventory Module column in the output will include which file(s) contributed to each site
+                    record for every year of waste release included, separated by an underscore character (e.g.
+                    "Chemical-Inventory_SIMv2").
+                10. Supports a standard and a legacy mode. The two output modes are explicityly concerned with how to
+                    format the output file. If the "legacy_mode" option is set to "False" then the output will reflect
+                    the "standard" formatting, and vice versa if the option is set to "True".
+                11. The user may specify the number of significant digits reported, the default is six
+                12. The user may modify the default file encoding to accommodate input files with special characters
+                13. The user may specify string patterns for input file columns corresponding to the site name, year,
+                    and water column. Multiple patterns may be supplied, allowing flexibility in the input files to use
+                    different naming conventions for their site name, year, and water columns.
+                14. After compiling all of the information, the user-specified number of significant figures will be
+                    preserved, rounding to the final digit. The rounding method employed will always break ties in favor
+                    of the next-greatest number. Otherwise the next closest digit is selected. A tolerance of error of
+                    "one" is reserved for any given value at the final significant digit (e.g. 3.14159 +/- 0.00001
 
 Pseudo Code:    The code in general works in the following manner:
                 1.  Read primary sources
