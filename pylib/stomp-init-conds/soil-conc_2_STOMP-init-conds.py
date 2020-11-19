@@ -198,18 +198,18 @@ class STOMP_obj:
         y_dims = []
         z_dims = []
         cell_vols = {'I': [], 'J': [], 'K': [], 'VOLUME': []}
-        for val1, val2 in zip(self.cell_dims['x-dir'], self.cell_dims['x-dir'][:-1]):
+        for val1, val2 in zip(self.cell_dims['x-dir'], self.cell_dims['x-dir'][1:]):
             x_dims.append(val2 - val1)
-        for val1, val2 in zip(self.cell_dims['y-dir'], self.cell_dims['y-dir'][:-1]):
+        for val1, val2 in zip(self.cell_dims['y-dir'], self.cell_dims['y-dir'][1:]):
             y_dims.append(val2 - val1)
-        for val1, val2 in zip(self.cell_dims['z-dir'], self.cell_dims['z-dir'][:-1]):
+        for val1, val2 in zip(self.cell_dims['z-dir'], self.cell_dims['z-dir'][1:]):
             z_dims.append(val2 - val1)
         for i in range(len(x_dims)):
             for j in range(len(y_dims)):
                 for k in range(len(z_dims)):
                     cell_vols['I'].append(i + 1)
-                    cell_vols['J'].append(i + 1)
-                    cell_vols['K'].append(i + 1)
+                    cell_vols['J'].append(j + 1)
+                    cell_vols['K'].append(k + 1)
                     cell_vols['VOLUME'].append(x_dims[i] * y_dims[j] * z_dims[k])
         cell_vols = pd.DataFrame.from_dict(cell_vols)
         return cell_vols
@@ -374,22 +374,25 @@ def soil_to_vol_conc(df, mat_lex, unit_factor):
     df['BULK_DENSITY'] = df['MAT_IDX'].map(mat_lex)
     df['FACTOR'] = unit_factor
     df['INIT_COND'] = df['SOIL_CONC'] * df['BULK_DENSITY'] * df['FACTOR']
-    df = df.loc[df['INIT_COND'] > 0, ['I', 'J', 'K', 'INIT_COND']].copy(deep=True)
-    df.reset_index(drop=True, inplace=True)
     return df
 
 
-def write_init_conds(df, number_format, out_file, ic_col):
+def write_init_conds(df, number_format, out_file, ic_col, solute, sumtotal, units):
     """
     Takes the information pertinent for the STOMP initial conditions card and writes it to a file (STOMP-formatted).
     :param df:              Pandas dataframe with the following columns: I, J, K, ic_col
     :param number_format:   The format to use when preparing the numbers
     :param out_file:        The file path to write to
     :param ic_col:          The column containing the initial conditions to be written to file
+    :param solute:          The name of the solute to be used
+    :param sumtotal:        The total activity or mass to write into the comment/header of the initial conditions card
+    :param units:           The units to display in the comment line for the sumtotal
     :return:
     """
+    # Filter out the unnecessary rows (ic_col > 0 to remove all cells without a concentration
+    df = df.loc[df[ic_col] > 0, :].copy(deep=True)
     # Prepare the card text, STOMP expects the following index pattern: i-start, i-end, j-start, j-end, k-start, k-end
-    df['CARD_TEXT'] = 'Overwrite Solute Volumetric Concentration,NO3,' + \
+    df['CARD_TEXT'] = 'Overwrite Solute Volumetric Concentration,{},'.format(solute) + \
                       df[ic_col].map(number_format.format) + \
                       ',1/m^3,,,,,,,' + \
                       df['I'].astype('str') + \
@@ -417,6 +420,8 @@ def write_init_conds(df, number_format, out_file, ic_col):
     with open(out_file, 'w') as write_file:
         write_file.write('#------------------------------------------------------------------\n')
         write_file.write('~Initial Conditions Card\n')
+        write_file.write('#------------------------------------------------------------------\n')
+        write_file.write('# Contains a total of {:,.2f} {} of {}\n'.format(sumtotal, units.split('/')[0], solute))
         write_file.write('#------------------------------------------------------------------\n')
         write_file.write('Gas Pressure, Aqueous Pressure,\n')
         write_file.write('{},\n'.format(len(df)))
@@ -447,7 +452,7 @@ def write_tecplot_file(df, out_file, number_format, display_units, ic_col):
     write_str += 'ZONE T= "1" I={:>6}, J={:>6}, K={:>6} DATAPACKING=POINT\n'.format(i_max, j_max, k_max)
     write_str += df.to_string(
         columns=['X', 'Y', 'Z', ic_col],
-        formatters={'INIT_COND': number_format.format},
+        formatters={ic_col: number_format.format},
         justify='left',
         header=False,
         index=False
@@ -467,11 +472,11 @@ def calc_total_ic(df, vol_col, ic_col, tot_col='TOTAL_IC'):
     :return:
     """
     df[tot_col] = df[vol_col] * df[ic_col]
-    ic_sum = df[tot_col].sum
+    ic_sum = df[tot_col].sum(axis=0)
     return df, ic_sum
 
 
-def scale_ics(df, factor, tot_col='TOTAL_IC', vol_col='CELL_VOL', scaled_col='INIT_COND_SCALED'):
+def scale_ics(df, factor, tot_col='TOTAL_IC', vol_col='VOLUME', scaled_col='INIT_COND_SCALED', scaled_total='SCALED_TOTAL'):
     """
     Accepts a pandas dataframe with 2 columns: vol_col [CELL_VOL] and tot_col [TOTAL_IC]. The scaling factor is compared
     against the summation of the tot_col, then a scaling factor is determined for scaling all of the cells. After
@@ -481,13 +486,16 @@ def scale_ics(df, factor, tot_col='TOTAL_IC', vol_col='CELL_VOL', scaled_col='IN
     :param factor:          Scaling factor (value to obtain with scaling)
     :param tot_col:         The column with the initial conditions totals
     :param vol_col:         The column with the cell volumes
-    :param scaled_col:  The column to be produced with the scaled initial conditions
+    :param scaled_col:      The column to be produced with the scaled initial conditions
+    :param scaled_total:    The column whose total has been scaled by the scaling factor
     :return:
     """
-    ic_sum = df[tot_col].sum
+    ic_sum = df[tot_col].sum(axis=0)
     multiplier = factor / ic_sum
-    df[scaled_col] = (df[tot_col] * multiplier) / df[vol_col]
-    return df, ic_sum
+    df[scaled_total] = df[tot_col] * multiplier
+    df[scaled_col] = df[scaled_total] / df[vol_col]
+    new_sum = df[scaled_total].sum(axis=0)
+    return df, new_sum
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -507,41 +515,63 @@ if __name__ == '__main__':
     init_conds.reset_index(drop=True, inplace=True)
     # Parse needed information from the STOMP card
     stomp_info = STOMP_obj(args.stomp_input)
-    # Assign the material indices to each node
+    # Assign the material indices and volumes to each node
     zone_df = parse_zone_file(stomp_info.zonation_path, stomp_info.I_len, stomp_info.J_len, stomp_info.K_len)
     init_conds = pd.merge(init_conds, zone_df, how='left', on=['I', 'J', 'K'])
+    init_conds = pd.merge(init_conds, stomp_info.volumes, how='left', on=['I', 'J', 'K'])
     # Calculate the volumetric concentrations and then create a totals column (also calculating the total)
-    final_df = soil_to_vol_conc(init_conds, stomp_info.soil_lex, args.factor)
-    final_df, total_ic = calc_total_ic(final_df, )
+    init_conds = soil_to_vol_conc(init_conds, stomp_info.soil_lex, args.factor)
+    init_conds, total_ic = calc_total_ic(df=init_conds, vol_col='VOLUME', ic_col='INIT_COND')
     # Write the initial conditions to file
-    init_conds_file = write_init_conds(final_df, args.out_format, Path(args.output_directory, args.output_file_name), 'INIT_COND')
+    init_conds_file = write_init_conds(
+        df=init_conds,
+        number_format=args.out_format,
+        out_file=Path(args.output_directory, args.output_file_name),
+        ic_col='INIT_COND',
+        solute=args.solute_name,
+        sumtotal=total_ic,
+        units=args.display_units
+    )
     # Write out the Tecplot file for visualizing the initial conditions recently generated.
     tec_file = Path(args.output_directory, '{}_tecplot.dat'.format(init_conds_file.stem))
-    write_tecplot_file(init_conds, tec_file, args.out_format, args.display_units, 'INIT_COND')
+    write_tecplot_file(
+        df=init_conds,
+        out_file=tec_file,
+        number_format=args.out_format,
+        display_units=args.display_units,
+        ic_col='INIT_COND'
+    )
     # If a scaling factor was asked for, then create a new initial conditions file that scales the total mass/activity
     # to the desired value and produce a separate file.
     if args.scale_factor is not None:
-        scaled_df = scale_ics(init_conds, args.scale_factor)
+        init_conds, scaled_total = scale_ics(init_conds, args.scale_factor)
         scaled_filename = Path(
             args.output_directory,
-            '{0}_scaled{1}'.format(str(Path(args.output_file_name).stem), str(Path(args.output_file_name).suffix))
+            '{0}_scaled{1}'.format(
+                str(Path(args.output_file_name).stem),
+                str(Path(args.output_file_name).suffix)
+            )
         )
-        final_scaled_df = scaled_df.loc[scaled_df['INIT_COND_SCALED'] > 0, ['I', 'J', 'K', 'INIT_COND_SCALED']].copy(deep=True)
-        write_init_conds(scaled_df, args.out_format, scaled_filename, 'INIT_COND_SCALED')
+        init_conds_file = write_init_conds(
+            df=init_conds,
+            number_format=args.out_format,
+            out_file=scaled_filename,
+            ic_col='INIT_COND_SCALED',
+            solute=args.solute_name,
+            sumtotal=scaled_total,
+            units=args.display_units
+        )
         scaled_tec = Path(args.output_directory, '{}_tecplot.dat'.format(scaled_filename.stem))
-        write_tecplot_file()
-        # Write out the detailed table for debugging purposes
-        detail_file = Path(args.output_directory, '{}_detail.csv'.format(init_conds_file.stem))
-        scaled_df.to_csv(
-            path_or_buf=detail_file,
-            columns=['I', 'J', 'K', 'SOIL_CONC', 'MAT_IDX', 'BULK_DENSITY', 'FACTOR', 'INIT_COND', 'INIT_COND_SCALED'],
-            index=False
+        write_tecplot_file(
+            df=init_conds,
+            out_file=scaled_tec,
+            number_format=args.out_format,
+            display_units=args.display_units,
+            ic_col='INIT_COND_SCALED'
         )
-    else:
-        # Write out the detailed table for debugging purposes
-        detail_file = Path(args.output_directory, '{}_detail.csv'.format(init_conds_file.stem))
-        init_conds.to_csv(
-            path_or_buf=detail_file,
-            columns=['I', 'J', 'K', 'SOIL_CONC', 'MAT_IDX', 'BULK_DENSITY', 'FACTOR', 'INIT_COND'],
-            index=False
-        )
+    # Write out the detailed table for debugging purposes
+    detail_file = Path(args.output_directory, '{}_detail.csv'.format(init_conds_file.stem))
+    init_conds.to_csv(
+        path_or_buf=detail_file,
+        index=False
+    )
