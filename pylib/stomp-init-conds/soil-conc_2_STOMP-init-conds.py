@@ -67,6 +67,18 @@ def str_2_func(eq_list):
     return no3_to_tc99
 
 
+def str_2_bool(mystr):
+    mystr = mystr.lower()
+    trues = ['t', 'true', '1']
+    falses = ['f', 'false', '0']
+    if mystr in trues:
+        return True
+    elif mystr in falses:
+        return False
+    else:
+        raise ValueError("Could not resolve argument to boolean: {}".format(mystr))
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # User Input (Parser)
 
@@ -107,7 +119,6 @@ parser.add_argument('--COPC_columns',
                     dest='COPC_columns',
                     nargs='+',
                     type=str.upper,
-                    required=True,
                     help='This script only processes one COPC. However, it can accept multiple columns of the same\n'
                          'COPC, but what this will do is take the maximum of the columns given for each point.'
                     )
@@ -163,8 +174,16 @@ parser.add_argument('--no3_to_tc99',
                          'and the second value must be the exponent. The equation these will be fitted to is of\n'
                          'the following format: scalar * no3_value ^ exponent.'
                     )
+parser.add_argument('--kt3d',
+                    dest='kt3d',
+                    type=str_2_bool,
+                    default=False,
+                    help='If the input concentrations file is formatted output from the KT3D tool from GSLIB, set\n'
+                         'this flag to "True" and the script will process the KT3D output. Default is [False]'
+                    )
 args = parser.parse_args()
-args.no3_to_tc99 = str_2_func(args.no3_to_tc99)
+if args.no3_to_tc99 is not None:
+    args.no3_to_tc99 = str_2_func(args.no3_to_tc99)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -194,6 +213,51 @@ def parse_csv(path, header='infer', usecols=None):
         )
     # Make all of the column headers uppercase
     df.columns = map(str.upper, df.columns)
+    return df
+
+
+def parse_kt3d(filepath, i_max, j_max, k_max, header_lines=9):
+    """
+    Expects a KT3D file output format: 9 header rows and 7 columns of data space-delimited. The columns of interest are
+    columns 1, 2, 3, 5 (x, y, z, estimate). This also assumes that the KT3D-formatted file was written such that
+    x is incremented first, then y, then z. Numbering will be pulled from the STOMP file.
+    :param filepath:        File path to read
+    :param i_max:           The maximum number of i-dir cells
+    :param j_max:           The maximum number of j-dir cells
+    :param k_max:           The maximum number of k-dir cells
+    :param header_lines:    The number of header lines to skip
+    :return:
+    """
+    file_text = Path(filepath).read_text()
+    file_text = file_text.replace('\r', '\n').replace('\n\n', '\n').split('\n')
+    df_data = {'X': [], 'Y': [], 'Z': [], 'I': [], 'J': [], 'K': [], 'SOIL_CONC': []}
+    # Set up the I, J, K indexing
+    i = 1
+    j = 1
+    k = 1
+    for line in file_text[header_lines:]:
+        if line == '':
+            continue
+        line = list(map(float, line.split()))
+        df_data['X'].append(line[0])
+        df_data['Y'].append(line[1])
+        df_data['Z'].append(line[2])
+        df_data['I'].append(i)
+        df_data['J'].append(j)
+        df_data['K'].append(k)
+        df_data['SOIL_CONC'].append(line[4])
+        i += 1
+        if i > i_max:
+            i = 1
+            j += 1
+        if j > j_max:
+            j = 1
+            k += 1
+        if k > k_max + 1:
+            raise ValueError(
+                "The file provided has more cells than the STOMP model has defined in its grid card: {}".format(filepath)
+            )
+    df = pd.DataFrame.from_dict(data=df_data)
     return df
 
 
@@ -518,23 +582,26 @@ def scale_ics(df, factor, tot_col='TOTAL_IC', vol_col='VOLUME', scaled_col='INIT
 # ----------------------------------------------------------------------------------------------------------------------
 # Main Program
 if __name__ == '__main__':
+    # Parse needed information from the STOMP card
+    stomp_info = STOMP_obj(args.stomp_input)
     # Build the dataframe of the concentrations
-    init_conds = parse_csv(
-        args.centroids_w_concs,
-    )
-    # Unify the concentration columns into one by taking the maximum of the "COPC_columns"
-    init_conds['SOIL_CONC'] = init_conds[args.COPC_columns].max(axis=1)
+    if args.kt3d is False:
+        if args.COPC_columns is None:
+            raise ValueError("For parsing Leapfrog data, you must include the --COPC_columns flag with the right\n"
+                             "column names.")
+        init_conds = parse_csv(
+            args.centroids_w_concs,
+        )
+        # Unify the concentration columns into one by taking the maximum of the "COPC_columns"
+        init_conds['SOIL_CONC'] = init_conds[args.COPC_columns].max(axis=1)
+        init_conds.drop(columns=args.COPC_columns, inplace=True)
+    elif args.kt3d is True:
+        init_conds = parse_kt3d(args.centroids_w_concs, stomp_info.I_len, stomp_info.J_len, stomp_info.K_len)
     # Set values to zero if they are less than the specified threshold
     init_conds.loc[init_conds['SOIL_CONC'] < args.threshold, 'SOIL_CONC'] = 0
-    init_conds.drop(columns=args.COPC_columns, inplace=True)
     # If converting to Tc-99
     if args.no3_to_tc99 is not None:
         init_conds.loc[init_conds['SOIL_CONC'] > 0, 'SOIL_CONC'] = init_conds.loc[init_conds['SOIL_CONC'] > 0, 'SOIL_CONC'].apply(lambda x: args.no3_to_tc99(x))
-    # Sort the dataframe by the indices: I > J > K (levels)
-    init_conds.sort_values(by=['I', 'J', 'K'], axis=0, ascending=True, inplace=True)
-    init_conds.reset_index(drop=True, inplace=True)
-    # Parse needed information from the STOMP card
-    stomp_info = STOMP_obj(args.stomp_input)
     # Assign the material indices and volumes to each node
     zone_df = parse_zone_file(stomp_info.zonation_path, stomp_info.I_len, stomp_info.J_len, stomp_info.K_len)
     init_conds = pd.merge(init_conds, zone_df, how='left', on=['I', 'J', 'K'])

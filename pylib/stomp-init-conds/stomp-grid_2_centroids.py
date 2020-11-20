@@ -68,6 +68,15 @@ parser.add_argument('-m', '--model_name',
                     default='ModelName',
                     help='The name of the model, default is [ModelName].'
                     )
+parser.add_argument('--out_format',
+                    dest='out_format',
+                    type=str.upper,
+                    choices=['LEAPFROG', 'KT3D'],
+                    default='LEAPFROG',
+                    help='This flag should be used if a specific output format is desired. Accepted options consist \n'
+                         'of "KT3D" or "LEAPFROG". The default is [LEAPFROG]. These formats correspond with the\n'
+                         'software intended to read the output file from this script.'
+                    )
 args = parser.parse_args()
 
 
@@ -129,21 +138,23 @@ def parse_grid_line(line_str):
     return centroids
 
 
-# ----------------------------------------------------------------------------------------------------------------------
-# Main Program
-if __name__ == '__main__':
-    # Parse the STOMP input file to pull out the STOMP grid cell centroids in x, y, and z directions
-    i_dir, j_dir, k_dir = parse_STOMP_grid(args.STOMP_input_file)
-    # Build a unified list in the output file
+def gen_leapfrog_text(i_list, j_list, k_list):
+    """
+    Prepares a string from the lists in 3D that conforms with the formatting requirements for use in Leapfrog Models.
+    :param i_list:  List of i-dir locations
+    :param j_list:  List of j-dir locations
+    :param k_list:  List of k-dir locations
+    :return:
+    """
     cell_centers = ['I,J,K,X,Y,Z,STOMP Model']
     i_counter = 0
-    for i in i_dir:
+    for i in i_list:
         i_counter += 1
         j_counter = 0
-        for j in j_dir:
+        for j in j_list:
             j_counter += 1
             k_counter = 0
-            for k in k_dir:
+            for k in k_list:
                 k_counter += 1
                 cell_centers.append('{0},{1},{2},{3},{4},{5},{6}'.format(
                     i_counter,
@@ -155,6 +166,43 @@ if __name__ == '__main__':
                     args.model_name
                 ))
     cell_centers = '\n'.join(cell_centers)
+    return cell_centers
+
+
+def gen_kt3d_text(i_list, j_list, k_list, modelname):
+    """
+    Prepares a string from the lists in 3D that conforms with the formatting requirements for use in KT3D GSLIB Models.
+    :param i_list:  List of i-dir locations
+    :param j_list:  List of j-dir locations
+    :param k_list:  List of k-dir locations
+    :return:
+    """
+    cell_centers = [modelname, '4', 'Xlocation', 'Ylocations', 'Zlocation', 'Primary']
+    primary_counter = 1
+    for k in k_list:
+        for j in j_list:
+            for i in i_list:
+                cell_centers.append('{0}\t{1}\t{2}\t{3}'.format(
+                    i,
+                    j,
+                    k,
+                    primary_counter
+                ))
+                primary_counter += 1
+    cell_centers = '\n'.join(cell_centers)
+    return cell_centers
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Main Program
+if __name__ == '__main__':
+    # Parse the STOMP input file to pull out the STOMP grid cell centroids in x, y, and z directions
+    i_dir, j_dir, k_dir = parse_STOMP_grid(args.STOMP_input_file)
+    # Build a unified list in the output file
+    if args.out_format == 'LEAPFROG':
+        centroid_text = gen_leapfrog_text(i_dir, j_dir, k_dir)
+    elif args.out_format == 'KT3D':
+        centroid_text = gen_kt3d_text(i_dir, j_dir, k_dir, args.model_name)
     # Write to a file
     outfile = Path(args.output_directory, args.output_file_name)
-    outfile.write_text(data=cell_centers)
+    outfile.write_text(data=centroid_text)
