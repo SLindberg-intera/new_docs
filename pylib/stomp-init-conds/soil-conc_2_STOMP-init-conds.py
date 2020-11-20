@@ -59,6 +59,14 @@ def positive_float(mystr):
         raise e
 
 
+def str_2_func(eq_list):
+    scalar, power = eq_list
+
+    def no3_to_tc99(val):
+        return scalar * (val ** power)
+    return no3_to_tc99
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # User Input (Parser)
 
@@ -147,7 +155,16 @@ parser.add_argument('--display_units',
                     help='This is to define the units of the final output (relevant to the Tecplot file only).\n'
                          'The default is [kg/m^3].'
                     )
+parser.add_argument('--no3_to_tc99',
+                    dest='no3_to_tc99',
+                    nargs=2,
+                    type=float,
+                    help='Provide two values (floats or integers are accepted). The first value must be the scalar \n'
+                         'and the second value must be the exponent. The equation these will be fitted to is of\n'
+                         'the following format: scalar * no3_value ^ exponent.'
+                    )
 args = parser.parse_args()
+args.no3_to_tc99 = str_2_func(args.no3_to_tc99)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -510,6 +527,9 @@ if __name__ == '__main__':
     # Set values to zero if they are less than the specified threshold
     init_conds.loc[init_conds['SOIL_CONC'] < args.threshold, 'SOIL_CONC'] = 0
     init_conds.drop(columns=args.COPC_columns, inplace=True)
+    # If converting to Tc-99
+    if args.no3_to_tc99 is not None:
+        init_conds.loc[init_conds['SOIL_CONC'] > 0, 'SOIL_CONC'] = init_conds.loc[init_conds['SOIL_CONC'] > 0, 'SOIL_CONC'].apply(lambda x: args.no3_to_tc99(x))
     # Sort the dataframe by the indices: I > J > K (levels)
     init_conds.sort_values(by=['I', 'J', 'K'], axis=0, ascending=True, inplace=True)
     init_conds.reset_index(drop=True, inplace=True)
