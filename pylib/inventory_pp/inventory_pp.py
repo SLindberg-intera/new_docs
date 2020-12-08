@@ -262,7 +262,7 @@ def legacy_col_formatter(col_str, year_col=None, water_col=None, site_col=None, 
         # Split and capitalize, but don't capitalize the string if it is "kg"
         new_col, units = [substr.capitalize() if substr != 'kg' else substr for substr in col_str.split('(')]
         # Catch the nitrate case for capitalizing the column
-        if new_col.lower == 'no3' or new_col.lower == 'cn':
+        if new_col.lower() == 'no3' or new_col.lower() == 'cn':
             new_col = new_col.upper()
     return new_col, units
 
