@@ -202,7 +202,7 @@
 		},
 		{"name":"CIE Mass Balance STOMP Input File Generator Tool", "command":"xprt_mb_input_gen_cie_linux-intel-64.exe", "description":"qualified on 09.24.2020; this tool generates generates the mass balance STOMP transport input file"
 		},
-		{"name":"Inventory Preprocessing Tool", "command":"inventory_pp.py", "description":"qualified on 11.20.2020; this tool to create a comprehensive data set consisting of radionuclide and/or chemical aqueous volume releases as a function of time for Central Plateau sites"
+		{"name":"Inventory Preprocessing Tool", "command":"inventory_pp.py", "description":"v1.1 qualified on 12.08.2020; this tool to create a comprehensive data set consisting of radionuclide and/or chemical aqueous volume releases as a function of time for Central Plateau sites"
 		}
 
   ],
