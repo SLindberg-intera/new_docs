@@ -1,0 +1,7 @@
+INFO--02/04/2020 10:44:23 AM--Starting CA-CIE Tool Runner.	Logging to "./testlog/fingerprint.py_TC-1_logfile.txt"
+INFO--02/04/2020 10:44:23 AM--Invoking: 	Command:"python"	Arguments:"../../CA-CIE-Tools-TestRepos/fingerprint1p2/CA-CIE-Tools/pylib/fingerprint/fingerprint.py testfile.txt -o ./testlog/fingerprint.py_TC-1_fingerprint.txt"
+INFO--02/04/2020 10:44:23 AM--Code Version: 1f1673849bd63b1795ee57fe48b0a237a91663d6 v1.1: ../../../../../../opt/tools/pylib/runner/runner.py
+INFO--02/04/2020 10:44:23 AM--Code Version: 2a5b132b490181ae24644bbe815941246172e6bc Local repo SHA-1 has does not correspond to a remote repo release version: ../../CA-CIE-Tools-TestRepos/fingerprint1p2/CA-CIE-Tools/pylib/fingerprint/fingerprint.py
+INFO--02/04/2020 10:44:23 AM--QA Status: QUALIFIED : ../../../../../../opt/tools/pylib/runner/runner.py
+INFO--02/04/2020 10:44:23 AM--QA Status: TEST : ../../CA-CIE-Tools-TestRepos/fingerprint1p2/CA-CIE-Tools/pylib/fingerprint/fingerprint.py
+INFO--02/04/2020 10:44:23 AM--Username:chall	Computer:olive	Platform:Linux 4.4.0-38-generic #57~14.04.1-Ubuntu SMP Tue Sep 6 17:20:43 UTC 2016

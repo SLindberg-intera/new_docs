@@ -1,0 +1,1 @@
+This is another file to be used in the acceptance testing of the fingerprint tool.

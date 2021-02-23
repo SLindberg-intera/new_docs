@@ -1,0 +1,3 @@
+Fingerprint generated at 2020-02-04 11:02:47.510244
+fingerprint_test.zip	e2c5533f26b8d1cbb27a8b3dbc7cc3e1f8eac608c40622379ee0c1261cddf1f6
+

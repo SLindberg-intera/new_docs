@@ -1,0 +1,1 @@
+python ../../../../../../opt/tools/pylib/runner/runner.py --logfile ./testlog/fingerprint.py_TC-1_logfile.txt --logfilemode w "python" "../../CA-CIE-Tools-TestRepos/fingerprint1p2/CA-CIE-Tools/pylib/fingerprint/fingerprint.py testfile.txt -o ./testlog/fingerprint.py_TC-1_fingerprint.txt"

@@ -1,0 +1,1 @@
+This is a test document for the acceptance testing of the fingerprint tool for the CA Quality Assurance Program
