@@ -1,0 +1,9 @@
+INFO--03/11/2020 07:33:28 AM--Starting CA-CIE Tool Runner.	Logging to "./runner_regridding_logfile.txt"
+INFO--03/11/2020 07:33:28 AM--Code Version: d78a9d7a967d9c2938d60f8abbd2f4d01348ff16 v1.15: /opt/tools/pylib/runner/runner.py<--1bcfd6779e9cbdb82673405873a8e5e81514ae27
+
+INFO--03/11/2020 07:33:28 AM--Code Version: 32fb0eba5a22ae42d9c1011f2673d85b4c0bde6d Local repo SHA-1 has does not correspond to a remote repo release version: ../../../CA-CIE-Tools-TestRepos/ca-surf_qa/CA-CIE-Tools/pylib/ca-surf/ca_build_surface_flux.py<--95e91b93a652a0af15310bf9d86a726d06fd1394
+
+INFO--03/11/2020 07:33:28 AM--QA Status: QUALIFIED : /opt/tools/pylib/runner/runner.py
+INFO--03/11/2020 07:33:28 AM--QA Status: TEST : ../../../CA-CIE-Tools-TestRepos/ca-surf_qa/CA-CIE-Tools/pylib/ca-surf/ca_build_surface_flux.py
+INFO--03/11/2020 07:33:28 AM--Invoking Command:"python3.6"	with Arguments:"../../../CA-CIE-Tools-TestRepos/ca-surf_qa/CA-CIE-Tools/pylib/ca-surf/ca_build_surface_flux.py -c C-14 Cl-36 H-3 I-129 Np-237 Re-187 Sr-90 Tc-99 -shp ../grid_attempt1/grid_attempt1.shp -i ../ss/input_SS -s mpond -o ./rad1_surface_flux.txt"
+INFO--03/11/2020 07:33:28 AM--Username:nmondragon	Computer:olive	Platform:Linux 4.4.0-38-generic #57~14.04.1-Ubuntu SMP Tue Sep 6 17:20:43 UTC 2016
