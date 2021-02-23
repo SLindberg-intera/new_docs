@@ -1,0 +1,7 @@
+Fingerprint generated at 2020-02-04 13:47:01.942365
+testfileMultiLine.txt	d76d70db70546d129caec7339d338c7e267a022f92b50efdb25d3836f31a0637
+
+line section [0,1); 0-indexed	48832f8dc7fb7bbceaec7db63d1960fc4856bca44b973c1aea53a2f5e6d549f4
+Fingerprint generated at 2020-02-04 13:47:02.283357
+testfileMultiLineLine1.txt	48832f8dc7fb7bbceaec7db63d1960fc4856bca44b973c1aea53a2f5e6d549f4
+
